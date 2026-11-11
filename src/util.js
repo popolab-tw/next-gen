@@ -95,6 +95,13 @@ var U = (function () {
   // 色盲友善模式（封面切換，存在本機）
   function cvd() { return document.documentElement.getAttribute('data-cvd') === '1'; }
   function setCvd(on) { if (on) document.documentElement.setAttribute('data-cvd', '1'); else document.documentElement.removeAttribute('data-cvd'); store.set('cvd', !!on); }
+  // 深淺色：預設跟著系統；在封面切換後記住（data-theme = light／dark）
+  function theme() { var t = document.documentElement.getAttribute('data-theme'); if (t === 'dark' || t === 'light') return t; try { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (e) { return 'light'; } }
+  function setTheme(t, keep) {
+    document.documentElement.setAttribute('data-theme', t);
+    if (keep !== false) store.set('theme', t);
+    try { [].forEach.call(document.querySelectorAll('meta[name="theme-color"]'), function (m) { m.setAttribute('content', t === 'dark' ? '#0d1210' : '#e9eee9'); }); } catch (e) { /* 忽略 */ }
+  }
   function isDark() { try { return /dark/.test(getComputedStyle(document.documentElement).colorScheme || ''); } catch (e) { return false; } }
   function hex3(c) { c = String(c || '').trim(); if (c[0] === '#' && c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3]; var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c); if (m) return [+m[1], +m[2], +m[3]]; return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16) || 0; }); }
   function mix(a, b, t) { var x = hex3(a), y = hex3(b); return 'rgb(' + x.map(function (v, i) { return Math.round(v + (y[i] - v) * t); }).join(',') + ')'; }
@@ -185,5 +192,5 @@ var U = (function () {
     var s = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : '') + '>' + (ICONS[name] || '') + '</svg>';
     var t = document.createElement('template'); t.innerHTML = s; return t.content.firstChild;
   }
-  return { task: task, safe: safe, report: report, onError: onError, modalOpen: modalOpen, h: h, svg: svg, clear: clear, sep: sep, wan: wan, wan1: wan1, yuan: yuan, monthly: monthly, pr: prFmt, topPct: topPct, thUp: thUp, cn: cn, debounce: debounce, store: store, toast: toast, cssVar: cssVar, reduceMotion: reduceMotion, cvd: cvd, setCvd: setCvd, isDark: isDark, mix: mix, copy: copy, modal: modal, confirmAmount: confirmAmount, icon: icon };
+  return { task: task, safe: safe, report: report, onError: onError, modalOpen: modalOpen, h: h, svg: svg, clear: clear, sep: sep, wan: wan, wan1: wan1, yuan: yuan, monthly: monthly, pr: prFmt, topPct: topPct, thUp: thUp, cn: cn, debounce: debounce, store: store, toast: toast, cssVar: cssVar, reduceMotion: reduceMotion, cvd: cvd, setCvd: setCvd, theme: theme, setTheme: setTheme, isDark: isDark, mix: mix, copy: copy, modal: modal, confirmAmount: confirmAmount, icon: icon };
 })();

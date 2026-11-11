@@ -206,6 +206,7 @@ var COMM = (function () {
     d.perChild = Math.round(res.perChild / 1e5) * 1e5;
     d.expPR = Math.round(res.hhExpensePR);
     d.childSubs = Math.round((res.childSubs || 0) / 1e5) * 1e5;
+    d.sv = 2;   // 標準門檻的算法版本：2 ＝「已經有房子」保留自己的房貸（2026-10-24 起）
     return d;
   }
   // 意見與回報：送到資料庫的 feedback 表（只有作者看得到）

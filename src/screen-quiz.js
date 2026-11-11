@@ -551,12 +551,13 @@
   function consentModal(after) {
     U.modal(function (box, close) {
       box.appendChild(h('h3', {}, '要匿名分享你的設定嗎？'));
-      box.appendChild(h('p', {}, '分享後，其他人會在題目旁看到「大家怎麼選」，你也能在報告裡看到自己在所有分享者中的位置。'));
+      box.appendChild(h('p', {}, '分享後，其他人會在題目旁看到「大家怎麼選」，你也能在報告裡看到自己在所有分享者中的位置。你也會成為 NEXT GEN 網站「全台分享地圖」上的一個匿名小點（地圖定期更新）。'));
       box.appendChild(h('ul', {},
         h('li', {}, '會分享：縣市與區域、孩子數、每一題的選擇、收入 PR（四捨五入到 5）、年齡區間（每 5 歲一組）、審查結果。'),
+        h('li', {}, '在地圖上點小點，可以看到年齡區間、縣市與區域、住法、孩子數、門檻 PR 與收入 PR。小點的位置是在縣市裡隨機分布的，不是你的住址；分享少於 5 筆的縣市不顯示收入 PR 與審查結果。'),
         h('li', {}, '不會分享：姓名、帳號資料、確切年齡、確切年薪、存款與貸款金額。'),
         h('li', {}, '只會分享這次送出的答案。之後修改或在報告裡調整設定都不會覆蓋，除非你在報告裡按「更新」。'),
-        h('li', {}, COMM.st.backend === 'web' ? '隨時可以在報告頁取消分享，資料會刪除（請用同一台裝置的同一個瀏覽器）。' : '隨時可以在報告頁取消分享，資料會刪除。')));
+        h('li', {}, COMM.st.backend === 'web' ? '隨時可以在報告頁取消分享，資料會刪除（請用同一台裝置的同一個瀏覽器）；地圖在下次更新時移除。' : '隨時可以在報告頁取消分享，資料會刪除。')));
       box.appendChild(h('div', { class: 'actions' },
         h('button', { class: 'btn ghost', onclick: function () { A.consent = false; U.store.set('consent', false); close(); after(); } }, '不分享'),
         h('button', { class: 'btn', onclick: function () { A.consent = true; U.store.set('consent', true); close(); after(); } }, '匿名分享')));

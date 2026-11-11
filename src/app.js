@@ -191,6 +191,7 @@ var APP = (function () {
   // ---------- 啟動 ----------
   A.start = function () {
     if (U.store.get('cvd', false)) document.documentElement.setAttribute('data-cvd', '1');
+    var th0 = U.store.get('theme', null); if (th0 === 'dark' || th0 === 'light') U.setTheme(th0, false);
     // 任何未預期的錯誤：記錄並提示，不讓畫面默默卡住
     var lastErrToast = 0;
     U.onError(function () { COMM.diag('error'); var now = Date.now(); if (now - lastErrToast > 4000) { lastErrToast = now; U.toast('發生錯誤，已記錄下來。可以重新整理後再試一次。'); } });

@@ -1,0 +1,155 @@
+/* ===================== NEXT GEN：全台分享地圖（3D） ===================== */
+.vz { --vz-glass-rgb: 255, 255, 255; --vz-glass-b: rgba(17, 17, 19, .12); --vz-bg: #ffffff; --vz-ink: #111113; --vz-ink-2: rgba(17, 17, 19, .62); --vz-ink-3: rgba(17, 17, 19, .42); --vz-rule: rgba(17, 17, 19, .16); --vz-chip: rgba(17, 17, 19, .04);
+  --vz-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Noto Sans TC", monospace;
+  background: var(--vz-bg); color: var(--vz-ink); border-top: 1px solid var(--vz-rule); padding: 64px 0 28px; font-family: var(--f-sans); width: 100%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .vz { --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); } }
+:root[data-theme="dark"] .vz { --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); }
+.vz-in { max-width: 1180px; margin: 0 auto; padding-inline: 24px; }
+.vz-k { display: flex; gap: 14px; font-family: var(--vz-mono); font-size: 11px; letter-spacing: .14em; color: var(--vz-ink-2); text-transform: uppercase; border-top: 1px solid var(--vz-ink); padding-top: 8px; }
+.vz-k span:last-child { margin-left: auto; }
+.vz-title { font-family: var(--f-sans); font-weight: 700; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.12; letter-spacing: -.01em; margin: 26px 0 14px; }
+.vz-lede { max-width: 40em; font-size: 15px; line-height: 1.7; color: var(--vz-ink-2); margin: 0 0 26px; }
+.vz-body { position: relative; }
+.vz-filters { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; padding: 0 max(24px, calc((100% - 1180px) / 2 + 24px)); border-bottom: 1px solid var(--vz-rule); position: sticky; top: calc(54px + env(safe-area-inset-top, 0px)); z-index: 6; background: var(--vz-bg); }
+.vz-filters::-webkit-scrollbar { display: none; }
+.vz-chip { flex: none; appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--vz-ink-2); font: 500 13.5px/1 var(--f-sans); padding: 13px 13px 11px; cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+.vz-chip:hover { color: var(--vz-ink); }
+.vz-chip.on { color: var(--vz-ink); border-bottom-color: var(--vz-ink); font-weight: 700; }
+.vz-chip:focus-visible, .vz-btn:focus-visible, .vz-x:focus-visible { outline: 2px solid var(--vz-ink); outline-offset: -2px; }
+.vz-stage { position: relative; height: clamp(560px, 86vh, 980px); height: clamp(560px, 86svh, 980px); overflow: hidden; background: var(--vz-bg); }
+.vz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; -webkit-tap-highlight-color: transparent; }
+.vz-canvas:active { cursor: grabbing; }
+.vz-msg { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--vz-mono); font-size: 12px; letter-spacing: .08em; color: var(--vz-ink-3); pointer-events: none; }
+.vz-wait { display: grid; }
+.vz-labels, .vz-leads { position: absolute; inset: 0; pointer-events: none; }
+.vz-lbl { position: absolute; left: 0; top: 0; font-size: 12px; line-height: 1.35; color: var(--vz-ink); will-change: transform; pointer-events: auto; appearance: none; background: none; border: 0; padding: 0; margin: 0; text-align: left; font-family: inherit; cursor: pointer; opacity: 0; transition: opacity .45s ease; }
+.vz-lbl.in { opacity: 1; }
+.vz-lbl.in.dim { opacity: .38; }
+.vz-lbl.in.dim:hover { opacity: .75; }
+.vz-lbl.out { opacity: 0; pointer-events: none; }
+.vz-lbl.ref { pointer-events: none; cursor: default; }
+.vz-lbl:not(.ref):hover b { text-decoration: underline; text-underline-offset: 3px; }
+.vz-lbl.on b { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.vz-lbl:focus-visible { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
+.vz-back { position: absolute; left: 24px; bottom: 76px; display: inline-flex; align-items: center; gap: 2px; appearance: none; background: var(--vz-bg); color: var(--vz-ink); border: 1px solid var(--vz-rule); border-radius: 2px; font: 500 12px/1 var(--f-sans); padding: 6px 10px 6px 4px; cursor: pointer; z-index: 2; }
+.vz-back svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.vz-tg { display: flex; align-items: center; gap: 8px; margin: 12px 0 2px; color: var(--vz-ink-2); cursor: pointer; white-space: nowrap; }
+.vz-tg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.vz-tg i { width: 28px; height: 16px; border-radius: 8px; background: var(--vz-rule); position: relative; transition: background .2s; flex: none; }
+.vz-tg i::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--vz-bg); transition: transform .2s; }
+.vz-tg input:checked + i { background: var(--vz-ink); }
+.vz-tg input:checked + i::after { transform: translateX(12px); }
+.vz-tg input:focus-visible + i { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
+.vz-back:hover { border-color: var(--vz-ink); }
+.vz-hint { position: absolute; left: 24px; top: 14px; font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .04em; color: var(--vz-ink-3); pointer-events: none; transition: opacity .8s ease; }
+.vz-hint.gone { opacity: 0; }
+.vz-canvas.panning { cursor: move; }
+.vz-btn.on { background: var(--vz-ink); color: var(--vz-bg); border-color: var(--vz-ink); }
+.vz-set { position: absolute; right: 24px; bottom: 64px; width: 284px; color: var(--vz-ink); padding: 10px 14px 12px; font-size: 12px; z-index: 5; max-height: calc(100% - 84px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.vz-set, .vz-card { border-radius: 16px; border: 1px solid var(--vz-glass-b); background: rgba(var(--vz-glass-rgb), var(--vz-glass-a, .3)); -webkit-backdrop-filter: blur(var(--vz-glass-blur, 16px)) saturate(1.15); backdrop-filter: blur(var(--vz-glass-blur, 16px)) saturate(1.15); }   /* 扁平霧玻璃：透明度與模糊（散射）可以在設定裡調 */
+.vz-set-h { display: flex; justify-content: space-between; align-items: center; font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .12em; color: var(--vz-ink-2); padding-bottom: 4px; }
+.vz-sl { display: grid; grid-template-columns: 6.6em minmax(0, 1fr) 3.2em; align-items: center; gap: 8px; margin: 6px 0; }
+.vz-sl > span { color: var(--vz-ink-2); white-space: nowrap; }
+.vz-sl b { font-family: var(--vz-mono); font-weight: 500; color: var(--vz-ink); text-align: right; font-size: 11px; }
+.vz-sl input { -webkit-appearance: none; appearance: none; width: 100%; height: 18px; background: transparent; margin: 0; cursor: pointer; }
+.vz-sl input::-webkit-slider-runnable-track { height: 2px; background: var(--vz-rule); }
+.vz-sl input::-moz-range-track { height: 2px; background: var(--vz-rule); }
+.vz-sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--vz-ink); margin-top: -6px; border: 0; }
+.vz-sl input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--vz-ink); border: 0; }
+.vz-sl input:focus-visible { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
+.vz-set-t { color: var(--vz-ink-2); margin: 10px 0 6px; }
+.vz-tgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin: 10px 0 4px; }
+.vz-tgs .vz-tg { margin: 0; }
+.vz-set-n { font-size: 10px; color: var(--vz-ink-3); line-height: 1.45; margin-top: 6px; }
+.vz-pals { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.vz-pal { appearance: none; background: none; border: 1px solid var(--vz-rule); border-radius: 8px; padding: 6px 7px 5px; display: flex; flex-direction: column; gap: 5px; cursor: pointer; color: var(--vz-ink); font: 500 12px/1.2 var(--f-sans); text-align: left; }
+.vz-pal i { display: block; height: 6px; border-radius: 1px; }
+.vz-pal.on { border-color: var(--vz-ink); box-shadow: inset 0 0 0 1px var(--vz-ink); }
+.vz-reset { appearance: none; background: none; border: 0; padding: 0; margin-top: 10px; color: var(--vz-ink-2); font: 12px var(--f-sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.vz-lbl b { display: block; font-weight: 700; }
+.vz-lbl span { display: block; font-family: var(--vz-mono); font-size: 10.5px; color: var(--vz-ink-2); letter-spacing: .02em; }
+.vz-lbl.ref b { font-family: var(--vz-mono); font-weight: 500; font-size: 11px; color: var(--vz-ink-2); }
+.vz-lbl.ground b { color: var(--vz-ink-2); font-weight: 500; }
+.vz-lead { stroke: var(--vz-ink-3); stroke-width: .75; fill: none; }
+.vz-dot { fill: var(--vz-ink); }
+.vz-legend { position: absolute; left: 24px; bottom: 18px; width: 210px; pointer-events: none; }
+.vz-lg-t { font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .1em; color: var(--vz-ink-2); margin-bottom: 6px; }
+.vz-lg-bar { height: 6px; border-radius: 1px; }
+.vz-lg-ticks { position: relative; height: 16px; font-family: var(--vz-mono); font-size: 10px; color: var(--vz-ink-2); }
+.vz-lg-ticks span { position: absolute; top: 4px; transform: translateX(-50%); }
+.vz-lg-ticks span:first-child { transform: none; }
+.vz-lg-ticks span:last-child { transform: translateX(-100%); }
+.vz-ctl { position: absolute; right: 24px; bottom: 18px; display: flex; gap: 6px; }
+.vz-btn { width: 34px; height: 34px; display: grid; place-items: center; background: var(--vz-bg); color: var(--vz-ink); border: 1px solid var(--vz-rule); border-radius: 2px; cursor: pointer; padding: 0; }
+.vz-btn:hover { border-color: var(--vz-ink); }
+.vz-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.vz-card { position: absolute; left: 0; top: 0; width: 212px; padding: 10px 12px 11px; z-index: 4; color: var(--vz-ink); font-size: 11px; line-height: 1.35; }
+.vz-card.dock { left: auto; right: 12px; top: 12px; width: 178px; transform: none !important; padding: 9px 11px 10px; }
+.vz-card-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vz-card-k { font-family: var(--vz-mono); font-size: 9.5px; letter-spacing: .12em; color: var(--vz-ink-3); }
+.vz-card-t { font-weight: 700; font-size: 12.5px; margin: 1px 0 7px; }
+.vz-card .vz-x, .vz-set .vz-x { width: 22px; height: 22px; display: grid; place-items: center; padding: 0; margin: -2px -3px 0 0; border-radius: 8px; border: 1px solid var(--vz-glass-b); background: transparent; color: var(--vz-ink-2); font-size: 14px; line-height: 1; }
+.vz-x { appearance: none; background: none; border: 0; color: var(--vz-ink-2); font-size: 22px; line-height: 1; padding: 0 2px; cursor: pointer; margin: -4px -4px 0 0; }
+.vz-card-pr { padding: 7px 0 8px; border-top: 1px solid var(--vz-glass-b); border-bottom: 1px solid var(--vz-glass-b); }
+.vz-card-l, .vz-card-g span { display: block; font-family: var(--vz-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--vz-ink-3); }
+.vz-card-big { display: flex; align-items: baseline; gap: 7px; margin-top: 1px; }
+.vz-card-big b { font-family: var(--vz-mono); font-weight: 400; font-size: 24px; letter-spacing: -.02em; line-height: 1.1; }
+.vz-card-big small { flex: 1; font-size: 10px; color: var(--vz-ink-2); line-height: 1.3; }
+.vz-card-bar { position: relative; height: 4px; border-radius: 2px; margin-top: 7px; }
+.vz-card-bar i { position: absolute; top: -3px; width: 2px; height: 10px; margin-left: -1px; border-radius: 1px; background: var(--vz-ink); }
+.vz-card-g { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 10px; padding-top: 8px; }
+.vz-card-g .wide { grid-column: 1 / -1; }
+.vz-card-g b { display: block; font-weight: 600; font-size: 11.5px; }
+.vz-card-g b.muted { color: var(--vz-ink-2); font-weight: 500; }
+.vz-card-g small { display: inline; font-weight: 400; font-size: 10px; color: var(--vz-ink-3); margin-left: 6px; }
+.vz-card-lead { fill: none; stroke: var(--vz-ink); stroke-opacity: .55; stroke-width: 1; }
+.vz-card-dot { fill: var(--vz-ink); fill-opacity: .8; }
+.vz-labels.pick .vz-lbl { touch-action: none; }
+.vz-labels.tight .vz-lbl span + span { display: none; }   /* 手機上資訊卡打開時，名稱只留兩行，才排得下 */
+.vz-tilt { position: absolute; inset: 0; top: -46px; pointer-events: none; }   /* 往上多 46px：對焦帶的中間＝視覺中心（扣掉底下的圖例與按鈕，和 viz.js 的 focusPt 一樣） */
+.vz-tilt[hidden] { display: none; }
+.vz-tilt i { position: absolute; left: 0; right: 0; height: 46%; }
+.vz-tilt .t1, .vz-tilt .t2, .vz-tilt .t3 { top: 0; }
+.vz-tilt .b1, .vz-tilt .b2, .vz-tilt .b3 { bottom: 0; }
+.vz-tilt .t1 { -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px); -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); }
+.vz-tilt .t2 { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-mask-image: linear-gradient(to bottom, #000 18%, transparent 68%); mask-image: linear-gradient(to bottom, #000 18%, transparent 68%); }
+.vz-tilt .t3 { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 42%); mask-image: linear-gradient(to bottom, #000 0%, transparent 42%); }
+.vz-tilt .b1 { -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px); -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 100%); mask-image: linear-gradient(to top, #000 30%, transparent 100%); }
+.vz-tilt .b2 { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-mask-image: linear-gradient(to top, #000 18%, transparent 68%); mask-image: linear-gradient(to top, #000 18%, transparent 68%); }
+.vz-tilt .b3 { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 42%); mask-image: linear-gradient(to top, #000 0%, transparent 42%); }
+.vz-mini .vz-canvas { filter: saturate(1.35) contrast(1.06); }
+.vz-sw { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.vz-foot { display: flex; flex-direction: column; gap: 3px; padding-top: 14px; font-family: var(--vz-mono); font-size: 10.5px; line-height: 1.6; color: var(--vz-ink-3); letter-spacing: .02em; }
+.vz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
+/* 全螢幕：整個畫面都給地圖，單指可以任意旋轉 */
+.vz.vz-full, .vz-body.vz-full { position: fixed; inset: 0; z-index: 200; background: var(--vz-bg); display: flex; flex-direction: column; }
+.vz-body.vz-full .vz-stage { flex: 1; height: auto; }
+.vz-body.vz-full .vz-canvas { touch-action: none; }
+.vz-body.vz-full .vz-filters { position: static; padding-top: env(safe-area-inset-top); }
+html.vz-lock, html.vz-lock body { overflow: hidden; }
+@media (max-width: 560px) {
+  .vz { padding-top: 44px; }
+  .vz-in { padding-inline: 16px; }
+  .vz-chip { padding: 12px 10px 10px; font-size: 13px; }
+  .vz-stage { height: clamp(460px, 70vh, 680px); height: clamp(460px, 70svh, 680px); }
+  .vz-lbl { font-size: 11px; }
+  .vz-lbl span { font-size: 9.5px; }
+  .vz-legend { left: 12px; bottom: 14px; width: 118px; }
+  .vz-ctl { right: 10px; bottom: 12px; gap: 3px; }
+  .vz-btn { width: 31px; height: 31px; }
+  .vz-set { left: 12px; right: 12px; width: auto; bottom: 52px; }
+  .vz-tilt { top: -38px; }
+  .vz-hint { right: 12px; left: 12px; top: 10px; }
+  .vz-back { left: 12px; bottom: 62px; }
+  .vz-card.dock { width: 158px; padding: 8px 10px 9px; }
+  .vz-card.dock .vz-card-t { margin-bottom: 5px; font-size: 12px; }
+  .vz-card.dock .vz-card-pr { padding: 5px 0 7px; }
+  .vz-card.dock .vz-card-big { align-items: baseline; gap: 6px; }
+  .vz-card.dock .vz-card-big b { font-size: 18px; }
+  .vz-card.dock .vz-card-bar { margin-top: 5px; }
+  .vz-card-c { padding-top: 6px; font-size: 11px; line-height: 1.55; font-weight: 600; }
+  .vz-card-c .vz-card-l { display: inline; font-weight: 400; }
+  .vz-set { max-height: calc(100% - 76px); padding: 9px 12px 10px; }
+  .vz-pals { grid-template-columns: repeat(3, 1fr); }
+  .vz-filters { padding: 0 8px; }
+}

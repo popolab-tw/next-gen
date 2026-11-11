@@ -22,13 +22,17 @@ try { requestAnimationFrame(function () { window.__diag.raf = true; }); } catch 
 const CFGP = path.join(__dirname, 'web.config.json');
 const CFG = fs.existsSync(CFGP) ? JSON.parse(fs.readFileSync(CFGP, 'utf8')) : {};
 const REPO = CFG.repoUrl || 'https://github.com/jasontzeng123/next-gen';
+const SITE = (CFG.siteUrl || 'https://jasontzeng123.github.io/next-gen/').replace(/\/?$/, '/');
+const NGURL = (CFG.nextgenUrl || SITE + 'map/').replace(/\/?$/, '/');
 const DESC = '用你心中養孩子的標準，加上台灣真實的房價、薪資、補助與稅制，算算你有沒有足夠的錢把孩子養大。';
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400;700&family=DotGothic16&display=swap">`;
-const APPBODY = `<div id="app">
+const NG = require('./ng.js');
+const APPBODY = xp => `<div id="app">
   <header id="topbar" class="topbar"></header>
   <main id="main" class="main" tabindex="-1"></main>
+  ${xp}
   <footer class="foot">
     <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">popo890827</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popo890827</a></div>
     <div class="foot-links"><a href="${REPO}" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="${REPO}/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
@@ -62,7 +66,7 @@ ${FONTS}
 <style>
 ${R('styles.css')}
 </style>
-${APPBODY}
+${APPBODY(NG.xpHtml({ web: false, ngUrl: NGURL }))}
 ${SCRIPT}
 `;
 fs.mkdirSync(path.join(__dirname, '..', 'dist'), { recursive: true });
@@ -107,7 +111,7 @@ ${R('styles.css')}
 <script>window.TWKIDS = ${JSON.stringify({ target: 'web', siteUrl: site, repoUrl: REPO, sb: sb, worldSrc: WORLD_FILE })};</script>
 </head>
 <body>
-${APPBODY}
+${APPBODY(NG.xpHtml({ web: true, ngUrl: NGURL }))}
 ${SCRIPT_WEB}
 </body>
 </html>
@@ -126,8 +130,11 @@ ${SCRIPT_WEB}
   if (fs.existsSync(tdir)) {
     fs.readdirSync(tdir).filter(f => /^world\.[0-9a-f]{10}\.js$/.test(f)).forEach(f => fs.unlinkSync(path.join(tdir, f)));
     fs.copyFileSync(path.join(out, WORLD_FILE), path.join(tdir, WORLD_FILE));
+    ['kv-640.webp', 'kv-1280.webp'].forEach(f => fs.copyFileSync(path.join(__dirname, '..', 'src', 'ng', f), path.join(tdir, f)));
   }
   fs.writeFileSync(path.join(out, 'favicon.svg'), SEAL);
+  // 頁尾上方 NEXT GEN 小欄的主視覺小圖
+  ['kv-640.webp', 'kv-1280.webp'].forEach(f => fs.copyFileSync(path.join(__dirname, '..', 'src', 'ng', f), path.join(out, f)));
   fs.writeFileSync(path.join(out, '.nojekyll'), '');
   // 免費方案閒置一週會暫停：每 3 天讀一次資料庫（publishable key 本來就公開在網頁裡）
   if (sb) {
@@ -150,6 +157,9 @@ jobs:
   }
   console.log('index.html', (Buffer.byteLength(web) / 1024).toFixed(1) + ' KB', sb ? '（已連上 Supabase）' : '（尚未設定 Supabase：本機模式）', '｜' + WORLD_FILE, (Buffer.byteLength(worldJs) / 1024).toFixed(1) + ' KB');
 }
+
+// NEXT GEN 網站（map/）與預覽版（dist/map.html）
+NG.build({ siteUrl: SITE, ngUrl: NGURL, repo: REPO, mv: CFG.nextgenMv });
 
 // 資料來源清單（docs/資料來源.md）
 require('./sources.js');

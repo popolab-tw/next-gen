@@ -30,10 +30,13 @@ APP.screens.cover = function (main) {
     cta.appendChild(h('button', { class: 'btn seal', onclick: function () { A.startQuiz(); } }, '開始試算', U.icon('next')));
   }
   inn.appendChild(cta);
-  // 色盲友善配色
+  // 色盲友善配色、深色模式
   var cvdIn = h('input', { type: 'checkbox', checked: U.cvd(), onchange: function (e) { U.setCvd(e.target.checked); U.toast(e.target.checked ? '已改用色盲友善配色' : '已改回一般配色'); } });
-  inn.appendChild(h('label', { class: 'cvd-toggle' }, cvdIn, h('span', { class: 'sw', 'aria-hidden': 'true' }), '色盲友善配色',
-    h('span', { class: 'cvd-chips', 'aria-hidden': 'true' }, h('i', { style: { background: 'var(--good)' } }), h('i', { style: { background: '#ecd060' } }), h('i', { style: { background: 'var(--bad)' } }))));
+  var darkIn = h('input', { type: 'checkbox', checked: U.theme() === 'dark', onchange: function (e) { U.setTheme(e.target.checked ? 'dark' : 'light'); } });
+  inn.appendChild(h('div', { class: 'cover-toggles' },
+    h('label', { class: 'cvd-toggle' }, cvdIn, h('span', { class: 'sw', 'aria-hidden': 'true' }), '色盲友善配色',
+      h('span', { class: 'cvd-chips', 'aria-hidden': 'true' }, h('i', { style: { background: 'var(--good)' } }), h('i', { style: { background: '#ecd060' } }), h('i', { style: { background: 'var(--bad)' } }))),
+    h('label', { class: 'cvd-toggle' }, darkIn, h('span', { class: 'sw', 'aria-hidden': 'true' }), '深色模式')));
   sheet.appendChild(inn);
   wrap.appendChild(sheet);
 

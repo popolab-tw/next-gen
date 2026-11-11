@@ -5,6 +5,7 @@
 - 網站：<https://jasontzeng123.github.io/next-gen/>
 - 製作：[popo890827](https://www.threads.com/@popo890827) × Claude
 - 授權：程式碼 [MIT](LICENSE)；文字、圖表與整理的資料 [CC BY 4.0](LICENSE-CONTENT.md)
+- 姊妹網站 **NEXT GEN 生育門檻可視化網頁**：<https://jasontzeng123.github.io/next-gen/map/>（把玩家匿名分享的養育標準放在 3D 台灣上，開場有專屬 MV）
 
 ## 想驗證計算？
 
@@ -22,6 +23,21 @@
 | `src/community.js` | 匿名分享與統計（Supabase） |
 | `research/` | 研究筆記與人口資料 |
 | `test/` | 自動測試 |
+
+## NEXT GEN（`map/`）
+
+和遊戲放在同一個 repo，網址是遊戲網址後面加 `map/`。由 `node build/build.js` 一起組裝：
+
+| 檔案 | 內容 |
+| --- | --- |
+| `src/viz.js`、`src/viz.css` | 3D 台灣（WebGL）：道路、地形、每位分享者一個點，可以依年齡層、住法、門檻 PR 等分層 |
+| `src/nextgen.js`、`src/ng.css` | 網站外框：開場標題 → MV（YouTube 隱私強化模式）→ 轉場到地圖；地圖下方的說明與「生育門檻測驗」小欄 |
+| `build/ng.js` | 組裝 `map/index.html`（網站）與 `dist/map.html`（claude.ai 預覽版） |
+| `build/ng_assets.py` | 主視覺縮圖、社群預覽圖與兩個網站的 QR Code（`src/ng/`） |
+| `viz/map.bin.gz` | 底圖：海岸線、行政區界、道路、等高線與地形高度網格 |
+| `viz/points.json` | 分享資料的固定版本：位置依縣市與人口密度隨機撒（不是真實住址），不含匿名代號與分享時間，順序打亂；分享少於 5 筆的縣市不放收入 PR 與審查結果 |
+
+MV 的 YouTube 影片代號設定在 `build/web.config.json` 的 `nextgenMv`（例：`{"yt": "影片代號", "len": "3 分半"}`）；沒有設定時用 `viz/mv-placeholder.mp4` 暫代。
 
 ## 發現錯誤？
 

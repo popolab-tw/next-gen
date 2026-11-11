@@ -1,0 +1,2473 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NEXT GEN・生育門檻可視化網頁</title>
+<meta name="description" content="4,698 位玩家匿名分享的養育標準，放在 3D 台灣上：不同縣市、住法與托育方式的人，心中養孩子需要多高的收入。開場有專屬 MV。">
+<link rel="canonical" href="https://jasontzeng123.github.io/next-gen/map/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:site_name" content="NEXT GEN">
+<meta property="og:title" content="NEXT GEN・生育門檻可視化網頁">
+<meta property="og:description" content="4,698 位玩家匿名分享的養育標準，放在 3D 台灣上：不同縣市、住法與托育方式的人，心中養孩子需要多高的收入。開場有專屬 MV。">
+<meta property="og:url" content="https://jasontzeng123.github.io/next-gen/map/">
+<meta property="og:image" content="https://jasontzeng123.github.io/next-gen/map/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NEXT GEN 生育門檻可視化網頁：3D 台灣上的 4,698 個光點">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="theme-color" content="#050506">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
+<script>try { if (localStorage.getItem('ng:theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}</script>
+<style>
+/* ===================== NEXT GEN：全台分享地圖（3D） ===================== */
+.vz { --vz-glass-rgb: 255, 255, 255; --vz-glass-b: rgba(17, 17, 19, .12); --vz-bg: #ffffff; --vz-ink: #111113; --vz-ink-2: rgba(17, 17, 19, .62); --vz-ink-3: rgba(17, 17, 19, .42); --vz-rule: rgba(17, 17, 19, .16); --vz-chip: rgba(17, 17, 19, .04);
+  --vz-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Noto Sans TC", monospace;
+  background: var(--vz-bg); color: var(--vz-ink); border-top: 1px solid var(--vz-rule); padding: 64px 0 28px; font-family: var(--f-sans); width: 100%; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .vz { --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); } }
+:root[data-theme="dark"] .vz { --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); }
+.vz-in { max-width: 1180px; margin: 0 auto; padding-inline: 24px; }
+.vz-k { display: flex; gap: 14px; font-family: var(--vz-mono); font-size: 11px; letter-spacing: .14em; color: var(--vz-ink-2); text-transform: uppercase; border-top: 1px solid var(--vz-ink); padding-top: 8px; }
+.vz-k span:last-child { margin-left: auto; }
+.vz-title { font-family: var(--f-sans); font-weight: 700; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.12; letter-spacing: -.01em; margin: 26px 0 14px; }
+.vz-lede { max-width: 40em; font-size: 15px; line-height: 1.7; color: var(--vz-ink-2); margin: 0 0 26px; }
+.vz-body { position: relative; }
+.vz-filters { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; padding: 0 max(24px, calc((100% - 1180px) / 2 + 24px)); border-bottom: 1px solid var(--vz-rule); position: sticky; top: calc(54px + env(safe-area-inset-top, 0px)); z-index: 6; background: var(--vz-bg); }
+.vz-filters::-webkit-scrollbar { display: none; }
+.vz-chip { flex: none; appearance: none; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--vz-ink-2); font: 500 13.5px/1 var(--f-sans); padding: 13px 13px 11px; cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
+.vz-chip:hover { color: var(--vz-ink); }
+.vz-chip.on { color: var(--vz-ink); border-bottom-color: var(--vz-ink); font-weight: 700; }
+.vz-chip:focus-visible, .vz-btn:focus-visible, .vz-x:focus-visible { outline: 2px solid var(--vz-ink); outline-offset: -2px; }
+.vz-stage { position: relative; height: clamp(560px, 86vh, 980px); height: clamp(560px, 86svh, 980px); overflow: hidden; background: var(--vz-bg); }
+.vz-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; -webkit-tap-highlight-color: transparent; }
+.vz-canvas:active { cursor: grabbing; }
+.vz-msg { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--vz-mono); font-size: 12px; letter-spacing: .08em; color: var(--vz-ink-3); pointer-events: none; }
+.vz-wait { display: grid; }
+.vz-labels, .vz-leads { position: absolute; inset: 0; pointer-events: none; }
+.vz-lbl { position: absolute; left: 0; top: 0; font-size: 12px; line-height: 1.35; color: var(--vz-ink); will-change: transform; pointer-events: auto; appearance: none; background: none; border: 0; padding: 0; margin: 0; text-align: left; font-family: inherit; cursor: pointer; opacity: 0; transition: opacity .45s ease; }
+.vz-lbl.in { opacity: 1; }
+.vz-lbl.in.dim { opacity: .38; }
+.vz-lbl.in.dim:hover { opacity: .75; }
+.vz-lbl.out { opacity: 0; pointer-events: none; }
+.vz-lbl.ref { pointer-events: none; cursor: default; }
+.vz-lbl:not(.ref):hover b { text-decoration: underline; text-underline-offset: 3px; }
+.vz-lbl.on b { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+.vz-lbl:focus-visible { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
+.vz-back { position: absolute; left: 24px; bottom: 76px; display: inline-flex; align-items: center; gap: 2px; appearance: none; background: var(--vz-bg); color: var(--vz-ink); border: 1px solid var(--vz-rule); border-radius: 2px; font: 500 12px/1 var(--f-sans); padding: 6px 10px 6px 4px; cursor: pointer; z-index: 2; }
+.vz-back svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.vz-tg { display: flex; align-items: center; gap: 8px; margin: 12px 0 2px; color: var(--vz-ink-2); cursor: pointer; white-space: nowrap; }
+.vz-tg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.vz-tg i { width: 28px; height: 16px; border-radius: 8px; background: var(--vz-rule); position: relative; transition: background .2s; flex: none; }
+.vz-tg i::after { content: ''; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--vz-bg); transition: transform .2s; }
+.vz-tg input:checked + i { background: var(--vz-ink); }
+.vz-tg input:checked + i::after { transform: translateX(12px); }
+.vz-tg input:focus-visible + i { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
+.vz-back:hover { border-color: var(--vz-ink); }
+.vz-hint { position: absolute; left: 24px; top: 14px; font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .04em; color: var(--vz-ink-3); pointer-events: none; transition: opacity .8s ease; }
+.vz-hint.gone { opacity: 0; }
+.vz-canvas.panning { cursor: move; }
+.vz-btn.on { background: var(--vz-ink); color: var(--vz-bg); border-color: var(--vz-ink); }
+.vz-set { position: absolute; right: 24px; bottom: 64px; width: 284px; color: var(--vz-ink); padding: 10px 14px 12px; font-size: 12px; z-index: 5; max-height: calc(100% - 84px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.vz-set, .vz-card { border-radius: 16px; border: 1px solid var(--vz-glass-b); background: rgba(var(--vz-glass-rgb), var(--vz-glass-a, .3)); -webkit-backdrop-filter: blur(var(--vz-glass-blur, 16px)) saturate(1.15); backdrop-filter: blur(var(--vz-glass-blur, 16px)) saturate(1.15); }   /* 扁平霧玻璃：透明度與模糊（散射）可以在設定裡調 */
+.vz-set-h { display: flex; justify-content: space-between; align-items: center; font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .12em; color: var(--vz-ink-2); padding-bottom: 4px; }
+.vz-sl { display: grid; grid-template-columns: 6.6em minmax(0, 1fr) 3.2em; align-items: center; gap: 8px; margin: 6px 0; }
+.vz-sl > span { color: var(--vz-ink-2); white-space: nowrap; }
+.vz-sl b { font-family: var(--vz-mono); font-weight: 500; color: var(--vz-ink); text-align: right; font-size: 11px; }
+.vz-sl input { -webkit-appearance: none; appearance: none; width: 100%; height: 18px; background: transparent; margin: 0; cursor: pointer; }
+.vz-sl input::-webkit-slider-runnable-track { height: 2px; background: var(--vz-rule); }
+.vz-sl input::-moz-range-track { height: 2px; background: var(--vz-rule); }
+.vz-sl input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--vz-ink); margin-top: -6px; border: 0; }
+.vz-sl input::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--vz-ink); border: 0; }
+.vz-sl input:focus-visible { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
+.vz-set-t { color: var(--vz-ink-2); margin: 10px 0 6px; }
+.vz-tgs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; margin: 10px 0 4px; }
+.vz-tgs .vz-tg { margin: 0; }
+.vz-set-n { font-size: 10px; color: var(--vz-ink-3); line-height: 1.45; margin-top: 6px; }
+.vz-pals { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.vz-pal { appearance: none; background: none; border: 1px solid var(--vz-rule); border-radius: 8px; padding: 6px 7px 5px; display: flex; flex-direction: column; gap: 5px; cursor: pointer; color: var(--vz-ink); font: 500 12px/1.2 var(--f-sans); text-align: left; }
+.vz-pal i { display: block; height: 6px; border-radius: 1px; }
+.vz-pal.on { border-color: var(--vz-ink); box-shadow: inset 0 0 0 1px var(--vz-ink); }
+.vz-reset { appearance: none; background: none; border: 0; padding: 0; margin-top: 10px; color: var(--vz-ink-2); font: 12px var(--f-sans); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.vz-lbl b { display: block; font-weight: 700; }
+.vz-lbl span { display: block; font-family: var(--vz-mono); font-size: 10.5px; color: var(--vz-ink-2); letter-spacing: .02em; }
+.vz-lbl.ref b { font-family: var(--vz-mono); font-weight: 500; font-size: 11px; color: var(--vz-ink-2); }
+.vz-lbl.ground b { color: var(--vz-ink-2); font-weight: 500; }
+.vz-lead { stroke: var(--vz-ink-3); stroke-width: .75; fill: none; }
+.vz-dot { fill: var(--vz-ink); }
+.vz-legend { position: absolute; left: 24px; bottom: 18px; width: 210px; pointer-events: none; }
+.vz-lg-t { font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .1em; color: var(--vz-ink-2); margin-bottom: 6px; }
+.vz-lg-bar { height: 6px; border-radius: 1px; }
+.vz-lg-ticks { position: relative; height: 16px; font-family: var(--vz-mono); font-size: 10px; color: var(--vz-ink-2); }
+.vz-lg-ticks span { position: absolute; top: 4px; transform: translateX(-50%); }
+.vz-lg-ticks span:first-child { transform: none; }
+.vz-lg-ticks span:last-child { transform: translateX(-100%); }
+.vz-ctl { position: absolute; right: 24px; bottom: 18px; display: flex; gap: 6px; }
+.vz-btn { width: 34px; height: 34px; display: grid; place-items: center; background: var(--vz-bg); color: var(--vz-ink); border: 1px solid var(--vz-rule); border-radius: 2px; cursor: pointer; padding: 0; }
+.vz-btn:hover { border-color: var(--vz-ink); }
+.vz-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.vz-card { position: absolute; left: 0; top: 0; width: 212px; padding: 10px 12px 11px; z-index: 4; color: var(--vz-ink); font-size: 11px; line-height: 1.35; }
+.vz-card.dock { left: auto; right: 12px; top: 12px; width: 178px; transform: none !important; padding: 9px 11px 10px; }
+.vz-card-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.vz-card-k { font-family: var(--vz-mono); font-size: 9.5px; letter-spacing: .12em; color: var(--vz-ink-3); }
+.vz-card-t { font-weight: 700; font-size: 12.5px; margin: 1px 0 7px; }
+.vz-card .vz-x, .vz-set .vz-x { width: 22px; height: 22px; display: grid; place-items: center; padding: 0; margin: -2px -3px 0 0; border-radius: 8px; border: 1px solid var(--vz-glass-b); background: transparent; color: var(--vz-ink-2); font-size: 14px; line-height: 1; }
+.vz-x { appearance: none; background: none; border: 0; color: var(--vz-ink-2); font-size: 22px; line-height: 1; padding: 0 2px; cursor: pointer; margin: -4px -4px 0 0; }
+.vz-card-pr { padding: 7px 0 8px; border-top: 1px solid var(--vz-glass-b); border-bottom: 1px solid var(--vz-glass-b); }
+.vz-card-l, .vz-card-g span { display: block; font-family: var(--vz-mono); font-size: 9.5px; letter-spacing: .06em; color: var(--vz-ink-3); }
+.vz-card-big { display: flex; align-items: baseline; gap: 7px; margin-top: 1px; }
+.vz-card-big b { font-family: var(--vz-mono); font-weight: 400; font-size: 24px; letter-spacing: -.02em; line-height: 1.1; }
+.vz-card-big small { flex: 1; font-size: 10px; color: var(--vz-ink-2); line-height: 1.3; }
+.vz-card-bar { position: relative; height: 4px; border-radius: 2px; margin-top: 7px; }
+.vz-card-bar i { position: absolute; top: -3px; width: 2px; height: 10px; margin-left: -1px; border-radius: 1px; background: var(--vz-ink); }
+.vz-card-g { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 10px; padding-top: 8px; }
+.vz-card-g .wide { grid-column: 1 / -1; }
+.vz-card-g b { display: block; font-weight: 600; font-size: 11.5px; }
+.vz-card-g b.muted { color: var(--vz-ink-2); font-weight: 500; }
+.vz-card-g small { display: inline; font-weight: 400; font-size: 10px; color: var(--vz-ink-3); margin-left: 6px; }
+.vz-card-lead { fill: none; stroke: var(--vz-ink); stroke-opacity: .55; stroke-width: 1; }
+.vz-card-dot { fill: var(--vz-ink); fill-opacity: .8; }
+.vz-labels.pick .vz-lbl { touch-action: none; }
+.vz-labels.tight .vz-lbl span + span { display: none; }   /* 手機上資訊卡打開時，名稱只留兩行，才排得下 */
+.vz-tilt { position: absolute; inset: 0; top: -46px; pointer-events: none; }   /* 往上多 46px：對焦帶的中間＝視覺中心（扣掉底下的圖例與按鈕，和 viz.js 的 focusPt 一樣） */
+.vz-tilt[hidden] { display: none; }
+.vz-tilt i { position: absolute; left: 0; right: 0; height: 46%; }
+.vz-tilt .t1, .vz-tilt .t2, .vz-tilt .t3 { top: 0; }
+.vz-tilt .b1, .vz-tilt .b2, .vz-tilt .b3 { bottom: 0; }
+.vz-tilt .t1 { -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px); -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); mask-image: linear-gradient(to bottom, #000 30%, transparent 100%); }
+.vz-tilt .t2 { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-mask-image: linear-gradient(to bottom, #000 18%, transparent 68%); mask-image: linear-gradient(to bottom, #000 18%, transparent 68%); }
+.vz-tilt .t3 { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 42%); mask-image: linear-gradient(to bottom, #000 0%, transparent 42%); }
+.vz-tilt .b1 { -webkit-backdrop-filter: blur(1.6px); backdrop-filter: blur(1.6px); -webkit-mask-image: linear-gradient(to top, #000 30%, transparent 100%); mask-image: linear-gradient(to top, #000 30%, transparent 100%); }
+.vz-tilt .b2 { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); -webkit-mask-image: linear-gradient(to top, #000 18%, transparent 68%); mask-image: linear-gradient(to top, #000 18%, transparent 68%); }
+.vz-tilt .b3 { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 42%); mask-image: linear-gradient(to top, #000 0%, transparent 42%); }
+.vz-mini .vz-canvas { filter: saturate(1.35) contrast(1.06); }
+.vz-sw { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.vz-foot { display: flex; flex-direction: column; gap: 3px; padding-top: 14px; font-family: var(--vz-mono); font-size: 10.5px; line-height: 1.6; color: var(--vz-ink-3); letter-spacing: .02em; }
+.vz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
+/* 全螢幕：整個畫面都給地圖，單指可以任意旋轉 */
+.vz.vz-full, .vz-body.vz-full { position: fixed; inset: 0; z-index: 200; background: var(--vz-bg); display: flex; flex-direction: column; }
+.vz-body.vz-full .vz-stage { flex: 1; height: auto; }
+.vz-body.vz-full .vz-canvas { touch-action: none; }
+.vz-body.vz-full .vz-filters { position: static; padding-top: env(safe-area-inset-top); }
+html.vz-lock, html.vz-lock body { overflow: hidden; }
+@media (max-width: 560px) {
+  .vz { padding-top: 44px; }
+  .vz-in { padding-inline: 16px; }
+  .vz-chip { padding: 12px 10px 10px; font-size: 13px; }
+  .vz-stage { height: clamp(460px, 70vh, 680px); height: clamp(460px, 70svh, 680px); }
+  .vz-lbl { font-size: 11px; }
+  .vz-lbl span { font-size: 9.5px; }
+  .vz-legend { left: 12px; bottom: 14px; width: 118px; }
+  .vz-ctl { right: 10px; bottom: 12px; gap: 3px; }
+  .vz-btn { width: 31px; height: 31px; }
+  .vz-set { left: 12px; right: 12px; width: auto; bottom: 52px; }
+  .vz-tilt { top: -38px; }
+  .vz-hint { right: 12px; left: 12px; top: 10px; }
+  .vz-back { left: 12px; bottom: 62px; }
+  .vz-card.dock { width: 158px; padding: 8px 10px 9px; }
+  .vz-card.dock .vz-card-t { margin-bottom: 5px; font-size: 12px; }
+  .vz-card.dock .vz-card-pr { padding: 5px 0 7px; }
+  .vz-card.dock .vz-card-big { align-items: baseline; gap: 6px; }
+  .vz-card.dock .vz-card-big b { font-size: 18px; }
+  .vz-card.dock .vz-card-bar { margin-top: 5px; }
+  .vz-card-c { padding-top: 6px; font-size: 11px; line-height: 1.55; font-weight: 600; }
+  .vz-card-c .vz-card-l { display: inline; font-weight: 400; }
+  .vz-set { max-height: calc(100% - 76px); padding: 9px 12px 10px; }
+  .vz-pals { grid-template-columns: repeat(3, 1fr); }
+  .vz-filters { padding: 0 8px; }
+}
+
+/* ===================== NEXT GEN：網站外框（開場、頁首、地圖下方的說明與小欄、頁尾） ===================== */
+:root {
+  --ng-bg: #050506; --ng-ink: #ececE6; --ng-ink-2: rgba(236, 236, 230, .64); --ng-ink-3: rgba(236, 236, 230, .42); --ng-rule: rgba(236, 236, 230, .16); --ng-chip: rgba(236, 236, 230, .05);
+  --f-sans: -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+  --f-disp: "Bebas Neue", "Oswald", Impact, "Arial Narrow", sans-serif;
+  --ng-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Noto Sans TC", monospace;
+  --ng-top: 54px; --ng-tabs: 41px; --ng-peek: 46px;
+  --seal: #c0302b;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { --ng-bg: #ffffff; --ng-ink: #111113; --ng-ink-2: rgba(17, 17, 19, .62); --ng-ink-3: rgba(17, 17, 19, .42); --ng-rule: rgba(17, 17, 19, .16); --ng-chip: rgba(17, 17, 19, .04); color-scheme: light; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--ng-top) + var(--ng-tabs)); }
+body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/1.6 var(--f-sans); -webkit-font-smoothing: antialiased; }
+.ng a { color: inherit; }
+.ng [hidden] { display: none !important; }
+.ng-in { max-width: 1180px; margin: 0 auto; padding-inline: 24px; }
+.ng-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- 頁首 ---------- */
+.ng-top { position: sticky; top: 0; z-index: 8; height: var(--ng-top); padding-top: env(safe-area-inset-top, 0px); background: var(--ng-bg); border-bottom: 1px solid var(--ng-rule); }
+.ng-top .ng-in { height: 100%; display: flex; align-items: center; gap: 18px; max-width: none; }
+.ng-brand { display: flex; align-items: baseline; gap: 12px; text-decoration: none; min-width: 0; }
+.ng-word { font-family: var(--f-disp); font-size: 27px; line-height: 1; letter-spacing: .07em; font-weight: 400; transform: translateY(2px); white-space: nowrap; }
+.ng-sub { font-size: 12.5px; letter-spacing: .28em; color: var(--ng-ink-2); white-space: nowrap; }
+.ng-head { font-size: 13.5px; color: var(--ng-ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; padding-left: 18px; border-left: 1px solid var(--ng-rule); }
+.ng-head b { color: var(--ng-ink); font-weight: 600; }
+.ng-acts { margin-left: auto; display: flex; gap: 6px; flex: none; }
+.ng-btn { appearance: none; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 1px solid var(--ng-rule); border-radius: 2px; background: none; color: var(--ng-ink); font: 500 12px/1 var(--ng-mono); letter-spacing: .08em; cursor: pointer; text-decoration: none; }
+.ng-btn:hover { border-color: var(--ng-ink); }
+.ng-btn:focus-visible, .ng-x-btn:focus-visible, .ng-more:focus-visible { outline: 2px solid var(--ng-ink); outline-offset: 2px; }
+.ng-btn svg { width: 14px; height: 14px; fill: currentColor; }
+.ng-btn.ic { width: 32px; padding: 0; justify-content: center; }
+.ng-btn.ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+
+/* ---------- 地圖：塞滿第一個畫面，底下留一條看得到下一段 ---------- */
+.ng .vz { padding: 0; border-top: 0; }
+.ng .vz-filters { top: calc(var(--ng-top) + env(safe-area-inset-top, 0px)); }
+.ng .vz-stage { height: calc(100vh - var(--ng-top) - var(--ng-tabs) - var(--ng-peek)); height: calc(100svh - var(--ng-top) - env(safe-area-inset-top, 0px) - var(--ng-tabs) - var(--ng-peek)); min-height: 420px; max-height: none; }
+
+/* ---------- 地圖下方：說明 ---------- */
+.ng-about { border-top: 1px solid var(--ng-rule); }
+.ng-more { display: flex; align-items: center; gap: 14px; height: var(--ng-peek); font-family: var(--ng-mono); font-size: 11px; letter-spacing: .14em; color: var(--ng-ink-2); text-transform: uppercase; text-decoration: none; }
+.ng-more span:last-child { margin-left: auto; }
+.ng-more:hover { color: var(--ng-ink); }
+.ng-more i { font-style: normal; display: inline-block; animation: ngBob 2.4s ease-in-out infinite; }
+@keyframes ngBob { 50% { transform: translateY(3px); } }
+.ng-about h2 { font-weight: 700; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.12; letter-spacing: -.01em; margin: 42px 0 16px; }
+.ng-lede { max-width: 40em; font-size: 15.5px; line-height: 1.75; color: var(--ng-ink-2); margin: 0; }
+.ng-notes { display: flex; flex-direction: column; gap: 3px; margin: 30px 0 0; padding: 14px 0 0; border-top: 1px solid var(--ng-rule); font-family: var(--ng-mono); font-size: 10.5px; line-height: 1.7; color: var(--ng-ink-3); letter-spacing: .02em; list-style: none; }
+
+/* ---------- 小欄：生育門檻測驗 ---------- */
+.ng-x { margin-top: 64px; border-top: 1px solid var(--ng-ink); }
+.ng-x .ng-in { display: grid; grid-template-columns: auto 1fr auto; gap: 28px; align-items: center; padding-top: 30px; padding-bottom: 34px; }
+.ng-x-k { display: flex; gap: 14px; font-family: var(--ng-mono); font-size: 11px; letter-spacing: .14em; color: var(--ng-ink-2); margin-bottom: 8px; }
+.ng-x-seal { width: 92px; height: 92px; display: block; transform: rotate(-6deg); }
+.ng-x-seal svg { width: 100%; height: 100%; display: block; }
+.ng-x h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.3; font-weight: 700; font-family: "Noto Serif TC", "Noto Serif CJK TC", "Songti TC", serif; letter-spacing: .02em; }
+.ng-x p { margin: 0 0 14px; max-width: 36em; font-size: 14px; line-height: 1.7; color: var(--ng-ink-2); }
+.ng-x-go { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.ng-x-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; background: var(--seal); color: #fff !important; text-decoration: none; font-weight: 700; font-size: 14px; border-radius: 2px; letter-spacing: .04em; }
+.ng-x-btn:hover { filter: brightness(1.08); }
+.ng-x-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+.ng-x-url { font-family: var(--ng-mono); font-size: 11.5px; color: var(--ng-ink-3); letter-spacing: .02em; word-break: break-all; }
+.ng-qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.ng-qr-box { width: 108px; height: 108px; padding: 8px; background: #fff; color: #111; border-radius: 4px; box-sizing: border-box; display: block; }
+.ng-qr-box svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+.ng-qr figcaption { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: var(--ng-ink-3); }
+
+/* ---------- 頁尾 ---------- */
+.ng-foot { border-top: 1px solid var(--ng-rule); }
+.ng-foot .ng-in { display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: baseline; padding-top: 20px; padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px)); font-size: 12.5px; color: var(--ng-ink-3); }
+.ng-foot a { color: var(--ng-ink-2); text-decoration: none; border-bottom: 1px solid var(--ng-rule); }
+.ng-foot a:hover { color: var(--ng-ink); border-bottom-color: var(--ng-ink); }
+.ng-credit { color: var(--ng-ink-2); font-size: 13.5px; }
+.ng-credit b { font-family: var(--ng-mono); font-weight: 500; font-size: 11px; letter-spacing: .14em; color: var(--ng-ink-3); margin-right: 8px; }
+.ng-foot .ng-r { margin-left: auto; }
+
+/* ---------- 提示訊息 ---------- */
+.ng .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ng-ink); color: var(--ng-bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; z-index: 400; opacity: 0; pointer-events: none; max-width: calc(100% - 32px); }
+.ng .toast.on { animation: ngToast 4.2s ease forwards; }
+@keyframes ngToast { 0% { opacity: 0; transform: translate(-50%, 12px); } 8%, 86% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, 0); } }
+
+/* ---------- 開場：標題畫面 → MV ---------- */
+html.ng-lock, html.ng-lock body { overflow: hidden; }
+.ng-intro { position: fixed; inset: 0; z-index: 300; background: #000; color: #ececE6; transition: opacity .9s ease; color-scheme: dark; }
+.ng-intro.out { opacity: 0; pointer-events: none; }
+.ng-title { position: absolute; inset: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 20px calc(5vh + env(safe-area-inset-bottom, 0px)); transition: opacity .6s ease; -webkit-tap-highlight-color: transparent; }
+.ng-intro.playing .ng-title { opacity: 0; pointer-events: none; }
+.ng-kv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; opacity: 0; animation: ngKv 2.4s ease .1s forwards; user-select: none; -webkit-user-drag: none; }
+@keyframes ngKv { from { opacity: 0; transform: scale(1.04); } to { opacity: .92; transform: scale(1); } }
+.ng-title::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 42%; background: linear-gradient(to top, rgba(0, 0, 0, .78), rgba(0, 0, 0, 0)); pointer-events: none; }
+.ng-play { position: relative; z-index: 1; appearance: none; background: none; border: 0; color: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 8px 12px; font: inherit; opacity: 0; animation: ngIn 1s ease 1.1s forwards; }
+.ng-play-c { width: 62px; height: 62px; border: 1px solid rgba(236, 236, 230, .7); border-radius: 50%; display: grid; place-items: center; transition: transform .25s ease, background .25s ease; }
+.ng-play-c svg { width: 20px; height: 20px; fill: currentColor; margin-left: 3px; }
+.ng-play:hover .ng-play-c, .ng-play:focus-visible .ng-play-c { background: rgba(236, 236, 230, .12); transform: scale(1.06); }
+.ng-play:focus { outline: none; }
+.ng-play:focus-visible .ng-play-c { outline: 2px solid #ececE6; outline-offset: 4px; }
+.ng-play-t { font-family: var(--ng-mono); font-size: 12.5px; letter-spacing: .22em; animation: ngPulse 2.6s ease-in-out 2s infinite; }
+.ng-play-s { font-size: 11.5px; letter-spacing: .12em; color: rgba(236, 236, 230, .55); margin-top: -6px; }
+.ng-intro.nomv .ng-play-c svg { margin-left: 0; }
+.ng-intro.nomv .ng-play-s { display: none; }
+@keyframes ngPulse { 50% { opacity: .45; } }
+@keyframes ngIn { to { opacity: 1; } }
+.ng-skipall { position: relative; z-index: 1; margin-top: 26px; font-size: 12.5px; color: rgba(236, 236, 230, .6) !important; text-decoration: none; letter-spacing: .06em; border-bottom: 1px solid rgba(236, 236, 230, .25); padding-bottom: 1px; opacity: 0; animation: ngIn 1s ease 1.5s forwards; }
+.ng-skipall:hover, .ng-skipall:focus-visible { color: #ececE6 !important; border-bottom-color: #ececE6; outline: none; }
+.ng-mv { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; pointer-events: none; }
+.ng-intro.on .ng-mv { opacity: 1; }
+.ng-mv video, .ng-yt, .ng-yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: contain; background: #000; }
+.ng-catch { position: absolute; inset: 0; display: none; }
+.ng-intro.playing .ng-catch { display: block; }
+.ng-intro.tap .ng-mv { opacity: 1; pointer-events: auto; }
+.ng-intro.tap .ng-catch, .ng-intro.tap .ng-wait { display: none !important; }
+.ng-hud { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 20px calc(18px + env(safe-area-inset-bottom, 0px)); display: none; align-items: center; gap: 10px; opacity: 0; transition: opacity .35s ease; }
+.ng-intro.playing .ng-hud { display: flex; }
+.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud { opacity: 1; }
+.ng-hb { appearance: none; height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; border: 1px solid rgba(236, 236, 230, .45); border-radius: 999px; background: rgba(0, 0, 0, .45); color: #ececE6; font: 500 12.5px/1 var(--f-sans); letter-spacing: .08em; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.ng-hb:hover { border-color: #ececE6; }
+.ng-hb:focus { outline: none; }
+.ng-hb:focus-visible { outline: 2px solid #ececE6; outline-offset: 2px; }
+.ng-hb svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.ng-skip { margin-left: auto; }
+.ng-esc { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: rgba(236, 236, 230, .5); }
+.ng-tapmsg { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-size: 13px; letter-spacing: .06em; background: rgba(0, 0, 0, .6); padding: 7px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
+.ng-wait { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 1.5px solid rgba(236, 236, 230, .2); border-top-color: #ececE6; border-radius: 50%; animation: ngSpin .9s linear infinite; display: none; pointer-events: none; }
+.ng-intro.playing.wait .ng-wait { display: block; }
+@keyframes ngSpin { to { transform: rotate(360deg); } }
+.ng-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(236, 236, 230, .12); display: none; pointer-events: none; }
+.ng-intro.playing .ng-prog { display: block; }
+.ng-prog i { position: absolute; inset: 0; background: rgba(236, 236, 230, .75); transform-origin: 0 50%; transform: scaleX(0); }
+@media (prefers-reduced-motion: reduce) { .ng-kv, .ng-play, .ng-skipall { animation-duration: .01s; animation-delay: 0s; } .ng-play-t, .ng-more i { animation: none; } }
+
+.k-tap { display: none; }
+@media (pointer: coarse) { .k-key, .ng-esc { display: none; } .k-tap { display: inline; } }
+
+/* ---------- 手機 ---------- */
+@media (max-width: 760px) { .ng-head { display: none; } }
+@media (max-width: 560px) {
+  :root { --ng-top: 50px; --ng-tabs: 39px; --ng-peek: 44px; }
+  .ng-in { padding-inline: 16px; }
+  .ng-word { font-size: 24px; }
+  .ng-sub { font-size: 11px; letter-spacing: .2em; }
+  .ng-btn { padding: 0 10px; }
+  .ng .vz-stage { min-height: 400px; }
+  .ng-about h2 { margin-top: 30px; }
+  .ng-x { margin-top: 44px; }
+  .ng-x .ng-in { grid-template-columns: auto 1fr; gap: 14px 16px; padding-top: 24px; }
+  .ng-x-seal { width: 58px; height: 58px; align-self: start; }
+  .ng-x-txt { display: contents; }
+  .ng-x-head { grid-column: 2; align-self: center; }
+  .ng-x p, .ng-x-go { grid-column: 1 / -1; }
+  .ng-x h3 { font-size: 19px; margin: 0; }
+  .ng-x-k { margin-bottom: 4px; }
+  .ng-qr { grid-column: 1 / -1; flex-direction: row; justify-content: flex-start; gap: 12px; }
+  .ng-qr-box { width: 84px; height: 84px; padding: 6px; }
+  .ng-foot .ng-r { margin-left: 0; }
+}
+@media (max-width: 380px) { .ng-sub { display: none; } }
+/* 直式手機：主視覺是橫的，整張放進畫面上半部 */
+@media (max-aspect-ratio: 4/5) {
+  .ng-kv { object-fit: contain; object-position: 50% 38%; }
+  .ng-title::after { height: 50%; }
+}
+
+</style>
+<script>window.TWKIDS = {"target":"nextgen","vizN":4698,"vizDate":"2026-10-24","vizMap":"viz-map.ab97b4251d.bin.gz","vizPts":"viz-pts.6f94f5586c.json"};
+window.NEXTGEN = {"mv":{"src":"mv-placeholder.7ec317c80a.mp4"}};</script>
+</head>
+<body class="ng">
+<div class="ng-intro" id="ng-intro" role="dialog" aria-modal="true" aria-label="NEXT GEN 開場">
+  <div class="ng-title">
+    <img class="ng-kv" src="kv-1920.webp" width="1920" height="1080" alt="NEXT GEN 生育門檻可視化網頁" fetchpriority="high" decoding="async">
+    <button class="ng-play" type="button"><span class="ng-play-c" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 3.2v13.6L16.4 10z"/></svg></span><span class="ng-play-t"><span class="k-key">點一下或按任意鍵，播放 MV</span><span class="k-tap">點一下，播放 MV</span></span><span class="ng-play-s">有聲音</span></button>
+    <a class="ng-skipall" href="#map">略過 MV，直接看地圖 →</a>
+  </div>
+  <div class="ng-mv"></div>
+  <div class="ng-wait" aria-hidden="true"></div>
+  <div class="ng-catch" aria-hidden="true"></div>
+  <p class="ng-tapmsg" hidden>瀏覽器擋住了自動播放，請點影片中間的播放鍵</p>
+  <div class="ng-hud">
+    <button class="ng-hb ng-mute" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3h-2.5z"/><path d="M11 5.5c1 1.3 1 3.7 0 5M12.8 3.8c2 2.4 2 6 0 8.4"/></svg><span>靜音</span></button>
+    <span class="ng-esc">ESC 略過</span>
+    <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
+  </div>
+  <div class="ng-prog" aria-hidden="true"><i></i></div>
+</div>
+<header class="ng-top"><div class="ng-in">
+  <a class="ng-brand" href="./" aria-label="NEXT GEN 生育門檻可視化網頁"><span class="ng-word">NEXT GEN</span><span class="ng-sub">生育門檻可視化</span></a>
+  <div class="ng-head"><b>4,698</b> 個人心中，養孩子的標準</div>
+  <div class="ng-acts">
+    <button class="ng-btn" id="ng-mvbtn" type="button" aria-label="重播 MV" title="重播 MV"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg>MV</button>
+    <button class="ng-btn ic" id="ng-theme" type="button" aria-label="深色模式" aria-pressed="true" title="換成淺色"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2A5.6 5.6 0 0 0 8 2.4z" fill="currentColor" stroke="none"/></svg></button>
+  </div>
+</div></header>
+<main>
+  <section class="vz" id="map" aria-label="全台分享地圖"><div class="vz-body"></div></section>
+  <section class="ng-about" id="ng-about" aria-labelledby="ng-about-t">
+    <div class="ng-in">
+      <a class="ng-more" id="ng-more" href="#ng-about"><span>ARCHIVE</span><span>全台分享地圖・N=4,698</span><span>往下看 <i>↓</i></span></a>
+      <h2 id="ng-about-t">4,698 個人心中，<br>養孩子的標準</h2>
+      <p class="ng-lede">每一點是一位在「你有資格生下一代嗎？」做完試算、選擇匿名分享的玩家；顏色是他的標準需要多高的收入（門檻 PR）。點的位置依縣市與人口密度隨機分布，不是真實住址。選一種分法，大家就會升到台灣上方的切片；點一下，可以看那個人的選擇。</p>
+      <ul class="ng-notes"><li>資料更新到 2026-10-24・只計入同意匿名分享的玩家；之後取消分享的人，下次更新時移除。</li><li>分享少於 5 筆的縣市不顯示收入 PR 與審查結果。</li><li>地形高度放大 5 倍，才看得出起伏；可以在右下角的設定調整。</li><li>地圖：道路 © OpenStreetMap contributors（經 Overture Maps）・地形 AWS Terrain Tiles（SRTM 等）・人口密度 WorldPop・行政區界 內政部</li></ul>
+    </div>
+  </section>
+  <aside class="ng-x" aria-labelledby="ng-x-t">
+    <div class="ng-in">
+      <span class="ng-x-seal" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect x="3" y="3" width="34" height="34" rx="5" fill="#fbfcfa" stroke="#c0302b" stroke-width="3"/><text x="20" y="27.5" text-anchor="middle" font-family="Noto Serif TC,Noto Serif CJK TC,serif" font-weight="900" font-size="20" fill="#c0302b">審</text></svg></span>
+      <div class="ng-x-txt">
+        <div class="ng-x-head"><div class="ng-x-k"><span>生育門檻測驗</span></div><h3 id="ng-x-t">你有資格生下一代嗎？</h3></div>
+        <p>地圖上的每一點，都是做完這份測驗的人。用你心中養孩子的標準，加上台灣真實的房價、薪資、補助與稅制，算算你有沒有足夠的錢把孩子養大，也看看自己落在這張地圖的哪裡。約 5 分鐘。</p>
+        <div class="ng-x-go"><a class="ng-x-btn" href="https://jasontzeng123.github.io/next-gen/">開始測驗 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg></a><span class="ng-x-url">jasontzeng123.github.io/next-gen</span></div>
+      </div>
+      <figure class="ng-qr"><span class="ng-qr-box" role="img" aria-label="生育門檻測驗網址的 QR Code"><svg viewBox="0 0 29 29" class="segno"><path class="qrline" stroke="currentColor" d="M0 0.5h7m2 0h4m1 0h1m1 0h3m3 0h7m-29 1h1m5 0h1m1 0h1m1 0h1m1 0h1m1 0h1m2 0h1m4 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h3m1 0h1m1 0h3m2 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h1m2 0h1m3 0h1m1 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m3 0h2m4 0h4m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m3 0h2m1 0h2m3 0h1m1 0h1m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h1m1 0h3m1 0h1m4 0h1m-20 1h1m5 0h1m1 0h1m3 0h3m1 0h2m2 0h3m2 0h3m-28 1h1m1 0h1m1 0h1m2 0h2m1 0h3m1 0h2m3 0h2m2 0h2m1 0h2m-28 1h1m1 0h2m1 0h2m3 0h1m1 0h1m1 0h3m5 0h2m-24 1h4m1 0h1m1 0h1m2 0h1m3 0h1m1 0h1m1 0h2m2 0h2m1 0h1m-22 1h1m1 0h2m1 0h2m1 0h1m2 0h2m2 0h1m2 0h2m4 0h1m-29 1h2m2 0h1m2 0h5m1 0h1m1 0h5m1 0h4m2 0h2m-27 1h3m1 0h2m1 0h3m1 0h3m2 0h1m1 0h1m2 0h1m1 0h2m-27 1h1m1 0h2m1 0h1m2 0h2m4 0h2m2 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m-29 1h2m4 0h1m2 0h3m1 0h1m3 0h1m2 0h1m2 0h1m1 0h2m-27 1h1m2 0h1m1 0h1m2 0h3m1 0h2m1 0h2m2 0h1m1 0h4m1 0h3m-29 1h2m1 0h1m2 0h1m1 0h2m2 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h2m2 0h1m-29 1h1m1 0h1m1 0h2m1 0h6m1 0h3m2 0h2m1 0h1m1 0h1m-25 1h1m1 0h1m2 0h2m4 0h1m5 0h1m2 0h5m1 0h3m-21 1h2m4 0h3m1 0h1m1 0h1m3 0h2m-26 1h7m2 0h2m1 0h1m2 0h6m1 0h1m1 0h3m-27 1h1m5 0h1m3 0h1m1 0h1m2 0h2m1 0h3m3 0h1m2 0h1m-28 1h1m1 0h3m1 0h1m3 0h1m1 0h3m1 0h1m1 0h8m1 0h1m-28 1h1m1 0h3m1 0h1m2 0h2m4 0h4m1 0h2m3 0h2m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h9m-28 1h1m5 0h1m6 0h2m1 0h1m1 0h1m2 0h2m2 0h2m1 0h1m-29 1h7m1 0h3m2 0h2m2 0h1m1 0h1m6 0h1"/></svg></span><figcaption>手機掃描</figcaption></figure>
+    </div>
+  </aside>
+</main>
+<footer class="ng-foot"><div class="ng-in">
+  <span class="ng-credit"><b>CREDIT</b>製作 <a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">popo890827</a> × Claude</span>
+  <a href="https://github.com/jasontzeng123/next-gen" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a>
+  <span>程式碼 MIT・地圖與資料 CC BY 4.0・MV 與主視覺不在 CC BY 範圍內</span>
+  <span class="ng-r">在 Threads 上追蹤 <a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">@popo890827</a></span>
+</div></footer>
+<script>
+/* ---- util.js ---- */
+/* =========================================================================
+   UTIL — DOM 與格式化工具
+   ========================================================================= */
+var U = (function () {
+  'use strict';
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) {
+      for (var k in attrs) {
+        var v = attrs[k];
+        if (v == null || v === false) continue;
+        if (k === 'class') el.className = v;
+        else if (k === 'style' && typeof v === 'object') { for (var sk in v) el.style.setProperty(sk.replace(/[A-Z]/g, function (m) { return '-' + m.toLowerCase(); }), v[sk]); }
+        else if (k === 'html') el.innerHTML = v;
+        else if (k === 'text') el.textContent = v;
+        else if (k.slice(0, 2) === 'on' && typeof v === 'function') el.addEventListener(k.slice(2), v);
+        else if (v === true) el.setAttribute(k, '');
+        else el.setAttribute(k, v);
+      }
+    }
+    for (var i = 2; i < arguments.length; i++) append(el, arguments[i]);
+    return el;
+  }
+  function append(el, c) {
+    if (c == null || c === false) return;
+    if (Array.isArray(c)) { c.forEach(function (x) { append(el, x); }); return; }
+    if (typeof c === 'string' || typeof c === 'number') el.appendChild(document.createTextNode(String(c)));
+    else el.appendChild(c);
+  }
+  function svg(tag, attrs) {
+    var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    if (attrs) for (var k in attrs) { if (attrs[k] == null) continue; if (k === 'text') el.textContent = attrs[k]; else el.setAttribute(k, attrs[k]); }
+    for (var i = 2; i < arguments.length; i++) { var c = arguments[i]; if (c) (Array.isArray(c) ? c : [c]).forEach(function (x) { if (x) el.appendChild(x); }); }
+    return el;
+  }
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); return el; }
+
+  // 金額
+  function sep(n) { return Math.round(n).toLocaleString('en-US'); }
+  function wan(n, opt) {
+    opt = opt || {};
+    if (n == null || isNaN(n)) return '—';
+    var neg = n < 0, a = Math.abs(n), s;
+    if (a >= 1e8) s = (a / 1e8).toFixed(a >= 1e9 ? 1 : 2).replace(/\.?0+$/, '') + ' 億';
+    else if (a >= 1e4 || opt.forceWan) s = sep(a / 1e4) + ' 萬';
+    else s = sep(a) + ' 元';
+    if (opt.plain) return (neg ? '−' : '') + s;
+    return (neg ? '−' : (opt.sign && n > 0 ? '+' : '')) + s;
+  }
+  function wan1(n) { // 一位小數的萬
+    var a = Math.abs(n);
+    if (a >= 1e8) return wan(n);
+    if (a >= 1e5) return (n < 0 ? '−' : '') + sep(a / 1e4) + ' 萬';
+    return (n < 0 ? '−' : '') + (a / 1e4).toFixed(1).replace(/\.0$/, '') + ' 萬';
+  }
+  function yuan(n) { return sep(n) + ' 元'; }
+  function monthly(n) { return n >= 10000 ? (n / 1e4).toFixed(n % 10000 === 0 ? 0 : 1).replace(/\.0$/, '') + ' 萬/月' : sep(n) + ' 元/月'; }
+  function prFmt(p) { if (p == null) return '—'; if (p >= 99) return p.toFixed(1); if (p < 1) return '<1'; return Math.round(p).toString(); }
+  function topPct(p) { var t = 100 - p; if (t < 1) return t.toFixed(1); return Math.round(t).toString(); }
+  // 門檻 PR 一律無條件進位到顯示的精度（50.3 → 51、99.12 → 99.2）：
+  // 四捨五入會出現「門檻 PR 50」卻「PR 50 的夫妻撐不住」的矛盾
+  function thUp(p) {
+    if (p == null || !(p >= 1)) return p;
+    if (p >= 99) return Math.min(99.9, Math.ceil(p * 10 - 1e-6) / 10);
+    return Math.min(99, Math.ceil(p - 1e-6));
+  }
+  var CN = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十'];
+  function cn(n) { return CN[n] || String(n); }
+
+  // 不依賴計時器的排程：MessageChannel 與 setTimeout 同時排，誰先到就執行（部分手機 App 會暫停計時器）
+  var errHook = null;
+  function onError(fn) { errHook = fn; }
+  function report(e, where) { try { if (window.__diag) window.__diag.errors.push((where ? where + ': ' : '') + String(e && (e.stack || e.message) || e).slice(0, 600)); } catch (x) { /* 忽略 */ } if (errHook) try { errHook(e, where); } catch (x) { /* 忽略 */ } }
+  function safe(fn, where) { try { return fn(); } catch (e) { report(e, where); return undefined; } }
+  function task(fn, where) {
+    var done = false;
+    var run = function () { if (done) return; done = true; safe(fn, where || 'task'); };
+    try { var ch = new MessageChannel(); ch.port1.onmessage = function () { ch.port1.close(); run(); }; ch.port2.postMessage(0); } catch (e) { /* 不支援時改用 setTimeout */ }
+    setTimeout(run, 0);
+  }
+  function debounce(fn, ms) { var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, ms); }; }
+  var store = {
+    get: function (k, d) { try { var v = window.localStorage.getItem('tw-kids:' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set: function (k, v) { try { window.localStorage.setItem('tw-kids:' + k, JSON.stringify(v)); } catch (e) { /* 無法儲存時略過 */ } }
+  };
+  var toastEl, toastT;
+  function toast(msg) {
+    if (!toastEl) { toastEl = h('div', { class: 'toast', role: 'status', 'aria-live': 'polite' }); document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    // 用 CSS 動畫自動消失，不靠計時器
+    toastEl.classList.remove('on'); void toastEl.offsetWidth; toastEl.classList.add('on');
+  }
+  function cssVar(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function reduceMotion() { try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  // 色盲友善模式（封面切換，存在本機）
+  function cvd() { return document.documentElement.getAttribute('data-cvd') === '1'; }
+  function setCvd(on) { if (on) document.documentElement.setAttribute('data-cvd', '1'); else document.documentElement.removeAttribute('data-cvd'); store.set('cvd', !!on); }
+  // 深淺色：預設跟著系統；在封面切換後記住（data-theme = light／dark）
+  function theme() { var t = document.documentElement.getAttribute('data-theme'); if (t === 'dark' || t === 'light') return t; try { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (e) { return 'light'; } }
+  function setTheme(t, keep) {
+    document.documentElement.setAttribute('data-theme', t);
+    if (keep !== false) store.set('theme', t);
+    try { [].forEach.call(document.querySelectorAll('meta[name="theme-color"]'), function (m) { m.setAttribute('content', t === 'dark' ? '#0d1210' : '#e9eee9'); }); } catch (e) { /* 忽略 */ }
+  }
+  function isDark() { try { return /dark/.test(getComputedStyle(document.documentElement).colorScheme || ''); } catch (e) { return false; } }
+  function hex3(c) { c = String(c || '').trim(); if (c[0] === '#' && c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3]; var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c); if (m) return [+m[1], +m[2], +m[3]]; return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16) || 0; }); }
+  function mix(a, b, t) { var x = hex3(a), y = hex3(b); return 'rgb(' + x.map(function (v, i) { return Math.round(v + (y[i] - v) * t); }).join(',') + ')'; }
+  // 複製：先用 Clipboard API；在嵌入框裡被擋時，改用選取＋execCommand；再不行就選取文字請使用者手動複製
+  function copy(text, fallbackEl, msg) {
+    var done = function () { toast(msg || '已複製'); };
+    function legacy() {
+      var el = fallbackEl, temp = false;
+      if (!el) { el = h('textarea', { readonly: true, style: { position: 'fixed', top: '-1000px', opacity: '0' } }, text); document.body.appendChild(el); temp = true; }
+      var ok = false;
+      try { el.focus(); el.select(); ok = document.execCommand && document.execCommand('copy'); } catch (e) { ok = false; }
+      if (temp) el.parentNode.removeChild(el);
+      if (ok) done(); else if (!temp) toast('已選取文字，請手動複製'); else toast('無法自動複製，請手動複製網址');
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, legacy);
+      else legacy();
+    } catch (e) { legacy(); }
+  }
+  var modalN = 0;
+  function modal(build) {
+    var id = 'mdl' + (++modalN);
+    var scrim = h('div', { class: 'modal-scrim', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': id + 'h' });
+    var box = h('div', { class: 'modal fade-in' });
+    scrim.appendChild(box);
+    var opener = document.activeElement;
+    var close = function () { if (scrim.parentNode) scrim.parentNode.removeChild(scrim); document.removeEventListener('keydown', onKey, true); if (opener && opener.focus) try { opener.focus(); } catch (e) { /* 忽略 */ } };
+    var onKey = function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+      if (e.key === 'Tab') {
+        var f = box.querySelectorAll('button, select, input, textarea, a[href]');
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        return;
+      }
+      // 對話框開著時，其他快捷鍵不作用在背後的頁面
+      if (!box.contains(e.target)) e.stopPropagation();
+      else if (e.key !== 'Enter' && e.key !== ' ') e.stopPropagation();
+    };
+    document.addEventListener('keydown', onKey, true);
+    scrim.addEventListener('click', function (e) { if (e.target === scrim) close(); });
+    build(box, close);
+    var hd = box.querySelector('h3'); if (hd) hd.id = id + 'h';
+    document.body.appendChild(scrim);
+    var f = box.querySelector('input, select, button'); if (f) f.focus();
+    return close;
+  }
+  // 大金額先確認（最常見的錯是把「元」填進「萬」的格子）：n 以輸入單位計
+  function confirmAmount(n, unit, onYes, onNo) {
+    var spoken = unit === '萬' ? ((Math.floor(n / 10000) ? Math.floor(n / 10000) + ' 億' : '') + (n % 10000 ? sep(+(n % 10000).toFixed(1)) + ' 萬' : '') + '元') : sep(n) + ' ' + unit;
+    modal(function (box, close) {
+      box.appendChild(h('h3', {}, '確定是 ' + spoken + '嗎？'));
+      box.appendChild(h('p', {}, unit === '萬' ? '這一格的單位是「萬」：填 100 代表 100 萬元。你填的是 ' + sep(n) + '，也就是新台幣 ' + sep(Math.round(n * 10000)) + ' 元。' : '你填的是 ' + spoken + '。'));
+      box.appendChild(h('div', { class: 'actions' },
+        h('button', { class: 'btn ghost', onclick: function () { close(); if (onNo) onNo(); } }, '重新填寫'),
+        h('button', { class: 'btn', onclick: function () { close(); onYes(); } }, '沒錯，是 ' + spoken)));
+    });
+  }
+  function modalOpen() { return !!document.querySelector('.modal-scrim'); }
+  // 小圖示（線條）
+  var ICONS = {
+    lab: '<path d="M9 3h6M10 3v6.2L4.6 18.4A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.6-2.6L14 9.2V3"/><path d="M7.5 14h9"/>',
+    book: '<path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H20v15H5.5A1.5 1.5 0 0 0 4 19.5v-15Z"/><path d="M4 19.5A1.5 1.5 0 0 0 5.5 21H20"/><path d="M8 7h8M8 10.5h6"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    next: '<path d="M9 5l7 7-7 7"/>',
+    redo: '<path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/>',
+    sliders: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+    save: '<path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/>',
+    copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+    image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+    close: '<path d="M6 6l12 12M18 6L6 18"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',
+    map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>',
+    people: '<circle cx="8" cy="7" r="3"/><path d="M3 20v-3a5 5 0 0 1 10 0v3"/><circle cx="17" cy="8" r="2.5"/><path d="M15 20v-3.5a4 4 0 0 1 6 0V20"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    report: '<path d="M6 3h9l4 4v14H6z"/><path d="M14.5 3v4.5H19"/><path d="M9 12h7M9 15.5h7M9 8.5h3"/>',
+    external: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+    download: '<path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/>',
+    code: '<path d="M8.5 7L3.5 12l5 5M15.5 7l5 5-5 5"/>',
+    share: '<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.9l7.6-3.8M8.2 13.1l7.6 3.8"/>'
+  };
+  function icon(name, cls) {
+    var s = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : '') + '>' + (ICONS[name] || '') + '</svg>';
+    var t = document.createElement('template'); t.innerHTML = s; return t.content.firstChild;
+  }
+  return { task: task, safe: safe, report: report, onError: onError, modalOpen: modalOpen, h: h, svg: svg, clear: clear, sep: sep, wan: wan, wan1: wan1, yuan: yuan, monthly: monthly, pr: prFmt, topPct: topPct, thUp: thUp, cn: cn, debounce: debounce, store: store, toast: toast, cssVar: cssVar, reduceMotion: reduceMotion, cvd: cvd, setCvd: setCvd, theme: theme, setTheme: setTheme, isDark: isDark, mix: mix, copy: copy, modal: modal, confirmAmount: confirmAmount, icon: icon };
+})();
+
+/* ---- data.js ---- */
+/* =========================================================================
+   DATA — 台灣養育成本、所得分布、補助與稅制參數
+   全部金額為新台幣「2026 年幣值」。est:true 代表估計值（見方法頁）。
+   ========================================================================= */
+var DATA = (function () {
+  'use strict';
+
+  // ---------- 資料來源 ----------
+  var SOURCES = {
+    birth:      { t: '勞動部｜好孕3方案：每胎生育補助補足至10萬元', u: 'https://www.mol.gov.tw/1607/1632/1633/84736/', d: '2026' },
+    allowance:  { t: '行政院｜0–未滿2歲育兒津貼', u: 'https://www.ey.gov.tw/Page/5C0ED08BC3240B/c7f92bd8-d84e-4918-831f-a84e505f1e91', d: '2022–2026' },
+    family:     { t: '中央社｜行政院家庭支持篇（托育、幼兒園、成長津貼）', u: 'https://www.cna.com.tw/news/aipl/202605270141.aspx', d: '2026-05' },
+    preschool:  { t: '新北市板橋區公所｜2–5歲育兒津貼與就學補助 FAQ', u: 'https://www.banqiao.ntpc.gov.tw/userfiles/3010500/files/20251016-FQA.pdf', d: '2025-10' },
+    kgFee:      { t: '親子天下｜幼兒園收費與家長繳費上限', u: 'https://www.parenting.com.tw/article/5089425', d: '2026-03' },
+    leave:      { t: '勞動部｜育嬰留職停薪津貼與按日申請', u: 'https://www.mol.gov.tw/1607/1632/1633/90804/', d: '2026' },
+    tax115:     { t: '中央社｜未成年子女免稅額調高三讀（115年度）', u: 'https://cna.com.tw/news/afe/202608210277.aspx', d: '2026-08' },
+    taxParam:   { t: '會計師整理｜115年度綜所稅免稅額、扣除額與課稅級距', u: 'https://cpacorey.com/income-tax-level-2026/', d: '2026' },
+    nhi:        { t: '健保署｜投保金額分級表與費率', u: 'https://www.nhi.gov.tw/ch/dl-80722-3a1c591f3afb48f7bf4ecca33e2d7974-1.pdf', d: '2026' },
+    laborIns:   { t: '勞動部｜勞保費率與投保薪資', u: 'https://www.mol.gov.tw/1607/1632/1633/86680/', d: '2026' },
+    rentSub:    { t: '115年度300億元中央擴大租金補貼作業規定', u: 'https://thd.taichung.gov.tw/media/1305401/附件2-115-300億租金補貼作業規定.pdf', d: '2026' },
+    rentSubNew: { t: '工商時報｜青年婚育租屋支持專案加碼倍數', u: 'https://www.ctee.com.tw/news/20250911700946-430102', d: '2025-09' },
+    qingan:     { t: '今周刊｜新青安3.0 方案內容（2026-08起）', u: 'https://www.businesstoday.com.tw/article/category/192008/post/202607160020/', d: '2026-07' },
+    mortgage:   { t: '自由時報｜五大銀行新承做房貸利率', u: 'https://ec.ltn.com.tw/article/breakingnews/5582725', d: '2026-08' },
+    tpeBirth:   { t: '臺北市生育補助發放辦法', u: 'https://laws.gov.taipei/law/LawSearch/LawArticleContent/FL081869', d: '2026' },
+    tpeCare:    { t: '臺北市友善托育補助實施計畫', u: 'https://laws.gov.taipei/Law/LawSearch/LawArticleContent/FL079829', d: '2026-07' },
+    cityBirth:  { t: '商周｜各縣市生育補助一覽', u: 'https://www.businessweekly.com.tw/career/blog/3021085', d: '2026' },
+    wage:       { t: '主計總處｜113年全年總薪資中位數及分布統計', u: 'https://www.stat.gov.tw/News_Content.aspx?n=2716&s=235514', d: '2025-11' },
+    wageYear:   { t: '主計總處｜114年全年薪資統計', u: 'https://www.stat.gov.tw/News_Content.aspx?n=2724&s=235863', d: '2026-02' },
+    wageDecile: { t: '主計總處十分位資料（轉載）', u: 'https://joelin.cc/p/9747', d: '2025-11' },
+    occupation: { t: '勞動部｜職類別薪資調查', u: 'https://www.mol.gov.tw/1607/1632/1633/90814/', d: '2025' },
+    household:  { t: '主計總處｜114年家庭收支調查', u: 'https://www.stat.gov.tw/News_Content.aspx?n=3703&s=236591', d: '2026-08' },
+    quintile:   { t: '臺中市主計處｜114年家庭收支（含全國五等分位）', u: 'https://www.dbas.taichung.gov.tw/media/1457179/第115-03號-經濟統計通報-臺中市114-年家庭收支狀況.pdf', d: '2026' },
+    savingRate: { t: '風傳媒｜113年家庭收支調查：每戶儲蓄與儲蓄率', u: 'https://www.storm.mg/lifestyle/11061012', d: '2025-08' },
+    youthSave:  { t: '經濟日報｜yes123 青年勞工調查：39歲以下平均存款', u: 'https://money.udn.com/money/story/5612/9415770', d: '2026-04' },
+    savingAge:  { t: '老喬報｜依主計總處家庭收支調查推估各年齡累積存款', u: 'https://joelin.cc/?p=3571', d: '2026-08' },
+    countyCons: { t: '主計總處家庭收支各縣市每人消費（彙整表）', u: 'https://csr.mcut.edu.tw/var/file/31/1031/img/2105/528706794.pdf', d: '2023' },
+    minLiving:  { t: '臺北市｜115年度最低生活費', u: 'https://service.docms.gov.taipei/attachments/115-income-limit.pdf', d: '2026' },
+    women:      { t: '主計總處｜婦女婚育與就業調查', u: 'https://ws.dgbas.gov.tw/public/attachment/7911117100zt9y70g.pdf', d: '2016' },
+    leju:       { t: '樂居｜各縣市近一年實價登錄均價', u: 'https://www.leju.com.tw/map/region?mode=price', d: '2026-10' },
+    rent591:    { t: '591租屋｜各縣市租金行情（刊登中位數）', u: 'https://rent.591.com.tw/market/region', d: '2026-10' },
+    rentMoi:    { t: '中央社｜內政部115上半年租金統計', u: 'https://www.cna.com.tw/news/aipl/202608130273.aspx', d: '2026-08' },
+    pir:        { t: '內政部房價負擔能力指標（115Q1，轉載）', u: 'https://fangbian.tw/house-price-income-ratio/', d: '2026' },
+    sinyi:      { t: '信義房價指數', u: 'https://www.sinyinews.com.tw/quarterly', d: '2005–2026' },
+    parking:    { t: '信義房屋｜2025平面車位均價', u: 'https://www.peoplenews.tw/articles/lifestyle/14573', d: '2026' },
+    careFee:    { t: '親子天下｜準公共托育收費上限', u: 'https://www.parenting.com.tw/article/5086811', d: '2026-01' },
+    tpeCareCap: { t: '臺北市準公共托育收費上限', u: 'https://www-ws.gov.taipei/001/Upload/358/relfile/17962/3171232/bb3f51f6-1fc7-445f-849e-56879b8342c2.pdf', d: '2026' },
+    childSurvey:{ t: '衛福部｜111年兒童及少年生活狀況調查', u: 'https://www.mohw.gov.tw/dl-86168-9a466094-0c39-4ed1-b95e-fdbc74e7c28e.html', d: '2022' },
+    helper:     { t: '中央社｜外籍家庭幫傭放寬至有12歲以下子女家庭', u: 'https://www.cna.com.tw/news/aipl/202603180239.aspx', d: '2026-03' },
+    postpartum: { t: '聯合報｜台北月子中心價格', u: 'https://udn.com/news/story/7323/9257447', d: '2026-01' },
+    postpartum2:{ t: '凱基銀行｜各地月子中心行情', u: 'https://www.kgibank.com.tw/zh-tw/kgibarticleshome/loan/pl-parenting', d: '2025-06' },
+    uniFee:     { t: '公視｜大專學雜費與私校學費減免', u: 'https://news.pts.org.tw/article/751419', d: '2025' },
+    hsFree:     { t: '公視｜高中職免學費', u: 'https://news.pts.org.tw/article/643833', d: '2023' },
+    lunch:      { t: '今周刊｜各縣市國中小營養午餐免費', u: 'https://www.businesstoday.com.tw/article/category/183030/post/202601080017/', d: '2026-01' },
+    carTax:     { t: '財政部｜使用牌照稅', u: 'https://www.etax.nat.gov.tw/etwmain/tax-info/understanding/tax-knowledge/NmrzjR', d: '2026' },
+    scooter:    { t: '遠見｜交通部機車使用狀況調查', u: 'https://city.gvm.com.tw/article/107558', d: '2022' },
+    tpass:      { t: 'Money101｜TPASS 各區月票', u: 'https://www.money101.com.tw/blog/%E5%8C%97%E6%8D%B7%E6%8D%B7%E9%81%8B-8-%E6%8A%98%E5%84%AA%E6%83%A0%E5%8F%96%E6%B6%88-%E5%B8%B8%E5%AE%A2%E6%96%B9%E6%A1%88%E6%90%AD%E8%B6%8A%E5%A4%9A%E7%9C%81%E8%B6%8A%E5%A4%9A', d: '2026-09' },
+    filial:     { t: 'yes123｜上班族每月孝親費調查', u: 'https://www.epochtimes.com.tw/n351538/', d: '2021' },
+    births:     { t: '內政部戶政統計（經維基百科彙整）', u: 'https://en.wikipedia.org/wiki/Demographics_of_Taiwan', d: '2026' },
+    bonus:      { t: '經濟日報｜主計總處年終獎金統計', u: 'https://money.udn.com/money/story/5612/9443738', d: '2026' },
+    population: { t: '內政部戶政司｜村里戶籍人口統計（115年9月）', u: 'https://www.ris.gov.tw/app/portal/346', d: '2026-09' },
+    molYear:    { t: '勞動部｜勞動統計年報 表1-1（歷年薪資與物價）', u: 'https://statdb.mol.gov.tw/html/year/year14/31010.pdf', d: '2025' },
+    sinyiPing:  { t: 'Taipei Times｜信義房屋：台北房價20年漲近3倍（1995 vs 2014）', u: 'https://www.taipeitimes.com/News/biz/archives/2015/06/14/2003620627', d: '2015' },
+    growthAllow:{ t: '今周刊｜0–18歲成長津貼（預算審議中）', u: 'https://www.businesstoday.com.tw/article/category/183030/post/202605210002/', d: '2026-05' }
+  };
+
+  // ---------- 縣市 ----------
+  // price: 萬元/坪（大樓華廈，近一年，樂居）; rent: 591 刊登中位數（元/月）
+  // cons: 每人每月消費支出（2023，主計總處）; minLiving: 115年最低生活費
+  // park: 月租車位; parkBuy: 平面車位均價（萬）; rsb: 租金補貼第二級基本額; cap: 新青安房價上限（萬）
+  function C(id, name, area, o) { o.id = id; o.name = name; o.area = area; return o; }
+  var COUNTIES = [
+    C('TPE', '台北市', 'north', { price: 107.35, priceNew: 128.88, rent: [15900, 30000, 35000, 44999], mgmt: 130, pir: 14.72, cons: 34014, minLiving: 20744, park: 2979, parkBuy: 287.8, rsb: 5000, cap: 3500, tpass: 1200, birth: [40000, 45000, 50000], small: 26 }),
+    C('NTPC', '新北市', 'north', { price: 60.36, priceNew: 71.33, rent: [12500, 19999, 25000, 28000], mgmt: 100, pir: 12.63, cons: 26226, minLiving: 17750, park: 2500, parkBuy: 204.3, rsb: 4000, cap: 2500, tpass: 1200, birth: [40000, 45000, 50000], small: 26 }),
+    C('TYN', '桃園市', 'north', { price: 38.63, priceNew: 43.62, rent: [9500, 16000, 22000, 25000], mgmt: 85, pir: 8.43, cons: 25235, minLiving: 17186, park: 2000, parkBuy: 162.9, rsb: 4000, cap: 2000, tpass: 1200, birth: [30000, 40000, 50000], small: 26 }),
+    C('TXG', '台中市', 'central', { price: 40.89, priceNew: 52.46, rent: [9466, 15000, 22000, 25000], mgmt: 85, pir: 11.35, cons: 26957, minLiving: 16431, park: 1800, parkBuy: 165.6, rsb: 4000, cap: 2000, tpass: 699, birth: [20000, 20000, 30000, 40000, 50000], small: 23 }),
+    C('TNN', '台南市', 'south', { price: 32.53, priceNew: 38.56, rent: [7500, 13500, 21000, 23287], mgmt: 65, pir: 8.76, cons: 22661, minLiving: 15515, park: 1600, parkBuy: 155.4, rsb: 3600, cap: 2000, tpass: 999, birth: [20000, 20000, 30000, 30000, 50000], small: 23 }),
+    C('KHH', '高雄市', 'south', { price: 31.74, priceNew: 38.53, rent: [7800, 16000, 21000, 24000], mgmt: 65, pir: 9.35, cons: 26399, minLiving: 16970, park: 1800, parkBuy: 204.8, rsb: 3600, cap: 2000, tpass: 999, birth: [30000, 30000, 30000], small: 23 }),
+    C('HSZ', '新竹市', 'north', { price: 50.73, priceNew: 62.15, rent: [9500, 16000, 24000, 28950], mgmt: 90, pir: 8.43, cons: 31211, minLiving: 15515, park: 2500, parkBuy: 159.0, rsb: 4000, cap: 2500, tpass: 1200, birth: [30000, 30000, 30000], small: 26 }),
+    C('HSQ', '新竹縣', 'north', { price: 51.43, priceNew: 56.90, rent: [10000, 20000, 25000, 30000], mgmt: 90, pir: 9.21, cons: 29578, minLiving: 15515, park: 2000, parkBuy: 159.0, rsb: 4000, cap: 2500, tpass: 1200, birth: [10000, 20000, 50000], small: 26 }),
+    C('KEE', '基隆市', 'north', { price: 28.98, priceNew: 46.33, rent: [8500, 10880, 15000, 16500], mgmt: 60, pir: 5.70, cons: 24234, minLiving: 15515, park: 1500, parkBuy: 110, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 1200, small: 26 }),
+    C('ILA', '宜蘭縣', 'north', { price: 27.06, priceNew: 29.61, rent: [8000, 13000, 16000, 18000], mgmt: 50, pir: 7.33, cons: 23808, minLiving: 15515, park: 1200, parkBuy: 100, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 800, small: 23 }),
+    C('MIA', '苗栗縣', 'central', { price: 30.80, priceNew: 34.16, rent: [7500, 13800, 20000, 23000], mgmt: 50, pir: 7.64, cons: 21017, minLiving: 15515, park: 1200, parkBuy: 100, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 1200, small: 23 }),
+    C('CHA', '彰化縣', 'central', { price: 28.70, priceNew: 32.88, rent: [6800, 12250, 18000, 19500], mgmt: 50, pir: 8.23, cons: 19292, minLiving: 15515, park: 1200, parkBuy: 100, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 699, small: 23 }),
+    C('NAN', '南投縣', 'central', { price: 23.81, priceNew: 28.13, rent: [6800, 11000, 18000, 19000], rentEst1: true, mgmt: 40, pir: 8.47, cons: 18650, minLiving: 15515, park: 1000, parkBuy: 90, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 699, small: 23 }),
+    C('YUN', '雲林縣', 'south', { price: 22.43, priceNew: 26.66, rent: [6500, 11000, 19000, 20500], rentEst1: true, mgmt: 40, pir: 7.17, cons: 20356, minLiving: 15515, park: 1000, parkBuy: 90, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 399, small: 23 }),
+    C('CYI', '嘉義市', 'south', { price: 25.85, priceNew: 34.65, rent: [7500, 12000, 16500, 20000], rentEst1: true, mgmt: 45, pir: 7.51, cons: 25599, minLiving: 15515, park: 1200, parkBuy: 100, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 399, small: 23 }),
+    C('CYQ', '嘉義縣', 'south', { price: 27.55, priceNew: 31.78, rent: [7500, 12000, 23000, 23800], rentEst1: true, mgmt: 40, pir: 6.67, cons: 19410, minLiving: 15515, park: 1000, parkBuy: 90, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 399, small: 23 }),
+    C('PIF', '屏東縣', 'south', { price: 21.86, priceNew: 26.29, rent: [6500, 11750, 17500, 19000], mgmt: 40, pir: 7.08, cons: 21594, minLiving: 15515, park: 1000, parkBuy: 90, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 999, small: 23 }),
+    C('HUA', '花蓮縣', 'east', { price: 23.35, priceNew: 27.39, rent: [7000, 12000, 17000, 18000], mgmt: 40, pir: 8.31, cons: 21484, minLiving: 15515, park: 1000, parkBuy: 90, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 399, small: 23 }),
+    C('TTT', '台東縣', 'east', { price: 20.95, priceNew: 29.10, rent: [7000, 11000, 15000, 17000], rentEst: true, mgmt: 40, pir: 8.15, cons: 21412, minLiving: 15515, park: 1000, parkBuy: 90, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 299, small: 23 }),
+    C('PEN', '澎湖縣', 'islands', { price: 19.44, priceNew: 22.4, priceEst: true, rent: [7500, 11000, 15000, 17000], rentEst: true, mgmt: 30, pir: 8.05, cons: 20971, minLiving: 15515, park: 800, parkBuy: 80, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 300, small: 23 }),
+    C('KIN', '金門縣', 'islands', { price: 24.64, priceNew: 26.0, priceEst: true, rent: [5500, 10000, 14000, 16000], rentEst: true, mgmt: 30, pir: 8.38, cons: 21000, consEst: true, minLiving: 15173, park: 800, parkBuy: 80, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 300, small: 23 }),
+    C('LIE', '連江縣', 'islands', { price: 24.0, priceNew: 26.0, priceEst: true, rent: [5500, 10000, 14000, 16000], rentEst: true, mgmt: 30, pir: 8.4, cons: 21000, consEst: true, minLiving: 15173, park: 500, parkBuy: 80, parkBuyEst: true, rsb: 3200, cap: 2000, tpass: 300, small: 23 })
+  ];
+  var COUNTY = {};
+  COUNTIES.forEach(function (c) { COUNTY[c.id] = c; });
+
+  // 區域：房價乘數（樂居行政區均價 / 全市均價）
+  var DISTRICTS = {
+    TPE: [{ id: 'core', name: '精華區', ex: '大安、信義、中山、松山', m: 1.25 }, { id: 'mid', name: '一般地區', ex: '內湖、士林、中正、南港', m: 1.0 }, { id: 'outer', name: '外圍地區', ex: '文山、北投、萬華', m: 0.86 }],
+    NTPC: [{ id: 'core', name: '蛋黃區', ex: '永和、板橋、中和、新店', m: 1.25 }, { id: 'mid', name: '蛋白區', ex: '新莊、三重、蘆洲、林口、汐止', m: 1.0 }, { id: 'outer', name: '外圍地區', ex: '淡水、三峽、樹林、八里', m: 0.7 }],
+    TYN: [{ id: 'core', name: '市中心', ex: '桃園區、中壢區', m: 1.1 }, { id: 'mid', name: '一般地區', ex: '八德、蘆竹、龜山', m: 0.92 }, { id: 'outer', name: '外圍地區', ex: '楊梅、大溪、觀音', m: 0.78 }],
+    TXG: [{ id: 'core', name: '七期與西屯南屯', ex: '西屯、南屯、北屯', m: 1.25 }, { id: 'mid', name: '一般地區', ex: '北區、西區、南區', m: 1.0 }, { id: 'outer', name: '外圍地區', ex: '太平、大里、烏日', m: 0.82 }],
+    TNN: [{ id: 'core', name: '市中心', ex: '東區、中西區、北區', m: 1.2 }, { id: 'mid', name: '一般地區', ex: '永康、安南、仁德', m: 0.95 }, { id: 'outer', name: '外圍地區', ex: '新營、佳里、麻豆', m: 0.75 }],
+    KHH: [{ id: 'core', name: '市中心', ex: '鼓山、左營、苓雅', m: 1.2 }, { id: 'mid', name: '一般地區', ex: '三民、前鎮、楠梓', m: 1.0 }, { id: 'outer', name: '外圍地區', ex: '鳳山、岡山、大寮', m: 0.87 }],
+    HSQ: [{ id: 'core', name: '竹北', ex: '竹北市', m: 1.23 }, { id: 'outer', name: '其他鄉鎮', ex: '竹東、湖口、新豐', m: 0.8 }]
+  };
+
+  // 0–2歲托育行情（補助前，元/月）與縣市加碼
+  var CARE = {
+    publicFee:  { TPE: 11000, NTPC: 9000, TYN: 9000, TXG: 8500, TNN: 10000, KHH: 9000, _: 9000 },
+    quasiFee:   { TPE: 22200, NTPC: 21000, TYN: 20000, TXG: 17500, TNN: 17500, KHH: 17500, HSZ: 19500, HSQ: 19500, _: 16500 },
+    privateFee: { TPE: 22500, NTPC: 21500, TYN: 22000, TXG: 17500, TNN: 20500, KHH: 15500, _: 17000 },
+    topQuasi:   { TPE: 8000, NTPC: 2500, TYN: 1500, TXG: 1400, HSZ: 2000, _: 0 },
+    topPublic:  { TPE: 2500, _: 0 },
+    allow02Top: { HSZ: 1000, _: 0 },
+    tpeQuasiSiblingFree: true
+  };
+  // 幼兒園（2–6歲）一般私立與雙語行情（元/月）
+  var KG = {
+    privateFee:   { TPE: 18000, NTPC: 18000, HSZ: 15000, HSQ: 15000, TYN: 15000, _: 12500 },
+    bilingualFee: { TPE: 32000, NTPC: 32000, HSZ: 26000, HSQ: 26000, TYN: 26000, TXG: 26000, _: 22000 },
+    extras: 1500
+  };
+  var ANQIN = { TPE: 11000, NTPC: 9000, TYN: 9000, HSZ: 9000, HSQ: 9000, _: 8000 };
+  var POSTPARTUM_CENTER = { TPE: 300000, NTPC: 300000, HSZ: 220000, HSQ: 220000, TYN: 220000, TXG: 220000, _: 180000 };
+  function byCounty(tbl, id) { return tbl[id] != null ? tbl[id] : tbl._; }
+
+  // ---------- 所得 ----------
+  // 全體受僱者全年總薪資十分位（113年，含獎金），以中位數為 1 的比值
+  var WAGE = {
+    median: 546000,
+    q: [[1, 0.42], [5, 0.53], [10, 0.6044], [20, 0.6978], [30, 0.7912], [40, 0.8919], [50, 1], [60, 1.1502], [70, 1.3791], [80, 1.7564], [90, 2.4469]],
+    paretoAlpha: 2.8,      // 以官方平均數 73.2 萬校正的尾端
+    ageSpread: 0.85,       // 同年齡層內的差距較全體小（估計）
+    toBase: 1.08,          // 113年（2024）薪資 → 2026 年水準（114年 +3.9%、115年 1–7月 +4.2%）
+    // 年齡（全體受僱者中位數 / 全體中位數）
+    age: [[22, 0.698], [27, 0.954], [34.5, 1.064], [44.5, 1.136], [57, 1.06], [66, 0.804]],
+    growth: 0.01
+  };
+  // 產業（中位數為 113 年全年總薪資，跨年齡）；k=產業內離散度相對全體；bonus=年終月數
+  var INDUSTRIES = [
+    { id: 'all', name: '不分產業（全體受僱者）', median: 546000, k: 1, bonus: 1.7 },
+    { id: 'fin', name: '金融及保險業', median: 1106000, k: 0.85, bonus: 3.65 },
+    { id: 'semi', name: '電子零組件製造（半導體等）', median: 876000, k: 0.85, bonus: 2.97 },
+    { id: 'comp', name: '電腦、電子及光學產品製造', median: 899000, k: 0.85, bonus: 3.54 },
+    { id: 'ict', name: '資訊通訊、軟體、出版影音', median: 807000, k: 0.85, bonus: 2.0 },
+    { id: 'power', name: '電力及燃氣供應業', median: 1091000, k: 0.6, bonus: 3.0 },
+    { id: 'prof', name: '專業、科學及技術服務（法律、會計、設計、顧問）', median: 700000, k: 0.85, bonus: 1.8, est: true },
+    { id: 'health', name: '醫療保健及社會工作（醫院、診所、照護）', median: 680000, k: 0.9, bonus: 1.7, est: true },
+    { id: 'transport', name: '運輸及倉儲業', median: 666000, k: 0.8, bonus: 1.86, est: true },
+    { id: 'mfg', name: '製造業（整體）', median: 570000, k: 0.85, bonus: 2.2 },
+    { id: 'realestate', name: '不動產業', median: 582000, k: 0.9, bonus: 1.8, est: true },
+    { id: 'retail', name: '批發及零售業', median: 549000, k: 0.85, bonus: 1.5, est: true },
+    { id: 'construction', name: '營建工程業', median: 522000, k: 0.8, bonus: 1.79, est: true },
+    { id: 'water', name: '用水供應及污染整治業', median: 505000, k: 0.75, bonus: 1.5 },
+    { id: 'arts', name: '藝術、娛樂及休閒服務業', median: 436000, k: 0.85, bonus: 1.0, est: true },
+    { id: 'support', name: '支援服務業（保全、清潔、派遣、旅行社）', median: 415000, k: 0.8, bonus: 1.0, est: true },
+    { id: 'food', name: '住宿及餐飲業', median: 415000, k: 0.8, bonus: 0.8 },
+    { id: 'edu', name: '教育服務業（補習班等，不含公立學校）', median: 382000, k: 0.85, bonus: 0.8 },
+    { id: 'other', name: '其他服務業（美容、維修、宗教團體等）', median: 381000, k: 0.85, bonus: 0.8 },
+    { id: 'civil', name: '公務人員', median: 820000, k: 0.4, bonus: 1.5, est: true, base2026: true },
+    { id: 'teacher', name: '公立學校教師', median: 860000, k: 0.35, bonus: 1.5, est: true, base2026: true },
+    { id: 'none', name: '目前沒有工作／全職照顧家庭', median: 0, k: 0, bonus: 0 }
+  ];
+  var INDUSTRY = {};
+  INDUSTRIES.forEach(function (x) {
+    if (!x.base2026) x.median = Math.round(x.median * WAGE.toBase / 1000) * 1000; // 換算成 2026 年薪資水準
+    INDUSTRY[x.id] = x;
+  });
+  WAGE.median2024 = WAGE.median; WAGE.median = Math.round(WAGE.median * WAGE.toBase / 1000) * 1000;
+
+  // 家庭可支配所得與消費支出（114年，五等分位平均數，視為第10/30/50/70/90百分位）
+  // 同齡平均存款（每人，元）：主計總處家庭收支調查各年齡的平均儲蓄，從 22 歲開始累積、不計投資報酬的推估（老喬報整理）。
+  // 官方沒有各年齡的存款餘額統計；這是平均數、且官方的「儲蓄」含還貸款與投資，偏樂觀。只用於「標準門檻」。
+  var SAVINGS_TYPICAL = [[22, 0], [25, 280000], [30, 750000], [35, 1380000], [40, 1930000], [45, 2600000], [50, 3230000], [55, 3860000], [60, 4640000], [65, 5420000]];
+
+  var HOUSEHOLD = {
+    // 114 年（2025）資料；載入時換算成 2026 年水準（可支配所得 ×1.04、消費 ×1.03）
+    disposable: [[10, 397191], [30, 726390], [50, 1043274], [70, 1435638], [90, 2449344]],
+    dispMedian: 1018000, dispMean: 1210000,
+    consumption: [[10, 397000], [30, 668000], [50, 876000], [70, 1120000], [90, 1555000]], consEst: true, // 各分位消費為估計值
+    consMean: 920000
+  };
+
+  // ---------- 稅與社會保險（115年度所得，實質固定） ----------
+  var TAX = {
+    exempt: 101000, exemptMinor: 151500,
+    std: { single: 136000, married: 272000 },
+    salarySpecial: 227000,
+    preschool: [150000, 225000], // 6歲以下：第1名 / 第2名起
+    rent: 180000,
+    mortgageCap: 300000,
+    insurancePerPerson: 24000,
+    basicLiving: 213000, // 115年度尚未公告，暫用114年度
+    brackets: [[610000, 0.05, 0], [1380000, 0.12, 42700], [2770000, 0.20, 153100], [5190000, 0.30, 430100], [Infinity, 0.40, 949100]]
+  };
+  var SI = {
+    laborRate: 0.13 * 0.2, laborMin: 29500, laborMax: 45800,
+    nhiRate: 0.0517 * 0.3, nhiMin: 29500, nhiMax: 313000, nhiMaxDeps: 3
+  };
+
+  // ---------- 補助（2026 現行） ----------
+  var BENEFIT = {
+    birthPerBaby: 100000,
+    allowance02: [5000, 6000, 7000],   // 0–未滿2歲，未使用公共/準公共托育
+    carePublic: [7000, 8000, 9000],    // 公共托育補助
+    careQuasi: [13000, 14000, 15000],  // 準公共托育補助
+    allowance26: [5000, 6000, 7000],   // 2–6歲未就讀公立/非營利/準公共
+    kgCap: { public: [1000, 0, 0], nonprofit: [2000, 1000, 0], quasi: [3000, 2000, 1000] },
+    leaveRate: 0.8, leaveInsMax: 45800, leaveMonths: 6,
+    privUniReduction: 35000,
+    growthAllowance: 60000 // 0–18歲成長津貼（尚未通過，預設不計入）
+  };
+  var RENT_SUB = { incomeMultiple: 3.5, incomeMultipleBase: 3, oldMult: [1, 1.4, 1.6, 1.8], newMultBase: 2, newMultStep: 0.5 };
+  var QINGAN = {
+    ltv: 0.8, years: 40, grace: 5,
+    capNoKid: 10000000, capKid: 15000000,
+    incomeMax: 2000000, ageMax: 50,
+    rates: [0.01775, 0.01775, 0.01775, 0.019, 0.02025, 0.0215, 0.02275]
+  };
+  var BANK = { ltv: 0.8, years: 30, rate: 0.025 };
+
+  // ---------- 生活與養育成本（2026 幣值） ----------
+  var COST = {
+    adultBase: 14000,                 // 全國一般水準：每位大人每月日常開銷（飲食、通訊、衣物、保險醫療、娛樂；不含住、行、孝親）
+    consExp: 0.75,                    // 縣市物價差異：（縣市每人消費／全國）^0.75
+    rentListingFactor: 0.9,           // 591 刊登價 → 實際成交租金
+    consNational: 25726,
+    lifestyle: { frugal: 0.7, normal: 1.0, comfy: 1.4 },
+    childLife: { frugal: 0.65, normal: 1.0, comfy: 1.6 },
+    // 孩子每月生活費（飲食、衣物、用品、醫療、零用錢；不含托育與教育）
+    child: [[0, 7000], [2, 6000], [6, 7500], [12, 10000], [18, 11000]],
+    utilBase: 2000, utilPerPerson: 700,
+    prenatalBirth: { frugal: 25000, normal: 45000, comfy: 120000 },
+    gearFirst: { frugal: 20000, normal: 50000, comfy: 100000 }, gearLater: 15000,
+    postpartumNanny: 110000, postpartumFamily: 15000,
+    elementaryPublic: 4000, juniorPublic: 5000, seniorPublic: 10000,
+    elementaryPrivate: 250000, juniorPrivate: 200000, seniorPrivate: 50000,
+    intlSchool: 450000,
+    hobbyClass: 3000,
+    cram: { junior: { none: 0, some: 6000, full: 13000 }, senior: { none: 0, some: 7000, full: 15000 } },
+    uni: { public: 51000, private: 99200 - 35000, mixed: 57600 },
+    master: 50000,
+    abroad: { US: { years: 2, perYear: 1700000 }, UK: { years: 1, perYear: 1300000 }, JP: { years: 2, perYear: 400000 } },
+    grandPaid: 11000, helper: 31000,
+    car: {
+      used: { buy: 350000, resale: 0.2, life: 8, run: 78000 },
+      new: { buy: 850000, resale: 0.3, life: 10, run: 80000 },
+      import: { buy: 1500000, resale: 0.35, life: 10, run: 100000 }
+    },
+    scooter: { buy: 70000, resale: 0.1, life: 8, run: 8767 },
+    travel: { none: 0, domestic: 30000, abroadPerPerson: 30000 },
+    elderCareMonthly: 15000,
+    pension: 300000,          // 65 歲後每人每年：勞保年金＋勞退約 2.5 萬/月（估計）
+    carInstallYears: 5,       // 購車 5 年分期
+    uniAwayRent: 8000,
+    houseSize: { 1: 18, 3: 34, 4: 44 }, // 2房依縣市 small
+    reno: { basic: 20000, light: 50000, full: 80000 },
+    closing: 0.025,
+    houseTax: { TPE: 18000, _: 10000 },
+    homeInsurance: 3000,
+    usedFactor: 0.92
+  };
+
+  // ---------- 歷史（時光機） ----------
+  // 時光機：每 5 年一格，往回 30 年（一代人）
+  // 房價：信義房價指數年平均（2016Q1=100）；1996 年為依信義 1995 年每坪均價推估。
+  // 薪資：工業及服務業每人每月總薪資（實質，2021 年幣值）。物價：消費者物價指數（2021=100）。
+  var HISTORY = {
+    years: [1996, 2001, 2006, 2011, 2016, 2021, 2026],
+    est: { 1996: true },
+    cpi: { 1996: 78.72, 2001: 81.92, 2006: 85.26, 2011: 91.21, 2016: 95.86, 2021: 100, 2026: 111.7 },
+    realWage: { 1996: 46564, 2001: 51211, 2006: 51011, 2011: 50393, 2016: 51384, 2021: 56127, 2026: 59180 },
+    sinyi: {
+      TPE: { 1996: 37, 2001: 35.42, 2006: 53.73, 2011: 90.68, 2016: 100.29, 2021: 115.79, 2026: 143.34 },
+      NTPC: { 1996: 42, 2001: 34.25, 2006: 50.38, 2011: 79.95, 2016: 101.78, 2021: 120.03, 2026: 159.90 },
+      TYN: { 1996: 52, 2001: 36.73, 2006: 50.77, 2011: 76.84, 2016: 101.23, 2021: 131.34, 2026: 188.00 },
+      HSZ: { 1996: 52, 2001: 47.43, 2006: 58.18, 2011: 77.63, 2016: 101.47, 2021: 148.09, 2026: 247.62 },
+      TXG: { 1996: 50, 2001: 35.20, 2006: 50.57, 2011: 78.94, 2016: 102.58, 2021: 140.06, 2026: 184.95 },
+      KHH: { 1996: 58, 2001: 38.87, 2006: 49.26, 2011: 66.85, 2016: 100.48, 2021: 125.95, 2026: 170.11 },
+      ALL: { 1996: 46, 2001: 35.79, 2006: 51.06, 2011: 80.84, 2016: 101.20, 2021: 124.75, 2026: 168.15 }
+    },
+    sinyiMap: { TPE: 'TPE', NTPC: 'NTPC', KEE: 'NTPC', TYN: 'TYN', HSZ: 'HSZ', HSQ: 'HSZ', TXG: 'TXG', KHH: 'KHH' },
+    tfr: { 1996: 1.76, 2001: 1.40, 2006: 1.115, 2011: 1.065, 2016: 1.17, 2021: 0.975, 2026: 0.695 },
+    births: { 1996: 325545, 2001: 260354, 2006: 204459, 2011: 196627, 2016: 208440, 2021: 153820, 2026: 107812 },
+    pir: { 1996: 4.5, 2001: 4.26, 2006: 4.97, 2011: 7.29, 2016: 9.32, 2021: 9.46, 2026: 9.47 },
+    pirEst: { 1996: true, 2001: '2002' },
+    // 30 年前還沒有的育兒支持（起始年）
+    newPolicies: [
+      ['育嬰留職停薪津貼', 2009], ['托育費用補助', 2008], ['0–2 歲育兒津貼', 2012], ['5 歲幼兒免學費', 2011],
+      ['準公共托育與幼兒園繳費上限', 2018], ['2–5 歲育兒津貼', 2019], ['高中職全面免學費', 2024], ['生育補助每胎 10 萬', 2026]
+    ]
+  };
+
+  HOUSEHOLD.disposable = HOUSEHOLD.disposable.map(function (p) { return [p[0], Math.round(p[1] * 1.04)]; });
+  HOUSEHOLD.consumption = HOUSEHOLD.consumption.map(function (p) { return [p[0], Math.round(p[1] * 1.03)]; });
+  return {
+    SOURCES: SOURCES, COUNTIES: COUNTIES, COUNTY: COUNTY, DISTRICTS: DISTRICTS,
+    CARE: CARE, KG: KG, ANQIN: ANQIN, POSTPARTUM_CENTER: POSTPARTUM_CENTER,
+    byCounty: byCounty, WAGE: WAGE, INDUSTRIES: INDUSTRIES, INDUSTRY: INDUSTRY, HOUSEHOLD: HOUSEHOLD, SAVINGS_TYPICAL: SAVINGS_TYPICAL,
+    TAX: TAX, SI: SI, BENEFIT: BENEFIT, RENT_SUB: RENT_SUB, QINGAN: QINGAN, BANK: BANK, COST: COST, HISTORY: HISTORY,
+    BASE_YEAR: 2026
+  };
+})();
+
+/* ---- viz.js ---- */
+/* =========================================================================
+   VIZ — 全台分享地圖：NEXT GEN 網站的 3D 可視化
+   每一點是一位匿名分享的玩家，位置依縣市（與市中心／一般／外圍）和人口密度隨機撒，不是真實住址。
+   選一種分法，點就升到台灣上方對應的切片；門檻 PR 則依數值連續分布在上方。
+   資料是固定版本（build/viz_points.py 產生），底圖是 OpenStreetMap 道路與地形（build/viz_map.py）。
+   ========================================================================= */
+var VIZ = (function () {
+  'use strict';
+  var h = U.h;
+
+  // ---------- 文字 ----------
+  var AGE_L = ['20–24 歲', '25–29 歲', '30–34 歲', '35–39 歲', '40–44 歲', '45–49 歲'];
+  var HOUSE_L = { rent: '租房子', buyUsed: '買中古屋', buyNew: '買新成屋或預售屋', family: '住長輩的房子', own: '已經有房子' };
+  var CARE_L = { grandFree: '長輩帶，不用給錢', self: '自己帶，不用辭職', grandPaid: '長輩帶，給帶孫費', public: '公共托育', quasi: '準公共保母或托嬰', private: '私立托嬰或保母', helper: '外籍家庭幫傭', quit: '一人辭職在家帶' };
+  var SCHOOL_L = { public: '全程讀公立', privateJH: '國中起讀私立', private: '全程讀私立', intl: '雙語或國際學校' };
+  var LIFE_L = { frugal: '精打細算', normal: '一般', comfy: '寬裕一點' };
+  var VERD_L = { broke: '駁回：到孩子獨立都缺錢', fail: '駁回：中途缺錢', tight: '附條件核准', pass: '核准' };
+
+  // ---------- 下載與解析 ----------
+  function b64bytes(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+  function gunzip(u8) {
+    if (!(u8[0] === 0x1f && u8[1] === 0x8b)) return Promise.resolve(u8);   // 伺服器已經解壓
+    if (typeof DecompressionStream === 'undefined') return Promise.reject(new Error('old-browser'));
+    var st = new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'));
+    return new Response(st).arrayBuffer().then(function (b) { return new Uint8Array(b); });
+  }
+  function getBytes(inline, url) {
+    if (inline) return Promise.resolve(b64bytes(inline));
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.arrayBuffer(); }).then(function (b) { return new Uint8Array(b); });
+  }
+  function getJSON(inline, url) {
+    if (inline) return Promise.resolve(inline);
+    return fetch(url).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); });
+  }
+  // 底圖：TWV1 + 標頭 JSON + 各圖層（折線，座標差值以 zigzag varint 存；等高線另附每條線的高度）＋ 高度網格
+  function parseMap(u8) {
+    if (String.fromCharCode(u8[0], u8[1], u8[2], u8[3]) !== 'TWV1') throw new Error('bad map');
+    var hl = u8[4] | (u8[5] << 8) | (u8[6] << 16) | (u8[7] << 24);
+    var head = JSON.parse(new TextDecoder().decode(u8.subarray(8, 8 + hl)));
+    var p = 8 + hl, q = head.q, layers = {};
+    function vi() { var r = 0, s = 0, b; do { b = u8[p++]; r += (b & 0x7f) * Math.pow(2, s); s += 7; } while (b & 0x80); return (r % 2) ? -(r + 1) / 2 : r / 2; }
+    function vu() { var r = 0, s = 0, b; do { b = u8[p++]; r += (b & 0x7f) * Math.pow(2, s); s += 7; } while (b & 0x80); return r; }
+    head.layers.forEach(function (L) {
+      var nl = vu(), pts = new Float32Array(L.pts * 2), lens = new Uint32Array(nl), k = 0, x = 0, y = 0, vals = null;
+      for (var i = 0; i < nl; i++) {
+        var n = vu(); lens[i] = n;
+        for (var j = 0; j < n; j++) { x += vi(); y += vi(); pts[k++] = x * q; pts[k++] = y * q; }
+      }
+      if (L.vals) { vals = new Float32Array(nl); for (i = 0; i < nl; i++) vals[i] = vu(); }
+      layers[L.id] = { pts: pts, lens: lens, vals: vals };
+    });
+    var dem = null;
+    if (head.dem) { var d = head.dem; dem = { x0: d.x0, y0: d.y0, d: d.d, nx: d.nx, ny: d.ny, k: d.step / 1000, g: u8.subarray(p, p + d.nx * d.ny) }; }
+    return { head: head, layers: layers, dem: dem };
+  }
+  // 地形高度（公里，雙線性內插）
+  function heightAt(dem, x, y) {
+    if (!dem) return 0;
+    var fx = (x - dem.x0) / dem.d - 0.5, fy = (y - dem.y0) / dem.d - 0.5;
+    var ix = Math.floor(fx), iy = Math.floor(fy), tx = fx - ix, ty = fy - iy;
+    function g(i, j) { i = Math.max(0, Math.min(dem.nx - 1, i)); j = Math.max(0, Math.min(dem.ny - 1, j)); return dem.g[j * dem.nx + i]; }
+    var v = (g(ix, iy) * (1 - tx) + g(ix + 1, iy) * tx) * (1 - ty) + (g(ix, iy + 1) * (1 - tx) + g(ix + 1, iy + 1) * tx) * ty;
+    return v * dem.k;
+  }
+
+  // ---------- 內容的範圍：海岸線的凸包 ----------
+  function hullOf(pts) {   // pts: [[x, y], ...]，回傳逆時針凸包
+    var P = pts.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+    function cross(o, a, b) { return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); }
+    var lo = [], up = [], i;
+    for (i = 0; i < P.length; i++) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], P[i]) <= 0) lo.pop(); lo.push(P[i]); }
+    for (i = P.length - 1; i >= 0; i--) { while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], P[i]) <= 0) up.pop(); up.push(P[i]); }
+    up.pop(); lo.pop(); return lo.concat(up);
+  }
+
+  // ---------- 配色：門檻 PR → 顏色（OKLCH，深淺模式各一組） ----------
+  // PR 大多集中在 80–100，所以高分段給比較多的色彩變化
+  var PR_STOPS = [[0, 0], [50, 0.3], [80, 0.55], [95, 0.8], [100, 1]];
+  function prU(pr) { for (var i = 1; i < PR_STOPS.length; i++) if (pr <= PR_STOPS[i][0]) { var a = PR_STOPS[i - 1], b = PR_STOPS[i]; return a[1] + (b[1] - a[1]) * (pr - a[0]) / (b[0] - a[0]); } return 1; }
+  var PALS = [  // 每組：[u, L, C, h]
+    { id: 'neon', name: '霓虹', light: [[0, 0.62, 0.11, 195], [0.3, 0.58, 0.13, 245], [0.55, 0.55, 0.17, 292], [0.8, 0.57, 0.21, 345], [1, 0.6, 0.22, 28]],
+      dark: [[0, 0.8, 0.11, 190], [0.3, 0.74, 0.13, 240], [0.55, 0.7, 0.16, 290], [0.8, 0.7, 0.2, 345], [1, 0.7, 0.21, 30]] },
+    { id: 'ice', name: '冰火', light: [[0, 0.5, 0.15, 255], [0.3, 0.62, 0.1, 245], [0.55, 0.74, 0.012, 80], [0.8, 0.64, 0.15, 40], [1, 0.56, 0.21, 27]],
+      dark: [[0, 0.62, 0.15, 255], [0.3, 0.72, 0.1, 240], [0.55, 0.84, 0.012, 80], [0.8, 0.72, 0.15, 45], [1, 0.66, 0.21, 28]] },
+    { id: 'lava', name: '熔岩', light: [[0, 0.4, 0.14, 300], [0.35, 0.5, 0.19, 345], [0.6, 0.58, 0.2, 28], [0.82, 0.67, 0.17, 52], [1, 0.74, 0.15, 75]],
+      dark: [[0, 0.46, 0.16, 300], [0.35, 0.58, 0.2, 345], [0.6, 0.67, 0.2, 30], [0.82, 0.78, 0.16, 60], [1, 0.9, 0.15, 95]] },
+    { id: 'aurora', name: '極光', light: [[0, 0.42, 0.13, 285], [0.35, 0.55, 0.11, 230], [0.6, 0.62, 0.11, 185], [0.82, 0.68, 0.15, 145], [1, 0.74, 0.17, 115]],
+      dark: [[0, 0.5, 0.14, 285], [0.35, 0.64, 0.11, 230], [0.6, 0.74, 0.11, 185], [0.82, 0.83, 0.15, 145], [1, 0.92, 0.17, 112]] },
+    { id: 'traffic', name: '綠紅', light: [[0, 0.6, 0.15, 150], [0.3, 0.66, 0.16, 128], [0.55, 0.74, 0.16, 100], [0.8, 0.66, 0.18, 58], [1, 0.57, 0.21, 28]],
+      dark: [[0, 0.74, 0.17, 150], [0.3, 0.8, 0.17, 128], [0.55, 0.86, 0.16, 100], [0.8, 0.76, 0.18, 58], [1, 0.67, 0.22, 28]] },
+    { id: 'vermilion', name: '朱墨', light: [[0, 0.8, 0, 0], [0.4, 0.68, 0.03, 30], [0.65, 0.62, 0.1, 30], [0.85, 0.6, 0.17, 29], [1, 0.57, 0.22, 28]],
+      dark: [[0, 0.42, 0, 0], [0.4, 0.52, 0.04, 30], [0.65, 0.6, 0.11, 30], [0.85, 0.66, 0.18, 30], [1, 0.7, 0.22, 30]] }
+  ];
+  function oklch(L, C, H) {
+    var a = C * Math.cos(H * Math.PI / 180), b = C * Math.sin(H * Math.PI / 180);
+    var l = Math.pow(L + 0.3963377774 * a + 0.2158037573 * b, 3), m = Math.pow(L - 0.1055613458 * a - 0.0638541728 * b, 3), s = Math.pow(L - 0.0894841775 * a - 1.2914855480 * b, 3);
+    var rgb = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s];
+    return rgb.map(function (v) { v = Math.max(0, Math.min(1, v)); return v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; });
+  }
+  function palOf(id) { return PALS.filter(function (p) { return p.id === id; })[0] || PALS[0]; }
+  function palColor(theme, u, id) {
+    var P = palOf(id)[theme];
+    for (var i = 1; i < P.length; i++) if (u <= P[i][0]) {
+      var a = P[i - 1], b = P[i], t = (u - a[0]) / (b[0] - a[0]);
+      var ha = a[2] < 0.02 ? b[3] : a[3], hb = b[2] < 0.02 ? a[3] : b[3], dh = hb - ha;   // 灰色沒有色相：跟著另一端
+      if (dh < -180) dh += 360; if (dh > 180) dh -= 360;
+      return oklch(a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, ha + dh * t);
+    }
+    var e = P[P.length - 1]; return oklch(e[1], e[2], e[3]);
+  }
+  function gradientCss(theme, id) { var s = []; for (var k = 0; k <= 20; k++) s.push(css(palColor(theme, k / 20, id)) + ' ' + (k * 5) + '%'); return 'linear-gradient(90deg,' + s.join(',') + ')'; }
+  function css(c, al) { return 'rgba(' + Math.round(c[0] * 255) + ',' + Math.round(c[1] * 255) + ',' + Math.round(c[2] * 255) + ',' + (al == null ? 1 : al) + ')'; }
+  var THEME = {
+    light: { bg: [1, 1, 1], ink: [0.06, 0.06, 0.07], major: 0.42, mid: 0.2, minor: 0.12, contour: 0.16, coast: 0.8, border: 0.22, slice: 0.32, sliceB: 0.15, frame: 0.18, stem: 0.07 },
+    dark: { bg: [0.02, 0.02, 0.025], ink: [0.93, 0.93, 0.9], major: 0.4, mid: 0.19, minor: 0.12, contour: 0.17, coast: 0.75, border: 0.22, slice: 0.32, sliceB: 0.16, frame: 0.2, stem: 0.09 }
+  };
+  function themeName() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark' || t === 'light') return t;
+    try { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (e) { return 'light'; }
+  }
+
+  // ---------- 矩陣與補間 ----------
+  function mul(a, b) { var o = new Float32Array(16); for (var c = 0; c < 4; c++) for (var r = 0; r < 4; r++) { var s = 0; for (var k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k]; o[c * 4 + r] = s; } return o; }
+  // 相機：yaw 決定水平方向，pitch 90° 是正上方往下看（北邊朝上時 yaw = 0）
+  function viewMat(T, yawDeg, pitDeg, d) {
+    var yaw = yawDeg * Math.PI / 180, pit = pitDeg * Math.PI / 180;
+    var sy = Math.sin(yaw), cy = Math.cos(yaw), cp = Math.cos(pit), sp = Math.sin(pit);
+    var zx = -sy * cp, zy = -cy * cp, zz = sp;            // 從目標指向相機
+    var xx = cy, xy = -sy, xz = 0;                        // 畫面右方（水平）
+    var yx = zy * xz - zz * xy, yy = zz * xx - zx * xz, yz = zx * xy - zy * xx;
+    var e = [T[0] + zx * d, T[1] + zy * d, T[2] + zz * d];
+    return new Float32Array([xx, yx, zx, 0, xy, yy, zy, 0, xz, yz, zz, 0, -(xx * e[0] + xy * e[1] + xz * e[2]), -(yx * e[0] + yy * e[1] + yz * e[2]), -(zx * e[0] + zy * e[1] + zz * e[2]), 1]);
+  }
+  function ortho(l, r, b, t, n, f) { return new Float32Array([2 / (r - l), 0, 0, 0, 0, 2 / (t - b), 0, 0, 0, 0, -2 / (f - n), 0, -(r + l) / (r - l), -(t + b) / (t - b), -(f + n) / (f - n), 1]); }
+  function xf(m, x, y, z) { return [m[0] * x + m[4] * y + m[8] * z + m[12], m[1] * x + m[5] * y + m[9] * z + m[13], m[2] * x + m[6] * y + m[10] * z + m[14]]; }
+  function ease(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function now() { return performance.now(); }
+  // 補間數值：tw(v) 建立；to(x, ms) 開始動畫；val() 取目前值
+  function tw(v) { return { a: v, b: v, t0: 0, d: 0 }; }
+  function twTo(o, v, ms) { o.a = twVal(o); o.b = v; o.t0 = now(); o.d = U.reduceMotion() ? 0 : ms; }
+  function twSet(o, v) { o.a = o.b = v; o.d = 0; }
+  function twVal(o) { if (!o.d) return o.b; var k = (now() - o.t0) / o.d; return k >= 1 ? o.b : o.a + (o.b - o.a) * ease(Math.max(0, k)); }
+  function twBusy(o) { return !!o.d && now() - o.t0 < o.d; }
+
+  // ---------- WebGL 程式 ----------
+  var VS_LINE = 'attribute vec3 aP;uniform mat4 uM;uniform float uZ;uniform float uHk;void main(){gl_Position=uM*vec4(aP.xy,uZ+aP.z*uHk,1.0);}';
+  var FS_FLAT = 'precision mediump float;uniform vec4 uC;void main(){gl_FragColor=uC;}';
+  // ---------- 植被地形 ----------
+  // 預設的線條地圖＋一層選擇性的綠（Selective Desaturation）：底是接近背景的暗色，植被的地方先褪成灰、再變成綠
+  //   uS：每 100 公尺的坡度（R 往東、G 往北、B 凹凸）→ 每個像素即時算光（太陽在西北方）；模糊過的坡度決定「哪裡綠」
+  //   uC：植被比例（R 森林、G 農地、B 草地灌叢）；uB：底（R 陸地、G 城市、B 水域）
+  //   綠的顏色跟著光（陰影偏藍綠、受光暖黃綠），飽和度也跟著光；色相有幾公里大的斑塊與每顆樹冠的變化
+  //   細節是程式產生的：樹冠（Worley 細胞噪聲，會受光的小凸起；森林邊緣一顆一顆變少）、田塊（250 公尺的拼布）
+  //   比一個螢幕像素還小的細節會淡成平均色（拉遠時不閃）；陡坡用三平面座標，細節不會被拉成直線；遠處漸暗到背景色
+  var VS_TER = 'attribute vec3 aP;attribute vec2 aG;uniform mat4 uM;uniform float uHk;uniform vec4 uTB;uniform vec3 uZd;' +
+    'varying vec2 vUV;varying vec2 vW;varying vec2 vG;varying float vH;varying float vD;' +
+    'void main(){vW=aP.xy;vH=aP.z;vG=aG;vUV=vec2((aP.x-uTB.x)/uTB.z,(uTB.y-aP.y)/uTB.w);vec3 w=vec3(aP.xy,aP.z*uHk);vD=dot(w,uZd);gl_Position=uM*vec4(w,1.0);}';
+  var FS_TER = '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n' +
+    'uniform sampler2D uS;uniform sampler2D uC;uniform sampler2D uB;uniform vec3 uBg;uniform float uOp;uniform float uHk;uniform vec3 uSun;' +
+    'uniform float uGray;uniform vec3 uFog;uniform float uDark;uniform float uBlur;uniform vec3 uP0;uniform vec3 uP1;uniform vec3 uP2;uniform vec3 uP3;uniform vec3 uF0;uniform vec3 uF1;uniform vec3 uGt;uniform float uGA2;' +
+    'varying vec2 vUV;varying vec2 vW;varying vec2 vG;varying float vH;varying float vD;' +
+    'float hs(vec2 c){return fract(sin(dot(c,vec2(127.1,311.7)))*43758.5453);}' +
+    'float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);i=mod(i,512.0);' +
+    'return mix(mix(hs(i),hs(i+vec2(1.0,0.0)),f.x),mix(hs(i+vec2(0.0,1.0)),hs(i+vec2(1.0,1.0)),f.x),f.y);}' +
+    'float fbm(vec2 p,float f){float s=0.0,t=0.0,a=1.0,sc=3.0;for(int i=0;i<5;i++){float k=clamp(sc/(f*8.0)-0.5,0.0,1.0)*a;s+=k*vn(p/sc+vec2(float(i)*17.3,float(i)*7.1));t+=k;a*=0.6;sc*=0.42;}return t>0.0?s/t:0.5;}' +
+    // Worley：最近的特徵點（d1）、第二近（d2）、從特徵點指向這裡的向量（off）、這一格的亂數（id）
+    'void wor(vec2 p,out float d1,out float d2,out vec2 off,out float id){vec2 i=floor(p),fr=fract(p);d1=9.0;d2=9.0;off=vec2(0.0);id=0.0;' +
+    'for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 g=vec2(float(x),float(y));vec2 c=mod(i+g,1024.0);vec2 o=vec2(hs(c),hs(c+vec2(17.0,3.0)))*0.8+0.1;vec2 r=g+o-fr;float d=dot(r,r);' +
+    'if(d<d1){d2=d1;d1=d;off=-r;id=hs(c+vec2(5.0,11.0));}else if(d<d2){d2=d;}}d1=sqrt(d1);d2=sqrt(d2);}' +
+    // 一層樹冠：受光面亮、背光面暗、樹之間的縫暗一點；太小看不到時回傳 1（平均）
+    'float crown(vec2 q,float s,float f,vec2 ls,float amp,float seed){float k=clamp(s/(f*1.8)-0.5,0.0,1.0);if(k<=0.0)return 1.0;' +
+    'float d1,d2,id;vec2 off;wor(q/s+vec2(seed,seed*1.7),d1,d2,off,id);float r=0.5+0.22*id;float ins=1.0-smoothstep(r*0.72,r,d1);' +
+    'vec2 tl=off/r*ins;float sh=1.0+amp*(dot(tl,ls)*0.9-(1.0-ins)*0.42+0.13+(id-0.5)*0.22);return mix(1.0,sh,k);}' +
+    // 田塊與街廓：x＝這一塊的亂數、y＝邊界（田埂、街道）
+    'vec2 cells(vec2 q,float s,float f,float seed){float k=clamp(s/(f*2.2)-0.6,0.0,1.0);if(k<=0.0)return vec2(0.5,0.0);' +
+    'float d1,d2,id;vec2 off;wor(q/s+vec2(seed,0.0),d1,d2,off,id);float e=1.0-smoothstep(0.03,0.08+f/s*1.2,d2-d1);return vec2(mix(0.5,id,k),e*k);}' +
+    // 某一個投影面上的細節：x 樹冠明暗、y 田塊亂數、z 田埂、w 城市街廓的明暗
+    'vec4 detail(vec2 q,float f,vec2 ls,vec3 want){float c=1.0;vec2 fd=vec2(0.5,0.0);float u=1.0;' +
+    'if(want.x>0.02){c=crown(q,0.045,f,ls,0.9,0.0)*crown(q,0.14,f,ls,0.7,13.0)*crown(q,0.42,f,ls,0.4,29.0);}' +
+    'if(want.y>0.02){fd=cells(q,0.26,f,41.0);}' +
+    'if(want.z>0.02){vec2 b=cells(q,0.13,f,71.0);u=(0.82+0.36*b.x)*(1.0-0.45*b.y);}' +
+    'return vec4(c,fd.x,fd.y,u);}' +
+    'vec3 hue(vec3 c,float a){vec3 k=vec3(0.57735);float ca=cos(a);return c*ca+cross(k,c)*sin(a)+k*dot(k,c)*(1.0-ca);}' +
+    // 綠的明暗色票：陰影偏藍綠 → 中間調 → 受光面暖的黃綠 → 最亮（只在受光最強的樹冠頂）
+    'vec3 pal(float t){if(t<0.45)return mix(uP0,uP1,t/0.45);if(t<0.85)return mix(uP1,uP2,(t-0.45)/0.4);return mix(uP2,uP3,clamp((t-0.85)/0.3,0.0,1.0));}' +
+    'vec2 sdec(vec3 s){vec2 s2=(s.rg*255.0-128.0)/127.0;return sign(s2)*s2*s2*2.0;}' +
+    'void main(){vec4 bs=texture2D(uB,vUV);if(bs.r<0.5)discard;' +
+    'vec3 sl=texture2D(uS,vUV).rgb;vec2 gr=sdec(sl);float cv=(sl.b*255.0-128.0)/127.0;' +
+    'vec3 sb=texture2D(uS,vUV,uBlur).rgb;vec2 grB=sdec(sb);float cvB=(sb.b*255.0-128.0)/127.0;' +   // 模糊過的地形（約 400 公尺）：決定哪裡綠
+    'vec3 cov=texture2D(uC,vUV).rgb;float wat=bs.b;' +
+    'vec2 fw=fwidth(vW);float f=sqrt(max(fw.x*fw.y,1e-12));' +
+    // 光：坡度放大固定在 1.2–2.2 倍（不跟著地形倍率一路加到 5 倍，坡面才不會全亮或全暗）
+    'float ex=clamp(uHk*0.8,1.2,2.2);vec3 N=normalize(vec3(-gr*ex,1.0));float lamN=max(dot(N,uSun),0.0)/uSun.z;' +
+    'vec3 NB=normalize(vec3(-grB*ex,1.0));float lamB=max(dot(NB,uSun),0.0)/uSun.z;' +
+    // 哪裡綠：植被 ×（0.75＋0.25×受光）× 山谷、緩坡 × 斑塊；受光主要拿來決定綠的明暗與色相
+    'float litB=smoothstep(0.3,1.1,lamB);float valley=1.0-0.45*smoothstep(0.0,0.7,cvB);float steep=1.0-0.45*smoothstep(0.5,1.0,length(grB));' +
+    'float alp=1.0-smoothstep(2.6,3.4,vH);float patch=smoothstep(0.2,0.8,0.5*vn(vW/3.5+vec2(9.0,4.0))+0.3*vn(vW/0.7+vec2(2.0,13.0))+0.2*vn(vW/0.22+vec2(7.0,3.0)));' +
+    'float vegW=cov.r+0.9*cov.b+0.7*cov.g;' +
+    'float G=vegW*(0.75+0.25*litB)*valley*steep*alp*(0.3+0.7*patch);' +
+    // 邊緣：扭曲過的雜訊（幾公里、幾百公尺、一兩百公尺都有不規則的邊）；門檻放寬
+    'vec2 wp=vW+(vec2(vn(vW/2.2+vec2(1.0,5.0)),vn(vW/2.2+vec2(8.0,2.0)))-0.5)*1.6+(vec2(vn(vW/0.45+vec2(4.0,1.0)),vn(vW/0.45+vec2(6.0,9.0)))-0.5)*0.3;' +
+    'float Gn=G+(fbm(wp,f)-0.5)*0.35;' +
+    'float g=smoothstep(0.36,0.88,Gn)*(1.0-clamp(wat*1.3,0.0,1.0));' +     // 綠的飽和度（約 4 成明顯綠、2–3 成淡綠）
+    'float pres=smoothstep(0.1,0.55,Gn)*(1.0-clamp(wat*1.3,0.0,1.0));' +  // 植被這一層看得到的程度（更寬：先褪成灰，再褪成底）
+    // 底：接近背景色，只帶很淡的山影
+    'float hs2=(lamN-1.0)*0.5+0.2*cv;' +
+    'vec3 base=uDark>0.5?uBg+vec3(0.034,0.038,0.044)*clamp(1.0+hs2*1.6,0.0,2.2):uBg*(1.0-0.07*clamp(1.0-hs2*1.6,0.0,2.2));' +
+    'if(uGray<0.5&&pres<0.01)discard;' +
+    // 樹冠、田塊：三平面座標，陡坡不拉絲
+    'vec3 Ng=normalize(vec3(-vG*uHk,1.0));vec3 tw=pow(abs(Ng),vec3(4.0));tw/=tw.x+tw.y+tw.z;float ze=vH*uHk;' +
+    'vec3 want=vec3(pres*(cov.r+cov.b),pres*cov.g,0.0);' +
+    'vec4 dt=detail(vW,f,uSun.xy,want)*tw.z;vec2 qd=vW;float tm=tw.z;' +
+    'if(tw.x>0.06){dt+=detail(vec2(vW.y,ze),f,uSun.yz,want)*tw.x;if(tw.x>tm){qd=vec2(vW.y,ze);tm=tw.x;}}else dt+=vec4(1.0,0.5,0.0,1.0)*tw.x;' +
+    'if(tw.y>0.06){dt+=detail(vec2(vW.x,ze),f,uSun.xz,want)*tw.y;if(tw.y>tm){qd=vec2(vW.x,ze);}}else dt+=vec4(1.0,0.5,0.0,1.0)*tw.y;' +
+    // 森林邊緣一顆一顆樹慢慢變少：每顆樹冠（約 70 公尺）依自己的亂數決定在綠色程度多少時出現
+    'float cid=0.5,ck=clamp(0.07/(f*1.8)-0.5,0.0,1.0);if(ck>0.0){float d1,d2,id;vec2 of;wor(qd/0.07+vec2(3.0,8.0),d1,d2,of,id);cid=id;}' +
+    'float g2=mix(g,smoothstep(cid*0.9-0.06,cid*0.9+0.06,g),ck);' +
+    // 綠的顏色跟著光走（陰影偏藍綠、受光暖黃綠），幾公里大的斑塊與每顆樹冠的色相、亮度各有一點不同
+    'float t=clamp(0.12+lamN*0.55,0.0,1.3)*mix(1.0,dt.x,0.9);' +
+    'float hv=(vn(vW/3.0+vec2(11.0,2.0))-0.5)*0.36+(cid-0.5)*0.12*ck;' +
+    'vec3 cF=hue(pal(t),hv)*(1.0+(cid-0.5)*0.16*ck);' +
+    'vec3 cG=hue(pal(t*0.95),hv+0.18)*0.95;' +                                    // 草地灌叢：偏橄欖
+    'vec3 cA=(dt.y<0.18?uF0*vec3(1.15,1.0,0.9):mix(uF0,uF1,dt.y))*(1.0-0.3*dt.z)*clamp(0.55+0.45*lamN,0.4,1.15);' +   // 農地：偏黃的綠、暗一點
+    'float wF=cov.r,wG=0.9*cov.b,wA=0.7*cov.g,wS=max(wF+wG+wA,0.001);vec3 vc=(cF*wF+cG*wG+cA*wA)/wS;' +
+    // Selective Desaturation：綠色程度只決定飽和度（亮處鮮、暗處接近灰），邊緣褪成灰而不是黑
+    'float Y=dot(vc,vec3(0.3,0.59,0.11));vec3 gry=vec3(Y)*uGt*mix(0.6,1.0,g2);' +
+    'float sat=g2*mix(0.25,1.0,smoothstep(0.05,0.75,t));' +
+    'vec3 col=mix(base,mix(gry,vc,sat),pres*uGA2);' +
+    // 遠處漸暗到背景色
+    'float fz=(uFog.x-vD)/uFog.y;float fg=uFog.z*smoothstep(-0.15,1.0,fz);col=mix(col,uBg,fg);' +
+    'float al=uGray<0.5?pres:1.0;' +
+    'gl_FragColor=vec4(mix(uBg,col,al*uOp),1.0);}';
+  // 點：aZ0／aZ1 是切片高度（0 代表在地面＝地形高度），aD 是每個點各自的延遲，讓上升看起來有層次
+  var PT_Z = 'uniform float uT;uniform float uHk;uniform float uFz;uniform float uOther;' +
+    'float ez(float t){return t<0.5?4.0*t*t*t:1.0-pow(-2.0*t+2.0,3.0)/2.0;}' +
+    'float zAt(float z0,float z1,float d,float g){float t=ez(clamp((uT-d)/1.1,0.0,1.0));return mix(z0<0.5?g:z0,z1<0.5?g:z1,t);}' +
+    'float liftAt(float z0,float z1,float d){float t=ez(clamp((uT-d)/1.1,0.0,1.0));return mix(z0,z1,t);}' +
+    'uniform float uFz2;uniform float uX;' +
+    'float focusA(float z1){if(uFz<-0.5)return 1.0;if(abs(z1-uFz)<0.5)return uX;if(abs(z1-uFz2)<0.5)return max(1.0-uX,uOther);return uOther;}';
+  var VS_PT = 'attribute vec2 aP;attribute float aH;attribute float aZ0;attribute float aZ1;attribute float aD;attribute vec3 aC;' +
+    'uniform mat4 uM;uniform float uS;uniform float uGround;varying vec3 vC;varying float vA;' + PT_Z +
+    'void main(){float g=aH*uHk;float z=zAt(aZ0,aZ1,aD,g);float lift=liftAt(aZ0,aZ1,aD);' +
+    'vA=(uGround>0.5?step(0.5,lift):1.0)*focusA(aZ1);gl_Position=uM*vec4(aP,uGround>0.5?g:z,1.0);gl_PointSize=uS;vC=aC;}';
+  var FS_PT = 'precision mediump float;varying vec3 vC;varying float vA;uniform vec3 uBg;uniform float uA;uniform float uRing;' +
+    'void main(){vec2 p=gl_PointCoord*2.0-1.0;float r=length(p);if(r>1.0||vA<0.01)discard;float e=fwidth(r);' +
+    'float a=1.0-smoothstep(1.0-e*1.5,1.0,r);vec3 c=mix(vC,uBg,smoothstep(uRing-e,uRing+e,r)*step(0.01,uRing));gl_FragColor=vec4(c,a*uA*vA);}';
+  var VS_STEM = 'attribute vec2 aP;attribute float aH;attribute float aZ0;attribute float aZ1;attribute float aD;attribute float aE;attribute vec3 aC;' +
+    'uniform mat4 uM;uniform float uA;uniform float uUp;varying vec4 vC;' + PT_Z +
+    'void main(){float g=aH*uHk;float z=zAt(aZ0,aZ1,aD,g);float lift=liftAt(aZ0,aZ1,aD);float up=step(0.5,lift);' +
+    // 升起的點：從地面連到點（靠點的一端比較明顯）；在地面的點：往正上方一段、越上面越淡
+    'float zt=mix(g+uUp,z,up);gl_Position=uM*vec4(aP,mix(g,zt,aE),1.0);' +
+    'float al=up*(0.25+0.75*aE)+(1.0-up)*(1.0-aE)*step(0.01,uUp);vC=vec4(aC,uA*al*focusA(aZ1));}';
+  var FS_STEM = 'precision mediump float;varying vec4 vC;void main(){if(vC.a<0.002)discard;gl_FragColor=vC;}';
+
+  // ---------- 偏好設定（只存在這台裝置） ----------
+  // terrain：地形高度放大倍數；lock：切換分法、看單一層時不動鏡頭；veg：植被風地形；tilt：微縮攝影效果
+  // glass：霧玻璃的透明度（0–1，越大越透明）；blur：霧玻璃的散射（模糊，像素）
+  // la：台灣線條（道路、等高線、海岸線、縣市界）的透明度倍率
+  var PREF0 = { stem: 1, gap: 0.75, terrain: 5, dot: 1, la: 1, glass: 0.9, blur: 2, contour: false, pal: 'neon', lock: false, veg: false, tilt: false };
+  var VEG_UI = false;   // 植被地形的開關先藏起來（功能保留；藏起來時一律關閉）
+  function loadPrefs() { var p = Object.assign({}, PREF0); try { var s = JSON.parse(localStorage.getItem('tw-kids:vizPrefs3') || 'null'); if (s && typeof s === 'object') Object.keys(PREF0).forEach(function (k) { if (typeof s[k] === typeof PREF0[k]) p[k] = s[k]; }); } catch (e) { /* 忽略 */ } return p; }
+  function savePrefs(p) { try { localStorage.setItem('tw-kids:vizPrefs3', JSON.stringify(p)); } catch (e) { /* 忽略 */ } }
+
+  // 同一次瀏覽只下載、解析一次（回到首頁時重用）
+  var cache = null;
+  function loadData(cfg) {
+    if (!cache) cache = Promise.all([getBytes(window.__VIZ_MAP, cfg.vizMap).then(gunzip).then(parseMap), getJSON(window.__VIZ_PTS, cfg.vizPts)]);
+    return cache;
+  }
+
+  function mount(host) {
+    var cfg = window.TWKIDS || {};
+    var YAW0 = 55;   // 從西南方往東北看：北部在左上、南部在右下
+    var st = { theme: themeName(), filter: 'map', t0: -1e9, zoom: 1, panX: 0, panY: 0, sel: -1, hov: -1, visible: false, alive: true, full: false, focus: null, prefs: loadPrefs() };
+    if (!VEG_UI) st.prefs.veg = false;
+    var stage = h('div', { class: 'vz-stage' });
+    var canvas = h('canvas', { class: 'vz-canvas', tabindex: '0', 'aria-label': '全台分享地圖：每一點是一位匿名分享的玩家。方向鍵旋轉，加號減號縮放。' });
+    var lbl = h('div', { class: 'vz-labels' });
+    var svg = U.svg('svg', { class: 'vz-leads', 'aria-hidden': 'true' });
+    var card = h('div', { class: 'vz-card', hidden: true, role: 'dialog', 'aria-label': '這位玩家的選擇' });
+    var msg = h('div', { class: 'vz-msg' }, '正在載入地圖…');
+    var ctl = h('div', { class: 'vz-ctl' });
+    var legend = h('div', { class: 'vz-legend' });
+    var panel = h('div', { class: 'vz-set', hidden: true, role: 'dialog', 'aria-label': '顯示設定' });
+    var touchy = (function () { try { return window.matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
+    var hint = h('div', { class: 'vz-hint' }, touchy ? '拖曳：轉動・雙指：縮放與移動・捲動網頁請滑地圖外面' : '拖曳：轉動・點兩下再拖：移動・Ctrl＋滾輪：縮放');
+    var back = h('button', { type: 'button', class: 'vz-back', hidden: true, 'aria-label': '回到上一步', title: '回到上一步', onclick: function () { goBack(); } });
+    back.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5"/></svg><span>上一步</span>';
+    // 微縮攝影：畫面上下漸進模糊（只模糊地圖，名稱與按鈕不受影響）
+    var tilt = h('div', { class: 'vz-tilt', hidden: true, 'aria-hidden': 'true' });
+    ['t1', 't2', 't3', 'b1', 'b2', 'b3'].forEach(function (k) { tilt.appendChild(h('i', { class: k })); });
+    [canvas, tilt, svg, lbl, back, legend, ctl, panel, card, hint, msg].forEach(function (e) { stage.appendChild(e); });
+    host.appendChild(stage);
+    var bar = h('div', { class: 'vz-filters', role: 'tablist', 'aria-label': '分法' });
+    host.insertBefore(bar, stage);
+    var sum = h('ul', { class: 'vz-sr' });
+    host.appendChild(sum);
+
+    var gl = null;
+    try { gl = canvas.getContext('webgl', { antialias: true, alpha: false, depth: true, preserveDrawingBuffer: false }); } catch (e) { gl = null; }
+    if (!gl) { msg.textContent = '你的瀏覽器無法顯示 3D 地圖（需要 WebGL）。'; return { destroy: function () {} }; }
+    gl.getExtension('OES_standard_derivatives');
+    function sh(type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+    function prog(vs, fs) {
+      var p = gl.createProgram();
+      gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
+      gl.attachShader(p, sh(gl.FRAGMENT_SHADER, (fs.indexOf('fwidth') >= 0 ? '#extension GL_OES_standard_derivatives : enable\n' : '') + fs));
+      gl.linkProgram(p); if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+      var o = { p: p, a: {}, u: {} }, i, n;
+      for (i = 0, n = gl.getProgramParameter(p, gl.ACTIVE_ATTRIBUTES); i < n; i++) { var a = gl.getActiveAttrib(p, i); o.a[a.name] = gl.getAttribLocation(p, a.name); }
+      for (i = 0, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); i < n; i++) { var u = gl.getActiveUniform(p, i); o.u[u.name] = gl.getUniformLocation(p, u.name); }
+      return o;
+    }
+    var P = {};
+    try { P.line = prog(VS_LINE, FS_FLAT); P.pt = prog(VS_PT, FS_PT); P.stem = prog(VS_STEM, FS_STEM); }
+    catch (e) { msg.textContent = '你的瀏覽器無法顯示 3D 地圖。'; return { destroy: function () {} }; }
+    function buf(data, target, usage) { var b = gl.createBuffer(); gl.bindBuffer(target || gl.ARRAY_BUFFER, b); gl.bufferData(target || gl.ARRAY_BUFFER, data, usage || gl.STATIC_DRAW); return b; }
+    function put(b, data) { gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW); }
+
+    // 折線 → 多個不超過 65535 個頂點的區塊（gl.LINES + Uint16 索引）；每個頂點 (x, y, 地形高度)
+    function lineChunks(L, closed, hgt) {
+      var out = [];
+      function flush(from, to, vstart, vend) {
+        var nv = vend - vstart, idx = [], v = 0, xyz = new Float32Array(nv * 3);
+        for (var k = 0; k < nv; k++) { xyz[k * 3] = L.pts[(vstart + k) * 2]; xyz[k * 3 + 1] = L.pts[(vstart + k) * 2 + 1]; xyz[k * 3 + 2] = hgt ? hgt(vstart + k) : 0; }
+        for (var i = from; i < to; i++) { var n = L.lens[i]; for (var j = 0; j < n - 1; j++) idx.push(v + j, v + j + 1); if (closed && n > 2) idx.push(v + n - 1, v); v += n; }
+        out.push({ vb: buf(xyz), ib: buf(new Uint16Array(idx), gl.ELEMENT_ARRAY_BUFFER), n: idx.length });
+      }
+      var vstart = 0, from = 0, cnt = 0;
+      for (var i = 0; i < L.lens.length; i++) {
+        if (cnt + L.lens[i] > 65000) { flush(from, i, vstart, vstart + cnt); vstart += cnt; from = i; cnt = 0; }
+        cnt += L.lens[i];
+      }
+      if (cnt) flush(from, L.lens.length, vstart, vstart + cnt);
+      return out;
+    }
+
+    var M = null, D = null, G = {}, N = 0, Zcur = null, Zto = null, delay = null, colors = null, Hpt = null;
+    var BB = null, frameB = null, HULL = null, MAIN = null, MAINP = null, topH = 0;   // MAINP：台灣本島的海岸線（判斷某一點在不在島上）   // frameB：切片外框（正的長方形）；HULL：全部內容（含外島插圖）的凸包；MAIN：台灣本島的凸包；topH：地形最高點（公里，未放大）
+
+    // ---------- 分法 ----------
+    function cols() { return D.cols; }
+    function prOf(i) { var t = D.cols.t[i]; return t < 0 ? null : t / 10; }
+    var FILTERS = [
+      { id: 'map', name: '地圖' },
+      { id: 'age', name: '年齡層', cats: function () { return AGE_L.map(function (l, i) { return { label: l, test: function (j) { return cols().a[j] === i; } }; }); } },
+      { id: 'house', name: '住法', cats: function () {
+        var hd = D.dict.h, ix = function (k) { return hd.indexOf(k); };
+        return [{ label: '住長輩的房子', keys: ['family'] }, { label: '租房子', keys: ['rent'] }, { label: '已經有房子', keys: ['own'] }, { label: '買房子', keys: ['buyUsed', 'buyNew'] }]
+          .map(function (c) { var ks = c.keys.map(ix); return { label: c.label, test: function (j) { return ks.indexOf(cols().h[j]) >= 0; } }; });
+      } },
+      { id: 'pr', name: '門檻 PR' },
+      { id: 'kids', name: '孩子數', cats: function () { return [1, 2, 3, 4].map(function (k) { return { label: k + ' 個孩子', test: function (j) { return cols().k[j] === k; } }; }); } },
+      { id: 'care', name: '0–2 歲誰帶', cats: function () { return ['grandFree', 'self', 'grandPaid', 'public', 'quasi', 'private', 'helper', 'quit'].map(function (k) { var v = D.dict.cr.indexOf(k); return { label: CARE_L[k], test: function (j) { return cols().cr[j] === v; } }; }); } },
+      { id: 'school', name: '國小到高中', cats: function () { return ['public', 'privateJH', 'private', 'intl'].map(function (k) { var v = D.dict.sc.indexOf(k); return { label: SCHOOL_L[k], test: function (j) { return cols().sc[j] === v; } }; }); } },
+      { id: 'life', name: '生活水準', cats: function () { return ['frugal', 'normal', 'comfy'].map(function (k) { var v = D.dict.l.indexOf(k); return { label: LIFE_L[k], test: function (j) { return cols().l[j] === v; } }; }); } },
+      { id: 'verdict', name: '審查結果', ground: '沒填收入', cats: function () { return ['broke', 'fail', 'tight', 'pass'].map(function (k) { var v = D.dict.vd.indexOf(k); return { label: VERD_L[k], test: function (j) { return cols().vd[j] === v; } }; }); } }
+    ];
+    var PR_H = 300, GAP = 98;   // GAP：相鄰切片的高度差（公里，再乘上設定裡的間距倍率）
+    var MAP_PITCH = 40, CAT_PITCH = 28;   // 預設俯角：地圖、切片
+    function hk() { return st.prefs.terrain; }   // 地形高度放大倍數（真實比例看不出起伏）；植被地形也用同一個，切換時地形不會變形
+    function baseZ() { return topH * hk() + 10; }   // 切片從地形最高點上方開始
+    function catCount(id) { var f = FILTERS.filter(function (x) { return x.id === id; })[0]; return f && f.cats ? f.cats().length : 0; }
+    // 預設角度：從西南方斜斜往東北看（北部在左上、南部在右下），每種分法都一樣，切換時鏡頭不會亂轉
+    function viewFor(id) { return { yaw: YAW0, pitch: id === 'map' ? MAP_PITCH : CAT_PITCH }; }
+    function median(a) { if (!a.length) return null; a.sort(function (x, y) { return x - y; }); var m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; }
+    // 切片清單（只算內容，不含高度）
+    function sliceDefs(id) {
+      var f = FILTERS.filter(function (x) { return x.id === id; })[0], out = [], cat = new Int16Array(N).fill(-1);
+      if (id === 'pr') { [0, 20, 40, 60, 80, 100].forEach(function (p) { out.push({ key: 'pr' + p, label: 'PR ' + p, ref: true, pr: p }); }); return { list: out, cat: cat }; }
+      if (!f || !f.cats) return { list: out, cat: cat };
+      var cs = f.cats(), prs = cs.map(function () { return []; }), cnt = cs.map(function () { return 0; }), left = 0;
+      for (var j = 0; j < N; j++) {
+        for (var c = 0; c < cs.length; c++) if (cs[c].test(j)) { cat[j] = c; cnt[c]++; var p2 = prOf(j); if (p2 != null) prs[c].push(p2); break; }
+        if (cat[j] < 0) left++;
+      }
+      if (f.ground && left) out.push({ key: id + ':g', label: f.ground, n: left, ground: true, idx: -1 });
+      cs.forEach(function (c, k) { out.push({ key: id + ':' + k, label: c.label, n: cnt[k], med: median(prs[k]), idx: k }); });
+      return { list: out, cat: cat };
+    }
+    // 依目前的設定（間距、地形高度）算每一層的高度與每個點的目標高度
+    var S = { list: [], leaving: [], cat: null, gap: 0, view: null };
+    function heights() {
+      var z = new Float32Array(N), b = baseZ(), g = S.gap * st.prefs.gap;
+      if (st.filter === 'pr') {
+        S.list.forEach(function (s) { s.zT = b + s.pr / 100 * PR_H * st.prefs.gap; });
+        for (var i = 0; i < N; i++) { var pr = prOf(i); z[i] = pr == null ? 0 : b + pr / 100 * PR_H * st.prefs.gap; }
+      } else {
+        S.list.forEach(function (s) { s.zT = s.ground ? 0 : b + s.idx * g; });
+        for (var j = 0; j < N; j++) z[j] = S.cat[j] >= 0 ? b + S.cat[j] * g : 0;
+      }
+      return z;
+    }
+    function setFilter(id, instant) {
+      var changed = st.filter !== id || !S.cat;
+      st.filter = id;
+      if (st.focus) st.focus = null;
+      st.backCam = null; back.hidden = true;
+      var v = viewFor(id), sd = sliceDefs(id);
+      S.view = v;
+      S.gap = GAP;
+      // 舊的切片淡出，新的從地面升起並淡入
+      var old = {}; S.list.forEach(function (s) { old[s.key] = s; });
+      if (changed) {
+        S.list.forEach(function (s) { twTo(s.al, 0, instant ? 0 : 450); s.leave = now(); S.leaving.push(s); });
+        S.list = sd.list.map(function (s) { s.z = tw(0); s.al = tw(0); twTo(s.al, 1, instant ? 0 : 700); return s; });
+      } else S.list = sd.list.map(function (s) { var o = old[s.key]; s.z = o ? o.z : tw(0); s.al = o ? o.al : tw(1); return s; });
+      S.cat = sd.cat;
+      var nz = heights();
+      S.list.forEach(function (s) { twTo(s.z, s.zT, instant ? 0 : 1100); });
+      for (var i = 0; i < N; i++) { Zcur[i] = curLift(i); Zto[i] = nz[i]; delay[i] = instant || U.reduceMotion() ? -9 : Math.random() * 0.45; }
+      upload();
+      st.t0 = now(); if (instant || U.reduceMotion()) st.t0 -= 5000;
+      twSet(st.other, 1); st.fz = -1;
+      [].forEach.call(bar.children, function (b) { var on = b.getAttribute('data-id') === id; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false'); });
+      syncLabels(); summary();
+      if (instant || !st.prefs.lock) refit(!instant, v);   // 固定鏡頭時，換分法不動鏡頭
+      if (st.sel >= 0) showCard(st.sel);
+      kick();
+    }
+    // 設定改變（間距、地形高度）：切片與點直接移到新高度
+    function relayout() {
+      if (!S.cat) return;
+      var nz = heights();
+      S.list.forEach(function (s) { twSet(s.z, s.zT); });
+      for (var i = 0; i < N; i++) { Zcur[i] = Zto[i] = nz[i]; delay[i] = -9; }
+      upload(); st.t0 = now() - 5000;
+      if (st.focus) st.fz = st.focus.zT;
+      kick();
+    }
+    // 點目前離地多高（0 = 在地面）
+    function curT(i) { var t = (now() - st.t0) / 1000 - delay[i]; return ease(Math.max(0, Math.min(1, t / 1.1))); }
+    function curLift(i) { if (!Zcur) return 0; return Zcur[i] + (Zto[i] - Zcur[i]) * curT(i); }
+    // 點在畫面上的實際高度（在地面時＝地形高度），和著色器的算法相同
+    function curZ(i) { var g = Hpt[i] * hk(), t = curT(i), z0 = Zcur[i] < 0.5 ? g : Zcur[i], z1 = Zto[i] < 0.5 ? g : Zto[i]; return z0 + (z1 - z0) * t; }
+    function animating() { return (now() - st.t0) / 1000 < 1.7 || S.leaving.length > 0 || S.list.some(function (s) { return twBusy(s.z) || twBusy(s.al); }) || twBusy(st.other) || twBusy(st.fx); }
+
+    // ---------- 點的緩衝區 ----------
+    function buildPoints() {
+      var c = D.cols; N = c.x.length;
+      Zcur = new Float32Array(N); Zto = new Float32Array(N); delay = new Float32Array(N); Hpt = new Float32Array(N);
+      var xy = new Float32Array(N * 2);
+      for (var i = 0; i < N; i++) { xy[i * 2] = c.x[i] / 100; xy[i * 2 + 1] = c.y[i] / 100; Hpt[i] = heightAt(M.dem, xy[i * 2], xy[i * 2 + 1]); }
+      G.xy = xy;
+      G.pXY = buf(xy); G.pH = buf(Hpt); G.pZ0 = gl.createBuffer(); G.pZ1 = gl.createBuffer(); G.pD = gl.createBuffer(); G.pC = gl.createBuffer();
+      var sxy = new Float32Array(N * 4), se = new Float32Array(N * 2);
+      for (i = 0; i < N; i++) { sxy[i * 4] = sxy[i * 4 + 2] = xy[i * 2]; sxy[i * 4 + 1] = sxy[i * 4 + 3] = xy[i * 2 + 1]; se[i * 2] = 0; se[i * 2 + 1] = 1; }
+      G.sXY = buf(sxy); G.sE = buf(se); G.sH = buf(dup(Hpt, 1)); G.sZ0 = gl.createBuffer(); G.sZ1 = gl.createBuffer(); G.sD = gl.createBuffer(); G.sC = gl.createBuffer();
+      recolor();
+    }
+    function dup(a, k) { var o = new Float32Array(a.length * 2); for (var i = 0; i < a.length / k; i++) for (var j = 0; j < k; j++) { o[i * 2 * k + j] = a[i * k + j]; o[i * 2 * k + k + j] = a[i * k + j]; } return o; }
+    function upload() {
+      [[G.pZ0, Zcur, G.sZ0], [G.pZ1, Zto, G.sZ1], [G.pD, delay, G.sD]].forEach(function (x) { put(x[0], x[1]); put(x[2], dup(x[1], 1)); });
+    }
+    function colorOf(pr) { return pr == null ? [0.55, 0.55, 0.55] : palColor(st.theme, prU(pr), st.prefs.pal); }
+    function recolor() {
+      colors = new Float32Array(N * 3);
+      var cache = {};
+      for (var i = 0; i < N; i++) {
+        var pr = prOf(i), k = pr == null ? -1 : Math.round(pr * 10);
+        var col = cache[k] || (cache[k] = colorOf(pr));
+        colors[i * 3] = col[0]; colors[i * 3 + 1] = col[1]; colors[i * 3 + 2] = col[2];
+      }
+      put(G.pC, colors); put(G.sC, dup(colors, 3));
+      drawLegend();
+      if (st.sel >= 0) showCard(st.sel);
+    }
+
+    // ---------- 相機 ----------
+    st.yaw = YAW0; st.pitch = 52; st.piv = [0, 0, 0];
+    // 相機：繞著樞紐點 st.piv 轉；cam.cx／cam.cy 是畫面中心相對樞紐點的位置（相機座標）
+    var cam = { cx: 0, cy: 0, hh: 200, from: null, to: null, ta: 0, dur: 1100 };
+    function viewM() { return viewMat(st.piv, st.yaw, st.pitch, 1500); }
+    function stageSize() { return { w: stage.clientWidth || 1, h: stage.clientHeight || 1 }; }
+    function leftPad() { var w = stageSize().w; return st.filter === 'map' ? 0 : w < 560 ? 92 : 176; }
+    function labW() { var l = leftPad(); return l ? l + (stageSize().w < 560 ? 16 : 56) : 0; }   // 名稱欄＋到切片的引線
+    var PADX = 12;   // 內容（含右邊的切片名稱）到畫面左右邊的距離
+    // 右邊要留的寬度：引線＋切片名稱實際的文字寬度（不是整個名稱欄）
+    function sideW() { var l = leftPad(); return l ? labW() - l + (st.labTW || l - 10) : 0; }
+    function labTextW() {
+      var w = 0, rg = document.createRange();
+      S.list.forEach(function (s) {
+        var L = lblMap[s.key]; if (!L) return;
+        var left = L.el.getBoundingClientRect().left, tw = document.createTreeWalker(L.el, NodeFilter.SHOW_TEXT), n;
+        while ((n = tw.nextNode())) { rg.selectNodeContents(n); var r = rg.getBoundingClientRect(); if (r.width) w = Math.max(w, r.right - left); }
+      });
+      return Math.ceil(w);
+    }
+    function padB() { return stageSize().w < 560 ? 56 : 64; }
+    function zRange(all) {
+      var z0 = 0, z1 = topH * hk();
+      if (st.focus && !all) return st.focus.ground ? [0, z1] : [st.focus.zT, st.focus.zT];
+      S.list.forEach(function (s) { z1 = Math.max(z1, s.zT || 0); });
+      return [z0, z1];
+    }
+    // 畫面範圍：放大到「台灣本島＋各層切片」剛好塞滿畫面（右邊留給切片名稱）；外框、金門馬祖等外島插圖和少數點可能被切掉
+    // 正上方俯瞰（或 whole）：全部內容（含外島插圖）都放進畫面
+    // 樞紐點放在內容中間（看單一層時在那一層上）
+    function fitTarget(yaw, pitch, whole, allZ) {
+      var sz = stageSize(), zr = zRange(allZ), xs = [], ys = [];
+      var piv = [(BB[0] + BB[2]) / 2, (BB[1] + BB[3]) / 2, (zr[0] + zr[1]) / 2];
+      var V = viewMat(piv, yaw, pitch, 1500);
+      (whole || pitch > 89.5 ? HULL : MAIN).forEach(function (c) { zr.forEach(function (z) { var p = xf(V, c[0], c[1], z); xs.push(p[0]); ys.push(p[1]); }); });
+      var x0 = Math.min.apply(0, xs), x1 = Math.max.apply(0, xs), y0 = Math.min.apply(0, ys), y1 = Math.max.apply(0, ys);
+      var padT = 18, pb = padB(), side = sideW();
+      var sx = (x1 - x0) / Math.max(40, sz.w - 2 * PADX - side), sy = (y1 - y0) / Math.max(40, sz.h - padT - pb), s = Math.max(sx, sy, 0.05);
+      // 地圖＋右邊的切片名稱整組左右置中（左右離畫面邊一樣遠）；上下放在「上緣到底下圖例、按鈕」這一段的正中間
+      return { cx: (x0 + x1) / 2 + side / 2 * s, cy: (y0 + y1) / 2 - (pb - padT) / 2 * s, hh: s * sz.h / 2, yaw: yaw, pitch: pitch, zoom: 1, panX: 0, panY: 0, px: piv[0], py: piv[1], pz: piv[2] };
+    }
+    function camNow() { return { cx: cam.cx, cy: cam.cy, hh: cam.hh, yaw: st.yaw, pitch: st.pitch, zoom: st.zoom, panX: st.panX, panY: st.panY, px: st.piv[0], py: st.piv[1], pz: st.piv[2] }; }
+    function camSet(t) { cam.cx = t.cx; cam.cy = t.cy; cam.hh = t.hh; st.yaw = t.yaw; st.pitch = t.pitch; st.zoom = t.zoom; st.panX = t.panX; st.panY = t.panY; st.piv = [t.px, t.py, t.pz]; }
+    function camTo(t, anim, dur) {
+      t = Object.assign(camNow(), t);
+      if (anim && !U.reduceMotion()) {
+        var dy = ((t.yaw - st.yaw) % 360 + 540) % 360 - 180;   // 轉最短的方向
+        t.yaw = st.yaw + dy;
+        cam.from = camNow(); cam.to = t; cam.ta = now(); cam.dur = dur || 1100;
+      } else { cam.from = null; camSet(t); }
+      kick();
+    }
+    function refit(anim, v) { if (!BB) return; v = v || { yaw: st.yaw, pitch: st.pitch }; camTo(fitTarget(v.yaw, v.pitch), anim); }
+    function camStep() {
+      if (!cam.from) return false;
+      var k = Math.min(1, (now() - cam.ta) / cam.dur), e = ease(k), f = cam.from, t = cam.to, o = {};
+      Object.keys(t).forEach(function (key) { o[key] = f[key] + (t[key] - f[key]) * e; });
+      camSet(o);
+      if (k >= 1) cam.from = null;
+      return true;
+    }
+    function stopCam() { if (cam.from) { camStep(); cam.from = null; } }
+    // 開場運鏡（NEXT GEN：MV 結束後）：從高處、另一個方向慢慢轉到預設視角
+    function runIntro() {
+      var dur = st.wantIntro; st.wantIntro = 0;
+      if (U.reduceMotion()) return;
+      var v = viewFor(st.filter), t = fitTarget(v.yaw, v.pitch), s = fitTarget(v.yaw - 64, 74);
+      s.zoom = 0.72;
+      camSet(s); camTo(t, true, dur);
+    }
+    function mvp() {
+      var sz = stageSize(), hh = cam.hh / st.zoom, hw = hh * sz.w / sz.h, cx = cam.cx + st.panX, cy = cam.cy + st.panY;
+      return mul(ortho(cx - hw, cx + hw, cy - hh, cy + hh, -4000, 4000), viewM());
+    }
+    function toScreen(m, x, y, z) { var sz = stageSize(), p = xf(m, x, y, z); return [(p[0] + 1) / 2 * sz.w, (1 - p[1]) / 2 * sz.h]; }
+    // 對焦中心：畫面左右的正中間、上下扣掉底下的圖例與按鈕後的中間；微縮攝影對焦在這裡，轉動也繞著這一點
+    function focusPt() { var sz = stageSize(); return [sz.w / 2, (sz.h - padB() + 18) / 2]; }
+    // 開始旋轉前：把樞紐點移到視覺中心看到的那一點（地圖模式在地表上、看單一層時在那一層上、其他在切片中間的高度），畫面不動，之後就繞著它轉
+    function onIsland(q) {   // 點在台灣本島上（射線法）
+      var P = MAINP, c = false;
+      for (var i = 0, j = P.length - 1; i < P.length; j = i++) if ((P[i][1] > q[1]) !== (P[j][1] > q[1]) && q[0] < (P[j][0] - P[i][0]) * (q[1] - P[i][1]) / (P[j][1] - P[i][1]) + P[i][0]) c = !c;
+      return c;
+    }
+    // onPlane：切換到另一層時，樞紐點一定放在那一層上（之後只把它移到新的那一層）
+    function reanchor(onPlane) {
+      var sz = stageSize(), hh = cam.hh / st.zoom, hw = hh * sz.w / sz.h;
+      var fp = focusPt(), sx = fp[0], sy = fp[1];
+      var ox = (sx / sz.w * 2 - 1) * hw, oy = (1 - sy / sz.h * 2) * hh;
+      var vx = cam.cx + st.panX + ox, vy = cam.cy + st.panY + oy;
+      var yaw = st.yaw * Math.PI / 180, pit = st.pitch * Math.PI / 180, sy_ = Math.sin(yaw), cy_ = Math.cos(yaw), cp = Math.cos(pit), sp = Math.sin(pit);
+      var Z = [-sy_ * cp, -cy_ * cp, sp], X = [cy_, -sy_, 0], Y = [Z[1] * X[2] - Z[2] * X[1], Z[2] * X[0] - Z[0] * X[2], Z[0] * X[1] - Z[1] * X[0]];
+      if (Math.abs(Z[2]) < 0.05) return;
+      var T = st.piv, zr = zRange(), pz, t;
+      function hit(z) { t = (z - T[2] - vx * X[2] - vy * Y[2]) / Z[2]; return [T[0] + vx * X[0] + vy * Y[0] + t * Z[0], T[1] + vx * X[1] + vy * Y[1] + t * Z[1]]; }
+      function inFrame(q) { return q[0] > BB[0] && q[0] < BB[2] && q[1] > BB[1] && q[1] < BB[3]; }
+      // 轉動中心＝對焦中心（視覺中心）看到的那一點：沿著視線往下找，先碰到哪一層切片上的台灣就是那一層；
+      // 看單一層時只看那一層；都沒有（例如移到下面的地圖）就是地表。門檻 PR 的參考平面沒有台灣，用點雲中間的高度
+      var plane = null;
+      if (st.focus) { if (!st.focus.ground && (onPlane || onIsland(hit(zr[0])))) plane = zr[0]; }
+      else if (st.filter === 'pr') { if (inFrame(hit((zr[0] + zr[1]) / 2))) plane = (zr[0] + zr[1]) / 2; }
+      else if (st.filter !== 'map') {
+        S.list.filter(function (q) { return !q.ground && !q.ref && sliceAlpha(q) > 0.3; }).sort(function (x, y) { return y.zT - x.zT; })
+          .some(function (q) { if (onIsland(hit(q.zT))) { plane = q.zT; return true; } return false; });
+      }
+      if (plane != null) { pz = plane; hit(pz); }
+      else if (M) {   // 沿著視線找到地表
+        var zg = 0;
+        for (var it = 0; it < 12; it++) { var q = hit(zg); zg += (heightAt(M.dem, q[0], q[1]) * hk() - zg) * 0.6; }
+        pz = zg; hit(pz);
+      } else { pz = plane || 0; hit(pz); }
+      st.piv = [T[0] + vx * X[0] + vy * Y[0] + t * Z[0], T[1] + vx * X[1] + vy * Y[1] + t * Z[1], pz];
+      cam.cx = -ox; cam.cy = -oy; st.panX = 0; st.panY = 0;
+    }
+    // 正上方俯瞰：接近時自動對正（北、東、南、西其中一個方向朝上）
+    function snapTop(force) {
+      if (!force && st.pitch < 74) return false;
+      camTo({ yaw: Math.round(st.yaw / 90) * 90, pitch: 90 }, true, 650);
+      return true;
+    }
+    function isTop() { return st.pitch > 89.5; }
+
+    // ---------- 焦點：只看一層切片 ----------
+    // st.other：其他層的透明度；st.fx：從上一個焦點換到這一個的進度（交叉淡入淡出）
+    // st.backCam：看單一層之前的鏡頭（按上一步回到全部時還原）
+    st.other = tw(1); st.fz = -1; st.fx = tw(1); st.fz2 = -9; st.prevKey = null; st.backCam = null;
+    function sliceByKey(k) { return S.list.filter(function (x) { return x.key === k; })[0] || null; }
+    function setFocus(s) {
+      if (s && (s.ref || st.filter === 'map' || st.filter === 'pr')) return;
+      var prev = st.focus;
+      if (s && prev && s.key === prev.key) return;
+      if (s && prev) { stopCam(); reanchor(true); }   // 樞紐點先放在目前這一層上，等一下只把它移到新的一層
+      if (s && !prev) st.backCam = camNow();   // 回到全部時要還原的鏡頭
+      st.focus = s;
+      if (s && prev) { st.fz2 = prev.zT; st.prevKey = prev.key; twSet(st.fx, 0); twTo(st.fx, 1, 600); st.fz = s.zT; }
+      else if (s) { st.fz = s.zT; twSet(st.fx, 1); st.prevKey = null; twTo(st.other, 0, 600); }
+      else { st.prevKey = prev ? prev.key : null; twTo(st.other, 1, 600); }
+      if (st.prefs.lock) { /* 固定鏡頭：不動 */ }
+      else if (s && prev) {
+        // 換到另一層：鏡頭不重置（角度、遠近都一樣），只跟著移到新的那一層
+        camTo({ pz: s.ground ? 0 : s.zT }, true, 700);
+      } else if (s) camTo(fitTarget(st.yaw, st.pitch), true, 900);   // 角度不變，只放大到這一層
+      else if (st.backCam) camTo(st.backCam, true, 900);
+      else camTo(fitTarget(st.yaw, isTop() ? 90 : (S.view ? S.view.pitch : st.pitch)), true, 900);
+      if (!s) st.backCam = null;
+      back.hidden = !st.focus;
+      syncLabels();
+      kick();
+    }
+    function goBack() { if (st.focus) setFocus(null); }   // 上一步：離開單層檢視，回到全部切片
+    function sliceAlpha(s) {   // 切片目前的透明度（含淡入淡出與焦點）
+      var a = twVal(s.al), o = twVal(st.other), x = twVal(st.fx);
+      if (st.focus) a *= s.key === st.focus.key ? x : s.key === st.prevKey && twBusy(st.fx) ? Math.max(1 - x, o) : o;
+      else if (twBusy(st.other)) a *= s.key === st.prevKey ? 1 : o;
+      return a;
+    }
+
+    // ---------- 繪製 ----------
+    // ---------- 植被地形（打開時才下載貼圖、建網格） ----------
+    var VEG = { tx: null, bands: null, loading: false, failed: false, tb: null };
+    function loadImg(src) { return new Promise(function (ok, bad) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = bad; im.src = src; }); }
+    function potTex(img, size) {   // 拉成 2 的次方大小才能用 mipmap（拉遠時不閃爍）
+      var cv = document.createElement('canvas'); cv.width = size; cv.height = size;
+      cv.getContext('2d').drawImage(img, 0, 0, size, size);
+      var t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cv); gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      var an = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+      if (an) gl.texParameterf(gl.TEXTURE_2D, an.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(8, gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT)));
+      return t;
+    }
+    // 坡度貼圖：電腦用 100 公尺（4096 貼圖），手機用 200 公尺（2048）
+    var vegHi = !touchy && (gl.getParameter(gl.MAX_TEXTURE_SIZE) || 0) >= 4096;
+    function buildVeg(ims) {
+      var dem = M.dem, nx = dem.nx, ny = dem.ny;
+      P.ter = prog(VS_TER, FS_TER);
+      VEG.tx = [potTex(ims[0], vegHi ? 4096 : 2048), potTex(ims[1], 2048), potTex(ims[2], 2048)];
+      VEG.tb = [dem.x0, dem.y0 + ny * dem.d, nx * dem.d, ny * dem.d];
+      // 陸地（底圖縮到高度網格大小）：只建陸地附近的三角面
+      var mc = document.createElement('canvas'); mc.width = nx; mc.height = ny;
+      var mx = mc.getContext('2d'); mx.drawImage(ims[2], 0, 0, nx, ny);
+      var px = mx.getImageData(0, 0, nx, ny).data, has = new Uint8Array(nx * ny);
+      for (var j = 0; j < ny; j++) for (var i = 0; i < nx; i++) has[j * nx + i] = px[((ny - 1 - j) * nx + i) * 4] > 20 ? 1 : 0;
+      function isL(i, j) { return i >= 0 && j >= 0 && i < nx && j < ny && has[j * nx + i]; }
+      function hg(i, j) { i = Math.max(0, Math.min(nx - 1, i)); j = Math.max(0, Math.min(ny - 1, j)); return dem.g[j * nx + i] * dem.k; }
+      // 頂點：每一格的中心＋網格的坡度（三平面用）；切成好幾段，每段不超過 65000 個頂點（Uint16 索引）
+      var rows = Math.floor(65000 / nx), bands = [];
+      for (var r0 = 0; r0 < ny - 1; r0 += rows - 1) {
+        var r1 = Math.min(ny - 1, r0 + rows - 1), nv = (r1 - r0 + 1) * nx, xyz = new Float32Array(nv * 3), gr = new Float32Array(nv * 2), idx = [];
+        for (j = r0; j <= r1; j++) for (i = 0; i < nx; i++) {
+          var o = (j - r0) * nx + i, v = o * 3;
+          xyz[v] = dem.x0 + (i + 0.5) * dem.d; xyz[v + 1] = dem.y0 + (j + 0.5) * dem.d; xyz[v + 2] = hg(i, j);
+          gr[o * 2] = (hg(i + 1, j) - hg(i - 1, j)) / (2 * dem.d); gr[o * 2 + 1] = (hg(i, j + 1) - hg(i, j - 1)) / (2 * dem.d);
+        }
+        for (j = r0; j < r1; j++) for (i = 0; i < nx - 1; i++) {
+          var keep = false;
+          for (var dj = -1; dj <= 2 && !keep; dj++) for (var di = -1; di <= 2 && !keep; di++) if (isL(i + di, j + dj)) keep = true;
+          if (!keep) continue;
+          var a = (j - r0) * nx + i, b = a + 1, c = a + nx, d = c + 1;
+          idx.push(a, b, c, b, d, c);
+        }
+        if (idx.length) bands.push({ vb: buf(xyz), gb: buf(gr), ib: buf(new Uint16Array(idx), gl.ELEMENT_ARRAY_BUFFER), n: idx.length });
+      }
+      VEG.bands = bands;
+    }
+    function applyVeg(on) {
+      if (on && !VEG.bands && !VEG.loading && !VEG.failed && M) {
+        VEG.loading = true;
+        var src = window.__VIZ_VEG || cfg.vizVeg;
+        (src ? Promise.all([loadImg(vegHi ? src.s : src.sm), loadImg(src.c), loadImg(src.b)]) : Promise.reject(new Error('no-veg')))
+          .then(function (ims) { if (!st.alive) return; buildVeg(ims); VEG.loading = false; kick(); })
+          .catch(function () { VEG.loading = false; VEG.failed = true; });   // 手機太舊、著色器編譯不過：維持原本的線條地圖
+      }
+      kick();
+    }
+    function vegOn() { return st.prefs.veg && !!VEG.bands; }
+    var VEGC = {   // 綠的色票（陰影→中間調→受光→最亮）、農地、灰的色調、不透明度、遠處漸暗（深淺模式）
+      dark: { p: [[0.082, 0.204, 0.169], [0.231, 0.451, 0.2], [0.498, 0.659, 0.247], [0.71, 0.8, 0.384]], f0: [0.25, 0.29, 0.1], f1: [0.43, 0.49, 0.18], gt: [0.97, 1, 1.03], a: 0.86, fogMax: 0.55, op: 1 },
+      light: { p: [[0.5, 0.62, 0.55], [0.5, 0.68, 0.45], [0.64, 0.77, 0.42], [0.76, 0.85, 0.52]], f0: [0.66, 0.7, 0.45], f1: [0.78, 0.82, 0.52], gt: [1, 1, 1], a: 0.62, fogMax: 0.5, op: 1 }
+    };
+    var SUN = (function () { var az = 315 * Math.PI / 180, al = 48 * Math.PI / 180; return [Math.sin(az) * Math.cos(al), Math.cos(az) * Math.cos(al), Math.sin(al)]; })();   // 太陽在西北方、高度 48 度
+    function drawVeg(M4, T, dim) {
+      var p = P.ter, C = VEGC[st.theme] || VEGC.dark; gl.useProgram(p.p);
+      var yw = st.yaw * Math.PI / 180, pt = st.pitch * Math.PI / 180, zd = [-Math.sin(yw) * Math.cos(pt), -Math.cos(yw) * Math.cos(pt), Math.sin(pt)];
+      var d0 = st.piv[0] * zd[0] + st.piv[1] * zd[1] + st.piv[2] * zd[2], rng = cam.hh / st.zoom / Math.max(0.3, Math.sin(pt)) * 1.2;
+      gl.uniformMatrix4fv(p.u.uM, false, M4); gl.uniform1f(p.u.uHk, hk()); gl.uniform4f(p.u.uTB, VEG.tb[0], VEG.tb[1], VEG.tb[2], VEG.tb[3]);
+      gl.uniform3fv(p.u.uZd, zd); gl.uniform3f(p.u.uFog, d0, rng, C.fogMax); gl.uniform1f(p.u.uDark, st.theme === 'dark' ? 1 : 0);
+      gl.uniform3f(p.u.uBg, T.bg[0], T.bg[1], T.bg[2]); gl.uniform1f(p.u.uOp, C.op * dim); gl.uniform3fv(p.u.uSun, SUN);
+      ['uP0', 'uP1', 'uP2', 'uP3'].forEach(function (u, k) { gl.uniform3fv(p.u[u], C.p[k]); });
+      gl.uniform3fv(p.u.uF0, C.f0); gl.uniform3fv(p.u.uF1, C.f1); gl.uniform3fv(p.u.uGt, C.gt); gl.uniform1f(p.u.uGA2, C.a);
+      gl.uniform1f(p.u.uBlur, vegHi ? 2.3 : 1.3);   // 坡度貼圖模糊到約 400 公尺（mipmap 偏移）
+      gl.uniform1f(p.u.uGray, 0);   // 綠色以外的地方不畫，直接看到底下的線條地圖
+      ['uS', 'uC', 'uB'].forEach(function (u, k) { gl.activeTexture(gl.TEXTURE0 + k); gl.bindTexture(gl.TEXTURE_2D, VEG.tx[k]); gl.uniform1i(p.u[u], k); });
+      gl.activeTexture(gl.TEXTURE0);
+      gl.enable(gl.DEPTH_TEST); gl.depthFunc(gl.LEQUAL); gl.depthMask(true); gl.disable(gl.BLEND);
+      VEG.bands.forEach(function (c) {
+        attr(p, 'aP', c.vb, 3); attr(p, 'aG', c.gb, 2);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, c.ib); gl.drawElements(gl.TRIANGLES, c.n, gl.UNSIGNED_SHORT, 0);
+      });
+      off(p);
+      gl.disable(gl.DEPTH_TEST); gl.enable(gl.BLEND);
+    }
+    // tw：台灣的線（道路、等高線、海岸線、縣市界），透明度乘上設定的「線條透明度」
+    function drawLines(chunks, M4, z, col, a, hscale, tw) {
+      if (tw) a = Math.min(1, a * st.prefs.la);
+      if (a <= 0.002) return;
+      var p = P.line; gl.useProgram(p.p);
+      gl.uniformMatrix4fv(p.u.uM, false, M4); gl.uniform1f(p.u.uZ, z); gl.uniform1f(p.u.uHk, hscale || 0); gl.uniform4f(p.u.uC, col[0], col[1], col[2], a);
+      chunks.forEach(function (c) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, c.vb); gl.enableVertexAttribArray(p.a.aP); gl.vertexAttribPointer(p.a.aP, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, c.ib); gl.drawElements(gl.LINES, c.n, gl.UNSIGNED_SHORT, 0);
+      });
+      gl.disableVertexAttribArray(p.a.aP);
+    }
+    function attr(p, name, b, n) { var l = p.a[name]; if (l == null || l < 0) return; gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.enableVertexAttribArray(l); gl.vertexAttribPointer(l, n, gl.FLOAT, false, 0, 0); }
+    function off(p) { for (var k in p.a) if (p.a[k] >= 0) gl.disableVertexAttribArray(p.a[k]); }
+    function ptUniforms(q, M4, ut, T) {
+      gl.uniformMatrix4fv(q.u.uM, false, M4); gl.uniform1f(q.u.uT, ut); gl.uniform1f(q.u.uHk, hk());
+      gl.uniform1f(q.u.uFz, st.focus || twBusy(st.other) ? st.fz : -1); gl.uniform1f(q.u.uOther, twVal(st.other));
+      gl.uniform1f(q.u.uFz2, twBusy(st.fx) ? st.fz2 : -9); gl.uniform1f(q.u.uX, twVal(st.fx));
+      if (q.u.uBg) gl.uniform3f(q.u.uBg, T.bg[0], T.bg[1], T.bg[2]);
+    }
+    var drag = null;
+    function frame() {
+      st.raf = 0;
+      if (!st.alive || !D || !M) return;
+      var dpr = Math.min(2, window.devicePixelRatio || 1), sz = stageSize();
+      var W = Math.round(sz.w * dpr), H = Math.round(sz.h * dpr);
+      if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+      var moving = camStep(), t = now();
+      if (st.vy) {   // 拖曳旋轉放開後的慣性
+        var dtf = Math.min(64, t - (st.lastFrameT || t));
+        st.yaw += st.vy * dtf; st.vy *= Math.exp(-dtf / 340);
+        if (Math.abs(st.vy) < 0.003) st.vy = 0; else moving = true;
+      }
+      st.lastFrameT = t;
+      var T = THEME[st.theme], ink = T.ink, M4 = mvp(), ut = (t - st.t0) / 1000, HKv = hk();
+      var busy = moving || animating() || !!drag;
+      if (st.lastF && busy) { st.ft = (st.ft || 16) * 0.9 + (t - st.lastF) * 0.1; if (st.ft > 40) st.lite = true; }
+      st.lastF = busy ? t : 0;
+      S.leaving = S.leaving.filter(function (s) { return t - s.leave < 500; });
+      if (!twBusy(st.other) && !st.focus) st.fz = -1;
+      gl.viewport(0, 0, W, H);
+      gl.clearColor(T.bg[0], T.bg[1], T.bg[2], 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.disable(gl.DEPTH_TEST);
+      var lifted = st.filter !== 'map', dim = lifted ? 0.6 : 1;
+      if (st.focus && !st.focus.ground) dim *= 0.4 + 0.6 * twVal(st.other);
+      var veg = vegOn() && !st.bare;
+      if (veg) drawVeg(M4, T, lifted ? 0.45 + 0.35 * dim / 0.6 : 1);
+      var rd = veg ? [0.9, 0.9, 0.95, 0.95] : [1, 1, 1, 1];   // 植被地形：線條地圖照常（只稍微淡一點點），等高線很淡   // 植被地形：鮮豔的顆粒投影在地表上，原本的線條地圖照常畫
+      if (!st.bare) {   // bare：自動測試用（軟體繪圖太慢），只畫海岸線與點
+        if (!(st.lite && busy) && rd[0]) drawLines(G.minor, M4, 0, ink, T.minor * dim, HKv, true);
+        drawLines(G.mid, M4, 0, ink, T.mid * dim * rd[1], HKv, true);
+        drawLines(G.major, M4, 0, ink, T.major * dim * rd[2], HKv, true);
+        if (st.prefs.contour) drawLines(G.contour, M4, 0, ink, T.contour * dim * Math.min(1, HKv / 2) * (veg ? 0.4 : 1), HKv, true);
+      }
+      drawLines(G.border, M4, 0, ink, T.border * dim * rd[3], HKv, true);
+      drawLines(G.coast, M4, 0, ink, T.coast * (lifted ? 0.85 : 1), 0, true);
+      drawLines(G.insets, M4, 0, ink, T.frame);
+      // 切片：外框與海岸線（淡入淡出、跟著高度動）
+      S.leaving.concat(S.list).forEach(function (s) {
+        if (s.ground) return;
+        var a = sliceAlpha(s), z = twVal(s.z);
+        drawLines(G.frame, M4, z, ink, T.frame * a);
+        if (!s.ref) { drawLines(G.coast, M4, z, ink, T.slice * a, 0, true); drawLines(G.border, M4, z, ink, T.sliceB * a, 0, true); }   // 切片上的台灣：海岸線與縣市界
+      });
+      if (lifted) drawLines(G.frame, M4, 0, ink, T.frame);
+      // 垂直的對齊線
+      var stemA = T.stem * st.prefs.stem * (lifted ? 1 : 1.6);
+      if (stemA > 0.002) {
+        var sp = P.stem; gl.useProgram(sp.p); ptUniforms(sp, M4, ut, T); gl.uniform1f(sp.u.uA, Math.min(1, stemA)); gl.uniform1f(sp.u.uUp, lifted ? 0 : 55);
+        attr(sp, 'aP', G.sXY, 2); attr(sp, 'aH', G.sH, 1); attr(sp, 'aZ0', G.sZ0, 1); attr(sp, 'aZ1', G.sZ1, 1); attr(sp, 'aD', G.sD, 1); attr(sp, 'aE', G.sE, 1); attr(sp, 'aC', G.sC, 3);
+        gl.drawArrays(gl.LINES, 0, N * 2); off(sp);
+      }
+      // 點：地面上的落腳點（淡），再畫點本身
+      var pp = P.pt; gl.useProgram(pp.p); ptUniforms(pp, M4, ut, T);
+      attr(pp, 'aP', G.pXY, 2); attr(pp, 'aH', G.pH, 1); attr(pp, 'aZ0', G.pZ0, 1); attr(pp, 'aZ1', G.pZ1, 1); attr(pp, 'aD', G.pD, 1); attr(pp, 'aC', G.pC, 3);
+      var ps = Math.max(2.4, Math.min(6, 2.6 * Math.sqrt(st.zoom * (st.focus ? 1.4 : 1)))) * dpr * st.prefs.dot;
+      if (lifted) { gl.uniform1f(pp.u.uGround, 1); gl.uniform1f(pp.u.uS, ps * 0.7); gl.uniform1f(pp.u.uA, 0.3); gl.uniform1f(pp.u.uRing, 0); gl.drawArrays(gl.POINTS, 0, N); }
+      gl.uniform1f(pp.u.uGround, 0); gl.uniform1f(pp.u.uS, ps + 1.4 * dpr); gl.uniform1f(pp.u.uA, 1); gl.uniform1f(pp.u.uRing, 0.7);
+      gl.drawArrays(gl.POINTS, 0, N);
+      off(pp);
+      // 選取／滑過的點
+      [st.hov, st.sel].forEach(function (i, k) {
+        if (i < 0 || (k === 0 && i === st.sel)) return;
+        var z = curZ(i), x = G.xy[i * 2], y = G.xy[i * 2 + 1];
+        if (lifted && curLift(i) > 0.5) drawSeg(M4, x, y, Hpt[i] * HKv, z, ink, 0.8);   // 從地面連到點的線
+        selDraw(M4, x, y, z, ps * (k ? 3.4 : 2.8), ink, 0.8, T.bg);
+        selDraw(M4, x, y, z, ps * 1.5, colors.subarray(i * 3, i * 3 + 3), 0, T.bg);
+      });
+      U.clear(svg);
+      if (st.sel >= 0) placeCard(M4);   // 先放資訊卡（手機上名稱要排在卡片下面）
+      positionLabels(M4);
+      if (moving || animating() || st.lblMoving) kick();
+      else if (st.lite && !st.idleDrawn) { st.idleDrawn = true; kick(); }   // 停下來後補畫一次完整的
+      if (busy) st.idleDrawn = false;
+    }
+    var tmpB = {};
+    function tb(k) { return tmpB[k] || (tmpB[k] = gl.createBuffer()); }
+    function selDraw(M4, x, y, z, size, col, ring, bg) {
+      var q = P.pt; gl.useProgram(q.p);
+      gl.uniformMatrix4fv(q.u.uM, false, M4); gl.uniform1f(q.u.uT, 99); gl.uniform1f(q.u.uHk, 0); gl.uniform1f(q.u.uFz, -1); gl.uniform1f(q.u.uOther, 1); gl.uniform1f(q.u.uFz2, -9); gl.uniform1f(q.u.uX, 1); gl.uniform1f(q.u.uGround, 0);
+      put(tb('xy'), new Float32Array([x, y])); put(tb('h'), new Float32Array([0])); put(tb('z'), new Float32Array([Math.max(z, 0.6)])); put(tb('d'), new Float32Array([0])); put(tb('c'), new Float32Array([col[0], col[1], col[2]]));
+      attr(q, 'aP', tb('xy'), 2); attr(q, 'aH', tb('h'), 1); attr(q, 'aZ0', tb('z'), 1); attr(q, 'aZ1', tb('z'), 1); attr(q, 'aD', tb('d'), 1); attr(q, 'aC', tb('c'), 3);
+      gl.uniform1f(q.u.uS, size); gl.uniform1f(q.u.uA, 1); gl.uniform1f(q.u.uRing, ring); gl.uniform3f(q.u.uBg, bg[0], bg[1], bg[2]);
+      gl.drawArrays(gl.POINTS, 0, 1); off(q);
+    }
+    function drawSeg(M4, x, y, z0, z1, col, a) {
+      var p = P.line; gl.useProgram(p.p);
+      gl.uniformMatrix4fv(p.u.uM, false, M4); gl.uniform1f(p.u.uZ, 0); gl.uniform1f(p.u.uHk, 1); gl.uniform4f(p.u.uC, col[0], col[1], col[2], a);
+      put(tb('seg'), new Float32Array([x, y, z0, x, y, z1]));
+      gl.enableVertexAttribArray(p.a.aP); gl.vertexAttribPointer(p.a.aP, 3, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.LINES, 0, 2); gl.disableVertexAttribArray(p.a.aP);
+    }
+    function kick() { if (!st.raf && st.visible && st.alive) st.raf = requestAnimationFrame(frame); }
+
+    // ---------- 切片名稱：平常排在切片左邊（細線連到切片）；看單一層時固定在左側中間 ----------
+    var lblMap = {};   // key → { el, x, y, init }
+    function fmt(n) { return U.sep(n); }
+    function syncLabels() {
+      var keep = {};
+      S.list.forEach(function (s) {
+        keep[s.key] = true;
+        var L = lblMap[s.key];
+        if (!L) {
+          var el = h('button', { type: 'button', class: 'vz-lbl' + (s.ref ? ' ref' : '') + (s.ground ? ' ground' : ''), tabindex: s.ref ? '-1' : '0' });
+          el.appendChild(h('b', {}, s.label));
+          if (s.n != null) {
+            if (stageSize().w < 560) { el.appendChild(h('span', {}, fmt(s.n) + ' 人')); if (s.med != null) el.appendChild(h('span', {}, '中位數 PR ' + Math.round(s.med))); }
+            else el.appendChild(h('span', {}, fmt(s.n) + ' 人' + (s.med != null ? '・門檻中位數 PR ' + Math.round(s.med) : '')));
+          }
+          if (!s.ref) el.addEventListener('click', function () { if (st.pickBlock) { st.pickBlock = false; return; } if (st.focus && st.focus.key === s.key) setFocus(null); else setFocus(sliceByKey(s.key)); });
+          el.style.width = (leftPad() - 10) + 'px';
+          lbl.appendChild(el);
+          L = lblMap[s.key] = { el: el, x: 0, y: 0, init: false, s: s };
+          requestAnimationFrame(function () { el.classList.add('in'); });
+        }
+        L.s = s;
+        L.el.classList.toggle('dim', !!st.focus && st.focus.key !== s.key);
+        L.el.classList.toggle('on', !!st.focus && st.focus.key === s.key);
+        L.el.setAttribute('aria-pressed', st.focus && st.focus.key === s.key ? 'true' : 'false');
+      });
+      Object.keys(lblMap).forEach(function (k) {
+        if (keep[k]) return;
+        var L = lblMap[k]; delete lblMap[k];
+        L.el.classList.remove('in'); L.el.classList.add('out');
+        setTimeout(function () { if (L.el.parentNode) L.el.parentNode.removeChild(L.el); }, 450);
+      });
+      S.list.forEach(function (s) { var L = lblMap[s.key]; if (L) L.el.style.width = (leftPad() - 10) + 'px'; });
+      st.labTW = labTextW();   // 名稱實際的文字寬度：畫面左右置中時用
+      lbl.classList.toggle('pick', !!st.focus);
+      if (!st.focus) { st.pickOff = 0; st.pickGeo = null; }
+    }
+    // 名稱最高可以放到哪裡：手機上資訊卡固定在右上角時，名稱排在卡片下面
+    function labTop() { return card.classList.contains('dock') && !card.hidden ? card.offsetTop + card.offsetHeight + 10 : 6; }
+    // 看單一層時拖動名稱列表（或在上面滾滾輪）換層
+    st.pickOff = 0; st.pickDrag = false; st.pickGeo = null;
+    var pk = null, wAcc = 0, wT = -1e9;
+    function pickTo(i) {
+      var g = st.pickGeo; if (!g || i === g.fi || i < 0 || i >= g.ord.length) return false;
+      var d = g.ord[i].c - g.ord[g.fi].c; st.pickOff += d; if (pk) pk.off0 += d;   // 位置不跳：換層後列表維持在手指底下
+      g.fi = i; setFocus(sliceByKey(g.ord[i].key)); return true;
+    }
+    lbl.addEventListener('pointerdown', function (e) { st.pickBlock = false; var el = e.target.closest && e.target.closest('.vz-lbl'); if (st.focus && el && e.button === 0) pk = { id: e.pointerId, y0: e.clientY, off0: st.pickOff, moved: false, el: el }; });
+    lbl.addEventListener('pointermove', function (e) {
+      if (!pk || e.pointerId !== pk.id) return;
+      var dy = e.clientY - pk.y0;
+      if (!pk.moved && Math.abs(dy) > 6) { pk.moved = true; st.pickDrag = true; try { pk.el.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ } }
+      if (!pk.moved || !st.focus) return;
+      st.pickOff = pk.off0 + dy;
+      var g = st.pickGeo;
+      if (g) {   // 最靠近中間那條線的名稱就是要看的那一層
+        var base = g.c0 - g.ord[g.fi].c + st.pickOff, best = g.fi, bd = Infinity;
+        g.ord.forEach(function (o, i) { var d = Math.abs(base + o.c - g.c0); if (d < bd) { bd = d; best = i; } });
+        pickTo(best);
+      }
+      kick();
+    });
+    function pickEnd(e) { if (!pk || e.pointerId !== pk.id) return; if (pk.moved) { st.pickDrag = false; st.pickOff = 0; st.pickBlock = e.type === 'pointerup'; kick(); } pk = null; }   // 拖完放開不算點名稱
+    lbl.addEventListener('pointerup', pickEnd); lbl.addEventListener('pointercancel', pickEnd);
+    lbl.addEventListener('wheel', function (e) {
+      if (!st.focus || !st.pickGeo) return;
+      e.preventDefault(); wAcc += e.deltaY;
+      var t = now(); if (Math.abs(wAcc) < 40 || t - wT < 150) return;
+      pickTo(st.pickGeo.fi + (wAcc > 0 ? 1 : -1)); wAcc = 0; wT = t;
+    }, { passive: false });
+    function positionLabels(M4) {
+      var keys = Object.keys(lblMap); st.lblMoving = false;
+      if (!keys.length) return;
+      var sz = stageSize(), lp = leftPad(), items = [], maxX = -Infinity, botLim = sz.h - padB() - 8;
+      keys.forEach(function (k) {
+        var L = lblMap[k], s = L.s, z = twVal(s.z), best = null;
+        // 那一層的台灣本島，畫面上最右邊的一點
+        MAIN.forEach(function (c) { var p = toScreen(M4, c[0], c[1], z); if (!best || p[0] > best[0]) best = p; });
+        items.push({ L: L, ay: best[1], ax: best[0], hgt: L.el.offsetHeight || 30, z: z, zT: s.ground ? 0 : s.zT || 0 });
+        maxX = Math.max(maxX, best[0]);
+      });
+      var tx, column = !!st.focus || st.pitch > 76, colX = sz.w - PADX - (st.labTW || lp - 10), top = labTop();
+      if (st.focus) {
+        // 看單一層：名稱像滾輪選單，看的那一層固定在右側中間，拖動（或滾輪）可以換層
+        var ord = items.slice().sort(function (a, b) { return b.zT - a.zT; }), tops = [], acc = 0;
+        ord.forEach(function (it) { tops.push(acc); acc += it.hgt + 6; });
+        var fi = 0; ord.forEach(function (it, i) { if (it.L.s.key === st.focus.key) fi = i; });
+        var c0 = (top + botLim) / 2, base = c0 - (tops[fi] + ord[fi].hgt / 2) + st.pickOff;
+        ord.forEach(function (it, i) { it.ty = base + tops[i]; });
+        st.pickGeo = { c0: c0, fi: fi, ord: ord.map(function (it, i) { return { key: it.L.s.key, c: tops[i] + it.hgt / 2 }; }) };
+        tx = colX;
+      } else if (column) {
+        // 正上方俯瞰：名稱固定在右側中間，高的切片在上
+        var ord2 = items.slice().sort(function (a, b) { return b.zT - a.zT; }), tot = ord2.reduce(function (t, it) { return t + it.hgt + 6; }, 0), y = Math.max(top, Math.min((top + botLim - tot) / 2, botLim - tot));
+        ord2.forEach(function (it) { it.ty = y; y += it.hgt + 6; });
+        tx = colX;
+      } else {
+        // 由上到下排開，避免重疊
+        var order = items.slice().sort(function (a, b) { return a.ay - b.ay; }), yy = top;
+        order.forEach(function (it) { it.ty = Math.max(it.ay - it.hgt / 2, yy); yy = it.ty + it.hgt + 4; });
+        if (yy > botLim) order.slice().reverse().forEach(function (it) { var lim = botLim - it.hgt; if (it.ty > lim) it.ty = lim; });
+        for (var k = order.length - 2; k >= 0; k--) if (order[k].ty + order[k].hgt + 4 > order[k + 1].ty) order[k].ty = order[k + 1].ty - order[k].hgt - 4;
+        // 放大後切片跑到畫面外：名稱整組移到右側中間（維持上下順序），不擠在角落
+        if (order.some(function (it) { return it.ay < 0 || it.ay > sz.h; })) {
+          var gh = order.reduce(function (t, it) { return t + it.hgt + 4; }, -4), cy0 = Math.max(top, Math.min((top + botLim - gh) / 2, botLim - gh));
+          order.forEach(function (it) { it.ty = cy0; cy0 += it.hgt + 4; });
+        }
+        tx = Math.max(10, Math.min(colX, maxX + labW() - lp));   // 名稱欄緊貼在切片右邊
+      }
+      svg.setAttribute('viewBox', '0 0 ' + sz.w + ' ' + sz.h); svg.setAttribute('width', sz.w); svg.setAttribute('height', sz.h);
+      items.forEach(function (it) {
+        var L = it.L;
+        if (!L.init) { L.x = tx; L.y = it.ty; L.init = true; }
+        // 名稱位置平滑移動
+        var nx = L.x + (tx - L.x) * 0.22, ny = st.pickDrag ? it.ty : L.y + (it.ty - L.y) * 0.22;   // 拖動名稱列表時直接跟著手指
+        if (Math.abs(nx - tx) < 0.4) nx = tx; if (Math.abs(ny - it.ty) < 0.4) ny = it.ty;
+        if (nx !== tx || ny !== it.ty) st.lblMoving = true;
+        L.x = nx; L.y = ny;
+        L.el.style.transform = 'translate(' + nx.toFixed(1) + 'px,' + ny.toFixed(1) + 'px)';
+        L.el.style.width = (lp - 10) + 'px';
+        var a = sliceAlpha(L.s);
+        if (st.focus ? st.focus.key !== L.s.key : column) return;   // 看單一層時只連那一層；俯瞰時不畫引線
+        if (a < 0.05) return;
+        var ly = ny + Math.min(it.hgt / 2, 9);
+        svg.appendChild(U.svg('path', { d: 'M' + (nx - 6).toFixed(1) + ' ' + ly.toFixed(1) + ' L' + it.ax.toFixed(1) + ' ' + it.ay.toFixed(1), class: 'vz-lead', style: 'opacity:' + a.toFixed(2) }));
+        svg.appendChild(U.svg('circle', { cx: it.ax.toFixed(1), cy: it.ay.toFixed(1), r: 2, class: 'vz-dot', style: 'opacity:' + a.toFixed(2) }));
+      });
+    }
+
+    // ---------- 圖例、按鈕、設定 ----------
+    function drawLegend() {
+      U.clear(legend);
+      legend.appendChild(h('div', { class: 'vz-lg-t' }, '門檻 PR'));
+      legend.appendChild(h('div', { class: 'vz-lg-bar', style: { background: gradientCss(st.theme, st.prefs.pal) } }));
+      var ticks = h('div', { class: 'vz-lg-ticks' });
+      [0, 50, 80, 95, 100].forEach(function (p) { ticks.appendChild(h('span', { style: { left: (prU(p) * 100) + '%' } }, String(p))); });
+      legend.appendChild(ticks);
+    }
+    function btn(icon, label, fn) { var b = h('button', { class: 'vz-btn', type: 'button', 'aria-label': label, title: label, onclick: fn }); b.innerHTML = icon; return b; }
+    var I_PLUS = '<svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg>', I_MINUS = '<svg viewBox="0 0 20 20"><path d="M4 10h12"/></svg>';
+    var I_RESET = '<svg viewBox="0 0 20 20"><path d="M4.5 8.5A6 6 0 1 1 5 13"/><path d="M4 4.5v4h4"/></svg>', I_FULL = '<svg viewBox="0 0 20 20"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12"/></svg>';
+    var I_EXIT = '<svg viewBox="0 0 20 20"><path d="M8 3.5V8H3.5M16.5 8H12V3.5M12 16.5V12h4.5M3.5 12H8v4.5"/></svg>';
+    var I_TOP = '<svg viewBox="0 0 20 20"><rect x="4" y="4" width="12" height="12" rx="1"/><circle cx="10" cy="10" r="1.6"/></svg>';
+    var I_SIDE = '<svg viewBox="0 0 20 20"><path d="M3 13l7-4 7 4-7 4z"/><path d="M3 9l7-4 7 4"/></svg>';
+    var I_SET = '<svg viewBox="0 0 20 20"><path d="M4 6h8M15 6h1M4 14h2M9 14h7"/><circle cx="13.5" cy="6" r="1.6"/><circle cx="7.5" cy="14" r="1.6"/></svg>';
+    var setBtn = btn(I_SET, '顯示設定', function () { panel.hidden = !panel.hidden; setBtn.classList.toggle('on', !panel.hidden); if (!panel.hidden) buildPanel(); });
+    var topBtn = btn(I_TOP, '正上方俯瞰', function () {
+      if (isTop()) { var v = st.focus ? { yaw: st.yaw, pitch: 52 } : (S.view || viewFor(st.filter)); camTo(fitTarget(YAW0, v.pitch), true, 800); }
+      else camTo(fitTarget(0, 90, true), true, 800);   // 固定北邊朝上、整張地圖放進畫面
+    });
+    ctl.appendChild(setBtn);
+    ctl.appendChild(topBtn);
+    ctl.appendChild(btn(I_PLUS, '放大', function () { zoomBy(1.35); }));
+    ctl.appendChild(btn(I_MINUS, '縮小', function () { zoomBy(1 / 1.35); }));
+    ctl.appendChild(btn(I_RESET, '重設視角', function () { refit(true, st.focus ? { yaw: YAW0, pitch: 52 } : viewFor(st.filter)); }));
+    var fullBtn = btn(I_FULL, '全螢幕', function () { toggleFull(); });
+    ctl.appendChild(fullBtn);
+    function slider(label, key, min, max, step, fmtv, onInput) {
+      var row = h('label', { class: 'vz-sl' });
+      var val = h('b', {}, fmtv(st.prefs[key]));
+      var inp = h('input', { type: 'range', min: String(min), max: String(max), step: String(step), value: String(st.prefs[key]), 'aria-label': label });
+      inp.addEventListener('input', function () { st.prefs[key] = +inp.value; val.textContent = fmtv(st.prefs[key]); savePrefs(st.prefs); onInput(); });
+      row.appendChild(h('span', {}, label)); row.appendChild(inp); row.appendChild(val);
+      return row;
+    }
+    function applyTilt(on) { tilt.hidden = !on; stage.classList.toggle('vz-mini', !!on); }
+    function applyGlass() { host.style.setProperty('--vz-glass-a', (1 - st.prefs.glass).toFixed(3)); host.style.setProperty('--vz-glass-blur', st.prefs.blur + 'px'); }
+    applyGlass();
+    function toggle(label, key, onChange) {
+      var cb = h('input', { type: 'checkbox', checked: !!st.prefs[key], onchange: function () { st.prefs[key] = cb.checked; savePrefs(st.prefs); onChange(cb.checked); kick(); } });
+      return h('label', { class: 'vz-tg' }, cb, h('i', { 'aria-hidden': 'true' }), h('span', {}, label));
+    }
+    function pct(v) { return Math.round(v * 100) + '%'; }
+    function times(v) { return (Math.round(v * 100) / 100) + '×'; }
+    function buildPanel() {
+      U.clear(panel);
+      panel.appendChild(h('div', { class: 'vz-set-h' }, h('span', {}, '顯示設定'), h('button', { type: 'button', class: 'vz-x', 'aria-label': '關閉', onclick: function () { panel.hidden = true; setBtn.classList.remove('on'); } }, '×')));
+      panel.appendChild(slider('對齊線透明度', 'stem', 0, 4, 0.05, pct, function () { kick(); }));
+      panel.appendChild(slider('切片間距', 'gap', 0.1, 2.5, 0.05, times, function () { relayout(); if (!st.prefs.lock) refit(false, { yaw: st.yaw, pitch: st.pitch }); }));
+      panel.appendChild(slider('地形高度倍率', 'terrain', 0, 15, 0.5, times, function () { relayout(); kick(); }));
+      panel.appendChild(slider('圓點大小', 'dot', 0.4, 3, 0.05, times, function () { kick(); }));
+      panel.appendChild(slider('線條透明度', 'la', 0, 4, 0.05, pct, function () { kick(); }));
+      panel.appendChild(slider('霧玻璃透明度', 'glass', 0, 1, 0.01, pct, applyGlass));
+      panel.appendChild(slider('霧玻璃散射', 'blur', 0, 40, 1, function (v) { return Math.round(v) + 'px'; }, applyGlass));
+      panel.appendChild(h('div', { class: 'vz-tgs' },
+        toggle('微縮攝影', 'tilt', function (on) { applyTilt(on); }),
+        toggle('顯示等高線', 'contour', function () {}),
+        toggle('固定鏡頭', 'lock', function () {}),
+        VEG_UI ? toggle('植被地形', 'veg', function (on) { applyVeg(on); buildPanel(); }) : null));
+      panel.appendChild(h('div', { class: 'vz-set-n' }, '固定鏡頭：換分法、看單一層時鏡頭不動（俯瞰與重設視角照常）'));
+      panel.appendChild(h('div', { class: 'vz-set-t' }, '配色'));
+      var pals = h('div', { class: 'vz-pals' });
+      PALS.forEach(function (p) {
+        var b = h('button', { type: 'button', class: 'vz-pal' + (st.prefs.pal === p.id ? ' on' : ''), 'aria-pressed': st.prefs.pal === p.id ? 'true' : 'false', onclick: function () { st.prefs.pal = p.id; savePrefs(st.prefs); recolor(); buildPanel(); if (st.sel >= 0) showCard(st.sel); kick(); } },
+          h('i', { style: { background: gradientCss(st.theme, p.id) } }), h('span', {}, p.name));
+        pals.appendChild(b);
+      });
+      panel.appendChild(pals);
+      panel.appendChild(h('button', { type: 'button', class: 'vz-reset', onclick: function () { st.prefs = Object.assign({}, PREF0); savePrefs(st.prefs); recolor(); relayout(); applyVeg(false); applyTilt(false); applyGlass(); refit(true, st.focus ? { yaw: st.yaw, pitch: st.pitch } : viewFor(st.filter)); buildPanel(); } }, '恢復預設'));
+    }
+    function zoomBy(k, cx, cy) {
+      stopCam();
+      // 最多縮小到整張地圖（含所有切片）大約佔畫面一半
+      var W = fitTarget(st.yaw, st.pitch, true, true), zmin = Math.min(0.6, cam.hh / (W.hh * 2));
+      var nz = Math.max(zmin, Math.min(16, st.zoom * k)); if (nz === st.zoom) return;
+      if (cx != null) { // 以手指／游標的位置為中心縮放
+        var sz = stageSize(), hh = cam.hh / st.zoom, hw = hh * sz.w / sz.h;
+        var wx = (cx / sz.w * 2 - 1) * hw, wy = (1 - cy / sz.h * 2) * hh, r = st.zoom / nz;
+        st.panX += wx * (1 - r); st.panY += wy * (1 - r);
+      }
+      st.zoom = nz; kick();
+    }
+    function panBy(dx, dy) {   // 螢幕上移動多少像素，畫面就跟著移動
+      var sz = stageSize(), upp = 2 * cam.hh / st.zoom / sz.h;
+      st.panX -= dx * upp; st.panY += dy * upp; kick();
+    }
+    function toggleFull() {
+      st.full = !st.full;
+      host.classList.toggle('vz-full', st.full);
+      document.documentElement.classList.toggle('vz-lock', st.full);
+      fullBtn.innerHTML = st.full ? I_EXIT : I_FULL; fullBtn.setAttribute('aria-label', st.full ? '離開全螢幕' : '全螢幕'); fullBtn.title = st.full ? '離開全螢幕' : '全螢幕';
+    }
+    function onKey(e) {
+      if (e.key !== 'Escape') return;
+      if (!panel.hidden) { panel.hidden = true; setBtn.classList.remove('on'); }
+      else if (st.sel >= 0) closeCard();
+      else if (st.focus) goBack();
+      else if (st.full) toggleFull();
+    }
+    document.addEventListener('keydown', onKey);
+    function hideHint() { if (!hint.classList.contains('gone')) hint.classList.add('gone'); }
+    setTimeout(hideHint, 9000);
+
+    // ---------- 篩選按鈕 ----------
+    FILTERS.forEach(function (f) {
+      bar.appendChild(h('button', { type: 'button', class: 'vz-chip', role: 'tab', 'data-id': f.id, 'aria-selected': 'false', onclick: function () { if (st.filter !== f.id) setFilter(f.id); else if (st.focus) setFocus(null); } }, f.name));
+    });
+
+    // ---------- 點選與卡片 ----------
+    function pick(sx, sy, rad) {
+      var M4 = mvp(), sz = stageSize(), best = -1, bd = rad * rad, fa = twVal(st.other);
+      for (var i = 0; i < N; i++) {
+        if (st.focus && fa < 0.5 && Math.abs(Zto[i] - st.focus.zT) > 0.5) continue;   // 看單一層時只能點那一層
+        var p = xf(M4, G.xy[i * 2], G.xy[i * 2 + 1], curZ(i));
+        var dx = (p[0] + 1) / 2 * sz.w - sx, dy = (1 - p[1]) / 2 * sz.h - sy, d = dx * dx + dy * dy;
+        if (d < bd) { bd = d; best = i; }
+      }
+      return best;
+    }
+    // 點到切片的外框邊緣：回傳那一層
+    function pickSlice(sx, sy, rad) {
+      if (st.filter === 'map' || st.filter === 'pr') return null;
+      var M4 = mvp(), best = null, bd = rad;
+      S.list.forEach(function (s) {
+        if (s.ground || sliceAlpha(s) < 0.3) return;
+        var z = twVal(s.z), c = frameB.map(function (q) { return toScreen(M4, q[0], q[1], z); });
+        for (var k = 0; k < 4; k++) {
+          var a = c[k], b = c[(k + 1) % 4], vx = b[0] - a[0], vy = b[1] - a[1], l2 = vx * vx + vy * vy || 1;
+          var t = Math.max(0, Math.min(1, ((sx - a[0]) * vx + (sy - a[1]) * vy) / l2));
+          var d = Math.hypot(a[0] + vx * t - sx, a[1] + vy * t - sy);
+          if (d < bd) { bd = d; best = s; }
+        }
+      });
+      return best;
+    }
+    function cname(i) { var c = DATA.COUNTY[D.dict.c[D.cols.c[i]]]; return c ? c.name : ''; }
+    function dname(i) {
+      var d = D.cols.d[i]; if (d < 0) return '';
+      var list = DATA.DISTRICTS[D.dict.c[D.cols.c[i]]] || [], id = D.dict.d[d];
+      var x = list.filter(function (o) { return o.id === id; })[0];
+      return x ? x.name : '';
+    }
+    // 資訊卡：霧玻璃圓角卡片；手機固定在右上角（切片名稱上面），電腦在點的右上方、用線連過去
+    function showCard(i) {
+      st.sel = i; U.clear(card); card.hidden = false;
+      var dk = stageSize().w < 560; card.classList.toggle('dock', dk); lbl.classList.toggle('tight', dk);
+      var c = D.cols, pr = prOf(i), hd = D.dict.h[c.h[i]], hidden = D.hide.indexOf(D.dict.c[c.c[i]]) >= 0;
+      card.appendChild(h('div', { class: 'vz-card-h' },
+        h('span', { class: 'vz-card-k' }, 'No.' + String(i + 1).padStart(4, '0')),
+        h('button', { type: 'button', class: 'vz-x', 'aria-label': '關閉', onclick: closeCard }, '×')));
+      card.appendChild(h('div', { class: 'vz-card-t' }, cname(i) + (dname(i) ? '・' + dname(i) : '')));
+      var big = pr == null ? '—' : pr >= 99.95 ? '100' : (Math.round(pr * 10) / 10).toString();
+      var bar = pr == null ? null : h('div', { class: 'vz-card-bar', style: { background: gradientCss(st.theme, st.prefs.pal) } }, h('i', { style: { left: (prU(pr) * 100).toFixed(1) + '%' } }));
+      if (dk) {   // 手機：只留重點，一行一項
+        card.appendChild(h('div', { class: 'vz-card-pr' }, h('div', { class: 'vz-card-big' }, h('span', { class: 'vz-card-l' }, '門檻 PR'), h('b', {}, big)), bar));
+        var inc2 = hidden ? '不顯示（人少）' : c.pa[i] < 0 ? '沒有填' : c.pa[i] + (c.p[i] && c.pb[i] >= 0 ? '・伴侶 ' + c.pb[i] : '');
+        card.appendChild(h('div', { class: 'vz-card-c' },
+          h('div', {}, (c.a[i] >= 0 ? AGE_L[c.a[i]] : '—') + (c.k[i] ? '・' + c.k[i] + ' 個孩子' : '')),
+          h('div', {}, HOUSE_L[hd] || '—'),
+          h('div', {}, h('span', { class: 'vz-card-l' }, '收入 PR'), ' ' + inc2)));
+        kick();
+        return;
+      }
+      var prb = h('div', { class: 'vz-card-pr' },
+        h('div', { class: 'vz-card-l' }, '門檻 PR'),
+        h('div', { class: 'vz-card-big' }, h('b', {}, big), h('small', {}, pr == null ? '' : pr >= 99.95 ? '收入再高也不夠' : '收入要贏過 ' + Math.round(pr) + '% 的同齡人')));
+      if (bar) prb.appendChild(bar);
+      card.appendChild(prb);
+      var g = h('div', { class: 'vz-card-g' });
+      function cell(k, v, wide) { g.appendChild(h('div', { class: wide ? 'wide' : '' }, h('span', {}, k), v)); }
+      cell('年齡層', h('b', {}, c.a[i] >= 0 ? AGE_L[c.a[i]] : '—'));
+      cell('孩子', h('b', {}, c.k[i] ? c.k[i] + ' 個' : '—'));
+      cell('住法', h('b', {}, HOUSE_L[hd] || '—'), true);
+      var inc;
+      if (hidden) inc = h('b', { class: 'muted' }, '不顯示', h('small', {}, '這個縣市分享的人少'));
+      else if (c.pa[i] < 0) inc = h('b', { class: 'muted' }, '沒有填');
+      else inc = h('b', {}, (c.p[i] ? '自己 ' : '') + 'PR ' + c.pa[i] + (c.p[i] && c.pb[i] >= 0 ? '・伴侶 PR ' + c.pb[i] : ''));
+      cell('收入 PR', inc, true);
+      card.appendChild(g);
+      kick();
+    }
+    function closeCard() { st.sel = -1; card.hidden = true; lbl.classList.remove('tight'); kick(); }
+    function placeCard(M4) {
+      var sz = stageSize();
+      if (sz.w < 560) { card.style.transform = ''; card.classList.add('dock'); lbl.classList.add('tight'); return; }
+      card.classList.remove('dock'); lbl.classList.remove('tight');
+      var i = st.sel, p = toScreen(M4, G.xy[i * 2], G.xy[i * 2 + 1], curZ(i)), cw = card.offsetWidth || 220, ch = card.offsetHeight || 190;
+      var gx = 64, gy = 44, x = p[0] + gx, y = p[1] - gy - ch;
+      if (x + cw > sz.w - 12) x = p[0] - gx - cw;   // 右邊放不下：放到左上
+      if (y < 12) y = p[1] + gy;                     // 上面放不下：放到下面
+      x = Math.max(12, Math.min(sz.w - cw - 12, x)); y = Math.max(12, Math.min(sz.h - ch - padB(), y));
+      card.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+      // 從點拉一條線到卡片最近的角：先斜 45 度、再水平
+      var cx = p[0] < x ? x : p[0] > x + cw ? x + cw : null, cy = p[1] > y + ch ? y + ch : p[1] < y ? y : null;
+      if (cx == null || cy == null) return;   // 點被卡片蓋住：不畫線
+      var dy = cy - p[1], dx = cx - p[0], ex = Math.abs(dx) > Math.abs(dy) ? p[0] + Math.sign(dx) * Math.abs(dy) : cx;
+      svg.appendChild(U.svg('polyline', { class: 'vz-card-lead', points: [p[0], p[1], ex, cy, cx, cy].map(function (v) { return v.toFixed(1); }).join(' ') }));
+      svg.appendChild(U.svg('circle', { class: 'vz-card-dot', cx: cx.toFixed(1), cy: cy.toFixed(1), r: 2.2 }));
+    }
+
+    // ---------- 操作：拖曳旋轉、點兩下再拖移動、雙指縮放與傾斜 ----------
+    var ptrs = {}, moved = 0, lastTap = null;
+    function ptList() { return Object.keys(ptrs).map(function (k) { return ptrs[k]; }); }
+    canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    canvas.addEventListener('pointerdown', function (e) {
+      ptrs[e.pointerId] = { x: e.clientX, y: e.clientY, type: e.pointerType };
+      moved = 0; stopCam(); hideHint(); st.vy = 0;
+      var L = ptList(), t = now();
+      if (L.length === 1) {
+        // 點兩下（第二下按住）、右鍵或 Shift：移動畫面
+        var dbl = lastTap && t - lastTap.t < 380 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 34;
+        if (dbl) clearTimeout(st.tapTimer);   // 是點兩下：取消第一下的動作
+        drag = { x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitch, type: e.pointerType, pan: dbl || e.button === 2 || e.shiftKey, dbl: dbl, px: e.clientX, py: e.clientY, rot: false };
+        if (drag.pan) canvas.classList.add('panning');
+      } else if (L.length === 2) drag = { pinch: Math.hypot(L[0].x - L[1].x, L[0].y - L[1].y), my: (L[0].y + L[1].y) / 2, mx: (L[0].x + L[1].x) / 2 };
+      try { canvas.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ }
+    });
+    // 點兩下再拖時，手機不要捲動網頁
+    canvas.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });   // 地圖上的手勢都給地圖，不捲動網頁
+    canvas.addEventListener('pointermove', function (e) {
+      var r = canvas.getBoundingClientRect();
+      if (!ptrs[e.pointerId]) {
+        if (e.pointerType === 'mouse' && D) { var i = pick(e.clientX - r.left, e.clientY - r.top, 10); if (i !== st.hov) { st.hov = i; canvas.style.cursor = i >= 0 ? 'pointer' : ''; kick(); } }
+        return;
+      }
+      ptrs[e.pointerId].x = e.clientX; ptrs[e.pointerId].y = e.clientY;
+      var L = ptList();
+      if (L.length === 1 && drag && drag.x != null) {
+        var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+        if (drag.pan) { panBy(e.clientX - drag.px, e.clientY - drag.py); drag.px = e.clientX; drag.py = e.clientY; return; }
+        if (!drag.rot) reanchor();   // 開始轉：繞著畫面中心底下（看單一層時是那一層）的點轉
+        drag.rot = true;
+        var tn = now(), ny = drag.yaw - dx * 0.35;
+        if (drag.lt && tn > drag.lt) drag.vy = 0.5 * (drag.vy || 0) + 0.5 * (ny - st.yaw) / (tn - drag.lt);
+        drag.lt = tn;
+        st.yaw = ny;
+        st.pitch = Math.max(12, Math.min(90, drag.pitch + dy * 0.3));
+        kick();
+      } else if (L.length === 2 && drag && drag.pinch) {
+        var d = Math.hypot(L[0].x - L[1].x, L[0].y - L[1].y), my = (L[0].y + L[1].y) / 2, mx = (L[0].x + L[1].x) / 2;
+        moved = 99;
+        // 雙指：一邊縮放一邊拖動（以兩指中間為中心縮放，再跟著兩指中間移動）
+        zoomBy(d / drag.pinch, drag.mx - r.left, drag.my - r.top);
+        panBy(mx - drag.mx, my - drag.my);
+        drag.pinch = d; drag.mx = mx; drag.my = my;
+        kick();
+      }
+    });
+    function up(e) {
+      var was = ptrs[e.pointerId], dr = drag; delete ptrs[e.pointerId];
+      var L = ptList();
+      canvas.classList.remove('panning');
+      if (L.length === 1) drag = { x: L[0].x, y: L[0].y, yaw: st.yaw, pitch: st.pitch, type: L[0].type, px: L[0].x, py: L[0].y, rot: !!(dr && dr.rot) };
+      else if (!L.length) drag = null;
+      if (!L.length && dr && (dr.rot || dr.pinch) && !snapTop() && dr.vy && now() - dr.lt < 90 && Math.abs(dr.vy) > 0.02) { st.vy = Math.max(-0.6, Math.min(0.6, dr.vy)); kick(); }   // 接近正上方：自動對正；否則保留慣性
+      if (e.type === 'pointerup' && was && moved < 6 && D) {
+        var r = canvas.getBoundingClientRect(), sx = e.clientX - r.left, sy = e.clientY - r.top, touch = e.pointerType !== 'mouse';
+        if (dr && dr.pan) {   // 點兩下（沒有拖）：放大；右鍵或 Shift 沒有拖：不動作
+          if (!dr.dbl) { lastTap = null; kick(); return; }
+          lastTap = null; zoomBy(1.6, sx, sy);
+        } else {
+          lastTap = { t: now(), x: e.clientX, y: e.clientY };
+          // 等一下再處理，確認不是點兩下的第一下
+          clearTimeout(st.tapTimer);
+          st.tapTimer = setTimeout(function () {
+            if (!st.alive) return;
+            var i = pick(sx, sy, touch ? 20 : 10);
+            if (i >= 0) showCard(i);
+            else { var s = pickSlice(sx, sy, touch ? 16 : 9); if (s) { closeCard(); setFocus(s); } else closeCard(); }
+          }, 260);
+        }
+      } else if (e.type === 'pointerup') lastTap = null;
+      kick();
+    }
+    canvas.addEventListener('pointerup', up);
+    canvas.addEventListener('pointercancel', up);
+    canvas.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && st.hov >= 0) { st.hov = -1; kick(); } });
+    canvas.addEventListener('wheel', function (e) {
+      if (!(e.ctrlKey || e.metaKey || st.full)) return;   // 一般滾動留給網頁；觸控板雙指縮放、按住 Ctrl 才縮放
+      e.preventDefault(); hideHint();
+      var r = canvas.getBoundingClientRect();
+      zoomBy(Math.exp(-e.deltaY * 0.0025), e.clientX - r.left, e.clientY - r.top);
+    }, { passive: false });
+    canvas.addEventListener('keydown', function (e) {
+      var k = e.key, done = true;
+      if (/^Arrow/.test(k)) { stopCam(); reanchor(); }
+      if (k === 'ArrowLeft') st.yaw += 6; else if (k === 'ArrowRight') st.yaw -= 6;
+      else if (k === 'ArrowUp') st.pitch = Math.min(90, st.pitch + 4); else if (k === 'ArrowDown') st.pitch = Math.max(12, st.pitch - 4);
+      else if (k === '+' || k === '=') zoomBy(1.25); else if (k === '-' || k === '_') zoomBy(0.8);
+      else done = false;
+      if (done) { e.preventDefault(); stopCam(); kick(); }
+    });
+
+    // ---------- 只在看得到時才畫 ----------
+    var io = null;
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(function (es) { es.forEach(function (en) { st.visible = en.isIntersecting; if (st.visible) kick(); }); });
+      io.observe(stage);
+    } else st.visible = true;
+    // 大小改變（轉向、全螢幕）時重新排；手機捲動時網址列伸縮造成的小變動就不理
+    var ro = null, lastSz = null;
+    if ('ResizeObserver' in window) {
+      ro = new ResizeObserver(function () {
+        var sz = stageSize();
+        if (lastSz && Math.abs(sz.w - lastSz.w) < 2 && Math.abs(sz.h - lastSz.h) < 90) { kick(); return; }
+        lastSz = sz;
+        if (D) { if (st.focus) refit(false, { yaw: st.yaw, pitch: st.pitch }); else setFilter(st.filter, true); }
+      });
+      ro.observe(stage);
+    }
+    function onTheme() { var t = themeName(); if (t !== st.theme) { st.theme = t; host.setAttribute('data-vz-theme', t); if (D) { recolor(); if (!panel.hidden) buildPanel(); } kick(); } }
+    var mo = new MutationObserver(onTheme); mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    var mq = null; try { mq = window.matchMedia('(prefers-color-scheme: dark)'); if (mq.addEventListener) mq.addEventListener('change', onTheme); } catch (e) { mq = null; }
+    host.setAttribute('data-vz-theme', st.theme);
+
+    // ---------- 給螢幕報讀器的文字摘要 ----------
+    function summary() {
+      U.clear(sum);
+      if (!S.list.length || st.filter === 'pr') { sum.appendChild(h('li', {}, '共 ' + fmt(N) + ' 位玩家分享。')); return; }
+      S.list.forEach(function (s) { if (s.n != null) sum.appendChild(h('li', {}, s.label + '：' + fmt(s.n) + ' 人' + (s.med != null ? '，門檻 PR 中位數 ' + Math.round(s.med) : ''))); });
+    }
+
+    // ---------- 載入 ----------
+    loadData(cfg).then(function (r) {
+      if (!st.alive) return;
+      M = r[0]; D = r[1];
+      var L = M.layers, dem = M.dem;
+      var hAt = function (Ly) { return function (k) { return heightAt(dem, Ly.pts[k * 2], Ly.pts[k * 2 + 1]); }; };
+      G.coast = lineChunks(L.coast, true); G.border = lineChunks(L.border, false, hAt(L.border));
+      G.major = lineChunks(L.major, false, hAt(L.major)); G.mid = lineChunks(L.mid, false, hAt(L.mid)); G.minor = lineChunks(L.minor, false, hAt(L.minor));
+      if (L.contour) {   // 等高線：每條線的高度存在 vals（單位 50 公尺）
+        var lineOf = new Float32Array(L.contour.pts.length / 2), k = 0;
+        for (var i = 0; i < L.contour.lens.length; i++) for (var j = 0; j < L.contour.lens[i]; j++) lineOf[k++] = L.contour.vals[i] * 0.05;
+        G.contour = lineChunks(L.contour, false, function (q) { return lineOf[q]; });
+      } else G.contour = [];
+      topH = 0; if (dem) for (i = 0; i < dem.g.length; i++) topH = Math.max(topH, dem.g[i] * dem.k);
+      var cp = [];
+      for (i = 0; i < L.coast.pts.length; i += 2) cp.push([L.coast.pts[i], L.coast.pts[i + 1]]);
+      (M.head.insets || []).forEach(function (f) { cp.push([f[0], f[1]], [f[2], f[1]], [f[2], f[3]], [f[0], f[3]]); });
+      HULL = hullOf(cp);
+      // 台灣本島：最長的那一條海岸線
+      var at = 0, mi = 0, ml = -1;
+      for (i = 0; i < L.coast.lens.length; i++) { if (L.coast.lens[i] > ml) { ml = L.coast.lens[i]; mi = at; } at += L.coast.lens[i]; }
+      var mp = []; for (i = 0; i < ml; i++) mp.push([L.coast.pts[(mi + i) * 2], L.coast.pts[(mi + i) * 2 + 1]]);
+      MAIN = hullOf(mp); MAINP = mp;
+      // 切片外框：正的長方形（地圖範圍外推 8 公里）
+      var b = M.head.bbox, pad = 8;
+      BB = [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad];
+      frameB = [[BB[0], BB[1]], [BB[2], BB[1]], [BB[2], BB[3]], [BB[0], BB[3]]];
+      G.frame = lineChunks({ pts: new Float32Array([].concat.apply([], frameB)), lens: new Uint32Array([4]) }, true);
+      var ip = [], il = [];
+      (M.head.insets || []).forEach(function (f) { ip.push(f[0], f[1], f[2], f[1], f[2], f[3], f[0], f[3]); il.push(4); });
+      G.insets = lineChunks({ pts: new Float32Array(ip), lens: new Uint32Array(il) }, true);
+      buildPoints();
+      applyTilt(st.prefs.tilt); if (st.prefs.veg) applyVeg(true);
+      msg.hidden = true;
+      host.classList.add('ready');
+      setFilter('map', true);
+      if (st.wantIntro) runIntro();
+    }).catch(function (e) {
+      cache = null;
+      msg.textContent = e && e.message === 'old-browser' ? '你的瀏覽器版本太舊，無法顯示地圖。' : '地圖載入失敗，請稍後再試。';
+    });
+
+    return {
+      destroy: function () {
+        st.alive = false; if (st.raf) cancelAnimationFrame(st.raf); clearTimeout(st.tapTimer);
+        if (io) io.disconnect(); if (ro) ro.disconnect(); mo.disconnect();
+        if (mq && mq.removeEventListener) mq.removeEventListener('change', onTheme);
+        document.removeEventListener('keydown', onKey);
+        document.documentElement.classList.remove('vz-lock');
+        var ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext();
+      },
+      setFilter: function (id) { if (D) setFilter(id); },
+      intro: function (dur) { st.wantIntro = dur || 2800; if (D && BB) runIntro(); },
+      ready: function () { return !!(D && BB); },
+      focus: function (k) { var s = S.list.filter(function (x) { return x.key === k || x.label === k; })[0]; setFocus(s || null); },
+      slices: function () { return S.list.map(function (s) { return { key: s.key, label: s.label, z: s.zT, ground: !!s.ground, ref: !!s.ref, cx: (BB[0] + BB[2]) / 2, cy: (BB[1] + BB[3]) / 2 }; }); },
+      screenAt: function (x, y, z) { return toScreen(mvp(), x, y, z); },
+      sliceEdge: function (k, e, t) { e = e || 0; t = t == null ? 0.5 : t; var s = S.list.filter(function (x) { return x.key === k; })[0]; if (!s) return null; var M4 = mvp(), a = toScreen(M4, frameB[e][0], frameB[e][1], twVal(s.z)), b = toScreen(M4, frameB[(e + 1) % 4][0], frameB[(e + 1) % 4][1], twVal(s.z)); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; },
+      setPref: function (k, v) { st.prefs[k] = v; savePrefs(st.prefs); if (k === 'pal') recolor(); else if (k === 'veg') applyVeg(v); else if (k === 'tilt') applyTilt(v); else if (k === 'glass' || k === 'blur') applyGlass(); else relayout(); if (!panel.hidden) buildPanel(); kick(); },
+      _vegReady: function () { return !!VEG.bands; },
+      state: st,
+      cam: cam,
+      _bare: function (v) { st.bare = !!v; kick(); },
+      _view: function (yaw, pitch) { refit(false, { yaw: yaw, pitch: pitch }); },
+      _box: function () { var M4 = mvp(), xs = [], ys = []; (isTop() ? HULL : MAIN).forEach(function (c) { zRange().forEach(function (z) { var p = toScreen(M4, c[0], c[1], z); xs.push(p[0]); ys.push(p[1]); }); }); return [Math.min.apply(0, xs), Math.min.apply(0, ys), Math.max.apply(0, xs), Math.max.apply(0, ys)]; },
+      _pickSlice: function (x, y) { var r = pickSlice(x, y, 16); return r && r.key; },
+      pick: function (sx, sy) { return pick(sx, sy, 20); },
+      screenOf: function (i) { return toScreen(mvp(), G.xy[i * 2], G.xy[i * 2 + 1], curZ(i)); },
+      data: function () { return D; },
+      show: function (i) { showCard(i); }
+    };
+  }
+  return { mount: mount, prU: prU, palColor: palColor, PALS: PALS };
+})();
+
+/* ---- nextgen.js ---- */
+/* =========================================================================
+   NG — NEXT GEN 網站：開場標題 → MV → 轉場到 3D 台灣
+   ・標題畫面：點一下或按任意鍵才播 MV（有聲音的影片要先有一次點擊，瀏覽器才肯播）
+   ・播放中：動滑鼠、點一下或按任意鍵 → 顯示「略過」；Esc 直接略過
+   ・MV 播完或略過 → 畫面淡出，地圖從高處轉進預設視角
+   ・MV 來源：YouTube（隱私強化模式）或網站上的影片檔，設定在 window.NEXTGEN.mv
+   ========================================================================= */
+var NG = (function () {
+  'use strict';
+  var h = U.h;
+  var CFG = window.NEXTGEN || {};
+  var KEY_THEME = 'ng:theme', KEY_SEEN = 'ng:seen';
+
+  // ---------- 深淺色：NEXT GEN 預設深色；自己記住，不影響遊戲網站 ----------
+  function getTheme() { var t = document.documentElement.getAttribute('data-theme'); return t === 'light' ? 'light' : 'dark'; }
+  function setTheme(t, keep) {
+    document.documentElement.setAttribute('data-theme', t);
+    if (keep) { try { localStorage.setItem(KEY_THEME, t); } catch (e) { /* 忽略 */ } }
+    try { [].forEach.call(document.querySelectorAll('meta[name="theme-color"]'), function (m) { m.setAttribute('content', t === 'dark' ? '#050506' : '#ffffff'); }); } catch (e) { /* 忽略 */ }
+    var b = document.getElementById('ng-theme'); if (b) { b.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false'); b.title = t === 'dark' ? '換成淺色' : '換成深色'; }
+  }
+  function initTheme() { var t = null; try { t = localStorage.getItem(KEY_THEME); } catch (e) { /* 忽略 */ } setTheme(t === 'light' ? 'light' : 'dark', false); }
+  function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } }
+
+  // ---------- 播放器：YouTube 或影片檔，對外介面一樣 ----------
+  // ev: { playing, waiting, ended, error, time(cur, dur) }
+  function filePlayer(host, mv, ev) {
+    var v = h('video', { class: 'ng-file', playsinline: '', preload: 'metadata' });
+    v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+    var big = (Math.max(screen.width, screen.height) >= 1100) && !(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+    try { if (navigator.connection && navigator.connection.saveData) big = false; } catch (e) { /* 忽略 */ }
+    var list = [].concat(mv.src || []), src = (big && mv.srcHi) || list[0];
+    v.src = src;
+    host.appendChild(v);
+    v.addEventListener('playing', function () { ev.playing(); });
+    v.addEventListener('waiting', function () { ev.waiting(); });
+    v.addEventListener('ended', function () { ev.ended(); });
+    v.addEventListener('error', function () { ev.error('file'); });
+    v.addEventListener('timeupdate', function () { ev.time(v.currentTime, v.duration || 0); });
+    return {
+      ready: function () { return true; },
+      play: function () { var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; ev.muted(true); v.play().catch(function () { ev.error('blocked'); }); }); },
+      stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } },
+      mute: function (m) { v.muted = m; },
+      muted: function () { return v.muted; },
+      native: function () { return false; }
+    };
+  }
+  var ytApi = null;
+  function loadYT() {
+    if (ytApi) return ytApi;
+    ytApi = new Promise(function (ok, no) {
+      if (window.YT && window.YT.Player) { ok(window.YT); return; }
+      var prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = function () { if (prev) try { prev(); } catch (e) { /* 忽略 */ } ok(window.YT); };
+      var s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api'; s.async = true;
+      s.onerror = function () { no(new Error('yt-api')); };
+      document.head.appendChild(s);
+      setTimeout(function () { no(new Error('yt-timeout')); }, 12000);
+    });
+    return ytApi;
+  }
+  function ytPlayer(host, mv, ev) {
+    var box = h('div', { class: 'ng-yt' }), slot = h('div');
+    box.appendChild(slot); host.appendChild(box);
+    var P = null, isReady = false, want = false, poll = 0, failed = false;
+    function tick() { if (!P || !P.getCurrentTime) return; var c = P.getCurrentTime() || 0, d = P.getDuration() || 0; ev.time(c, d); }
+    loadYT().then(function (YT) {
+      P = new YT.Player(slot, {
+        host: 'https://www.youtube-nocookie.com',
+        videoId: mv.yt,
+        width: '100%', height: '100%',
+        playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1, iv_load_policy: 3, fs: 0, disablekb: 1, cc_load_policy: 0, modestbranding: 1, origin: location.origin },
+        events: {
+          onReady: function () { isReady = true; var f = P.getIframe && P.getIframe(); if (f) { f.setAttribute('title', 'NEXT GEN MV'); f.setAttribute('tabindex', '-1'); } if (want) P.playVideo(); },
+          onStateChange: function (e) {
+            if (e.data === 1) { ev.playing(); clearInterval(poll); poll = setInterval(tick, 200); }
+            else if (e.data === 3) ev.waiting();
+            else if (e.data === 0) { clearInterval(poll); ev.ended(); }
+            else if (e.data === 2) clearInterval(poll);
+          },
+          onError: function () { failed = true; ev.error('yt'); }
+        }
+      });
+    }).catch(function () { failed = true; ev.error('yt-api'); });
+    return {
+      ready: function () { return isReady; },
+      failed: function () { return failed; },
+      play: function () { want = true; if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
+      stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } } },
+      mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
+      muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
+      native: function (on) { box.classList.toggle('tap', !!on); }   // 手機擋自動播放時，改讓觀眾直接點 YouTube 的播放鍵
+    };
+  }
+
+  // ---------- 開場 ----------
+  function intro(viz) {
+    var mv = CFG.mv || {};
+    var root = document.getElementById('ng-intro');
+    if (!root) return { open: function () {} };
+    var title = root.querySelector('.ng-title'), stageEl = root.querySelector('.ng-mv'), hud = root.querySelector('.ng-hud');
+    var skipBtn = root.querySelector('.ng-skip'), muteBtn = root.querySelector('.ng-mute'), bar = root.querySelector('.ng-prog i'), tapMsg = root.querySelector('.ng-tapmsg');
+    var playBtn = root.querySelector('.ng-play'), skipAll = root.querySelector('.ng-skipall');
+    var state = 'title', hudT = 0, startT = 0, player = null, nearEnd = false;
+    var has = !!(mv.yt || mv.src);
+    var ev = {
+      playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); },
+      waiting: function () { root.classList.add('wait'); },
+      ended: function () { done(); },
+      error: function (why) { if (state === 'play') done('fail'); else if (state === 'title') noMv(); },
+      muted: function () { syncMute(); },
+      time: function (c, d) {
+        if (d > 0) { bar.style.transform = 'scaleX(' + Math.min(1, c / d).toFixed(4) + ')'; if (!nearEnd && d - c < 0.35) { nearEnd = true; done(); } }   // 搶在 YouTube 片尾畫面出現前轉場
+      }
+    };
+    if (has) player = mv.yt ? ytPlayer(stageEl, mv, ev) : filePlayer(stageEl, mv, ev);
+    else noMv();
+    function noMv() { root.classList.add('nomv'); playBtn.querySelector('.ng-play-t').textContent = '進入地圖'; }
+
+    function lock(on) { document.documentElement.classList.toggle('ng-lock', on); }
+    function showHud() {
+      if (state !== 'play') return;
+      root.classList.add('hud'); clearTimeout(hudT);
+      hudT = setTimeout(function () { root.classList.remove('hud'); }, 3200);
+    }
+    function syncMute() { if (!player) return; var m = player.muted(); muteBtn.setAttribute('aria-pressed', m ? 'true' : 'false'); muteBtn.querySelector('span').textContent = m ? '開聲音' : '靜音'; }
+    function play() {
+      if (state !== 'title') return;
+      if (!has || (player.failed && player.failed())) { done(); return; }
+      state = 'play'; nearEnd = false;
+      root.classList.add('playing', 'wait'); root.classList.remove('on');
+      bar.style.transform = 'scaleX(0)';
+      player.play();
+      // 3.5 秒還沒開始：可能是手機擋了自動播放 → 讓觀眾直接點影片
+      clearTimeout(startT);
+      startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } }, 3500);
+      setTimeout(function () { if (state === 'play') skipBtn.focus({ preventScroll: true }); }, 60);
+    }
+    function done(why) {
+      if (state === 'done') return;
+      var wasPlay = state === 'play';
+      state = 'done'; ss(KEY_SEEN, '1');
+      clearTimeout(startT); clearTimeout(hudT);
+      root.classList.add('out');
+      if (viz && viz.intro) viz.intro(wasPlay ? 3000 : 2400);
+      setTimeout(function () {
+        if (player) player.stop();
+        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap'); tapMsg.hidden = true;
+        lock(false);
+        if (document.activeElement && root.contains(document.activeElement)) document.activeElement.blur();
+      }, 950);
+      if (why === 'fail') U.toast && U.toast('MV 載入失敗，先帶你看地圖。可以稍後按上方的 MV 再試一次。');
+    }
+    function open(direct) {
+      state = 'title'; root.hidden = false; lock(true);
+      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap');
+      if (direct) play();
+      else setTimeout(function () { playBtn.focus({ preventScroll: true }); }, 30);
+    }
+
+    // 標題畫面：點任何地方（「直接看地圖」除外）或按任意鍵 → 播放
+    title.addEventListener('click', function (e) { if (e.target.closest('.ng-skipall')) return; play(); });
+    skipAll.addEventListener('click', function (e) { e.preventDefault(); done(); });
+    skipBtn.addEventListener('click', function (e) { e.stopPropagation(); done(); });
+    muteBtn.addEventListener('click', function (e) { e.stopPropagation(); if (player) { player.mute(!player.muted()); setTimeout(syncMute, 120); } showHud(); });
+    root.querySelector('.ng-catch').addEventListener('click', function () { showHud(); });
+    root.addEventListener('mousemove', function () { showHud(); });
+    document.addEventListener('keydown', function (e) {
+      if (root.hidden || state === 'done') return;
+      if (e.metaKey || e.ctrlKey || e.altKey || /^(Shift|Control|Alt|Meta|CapsLock|Tab)$/.test(e.key)) return;
+      if (state === 'title') {
+        if (document.activeElement === skipAll && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結自己處理
+        e.preventDefault(); play(); return;
+      }
+      if (e.key === 'Escape') { e.preventDefault(); done(); return; }
+      if ((e.key === 'Enter' || e.key === ' ') && (document.activeElement === skipBtn || document.activeElement === muteBtn)) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
+      e.preventDefault(); showHud();
+    });
+    return { open: open, skip: function () { done(); }, state: function () { return state; } };
+  }
+
+  // ---------- 啟動 ----------
+  function start() {
+    initTheme();
+    var tb = document.getElementById('ng-theme');
+    if (tb) tb.addEventListener('click', function () { setTheme(getTheme() === 'dark' ? 'light' : 'dark', true); });
+    var host = document.querySelector('#map .vz-body');
+    var viz = host ? VIZ.mount(host) : null;
+    var it = intro(viz);
+    var mvb = document.getElementById('ng-mvbtn');
+    if (mvb) mvb.addEventListener('click', function () { it.open(true); });
+    // 已經看過（同一個分頁）或網址帶 #map：直接看地圖
+    var skip = ss(KEY_SEEN) === '1' || /^#(map|地圖)$/.test(decodeURIComponent(location.hash || ''));
+    if (skip) { var r = document.getElementById('ng-intro'); if (r) r.hidden = true; }
+    else it.open(false);
+    // 「往下看」：捲到地圖下面的說明
+    var more = document.getElementById('ng-more');
+    if (more) more.addEventListener('click', function (e) { e.preventDefault(); var t = document.getElementById('ng-about'); if (t) t.scrollIntoView({ behavior: U.reduceMotion() ? 'auto' : 'smooth' }); });
+    window.__ng = { viz: viz, intro: it };
+  }
+  return { start: start };
+})();
+
+NG.start();
+</script>
+</body>
+</html>

@@ -17,4 +17,6 @@
 
 - **引用的原始資料**：政府統計、新聞報導、樂居、591、信義房價指數等來源本身的內容，權利屬於各來源，請依各自的條款使用（清單見 [docs/資料來源.md](docs/資料來源.md)）。政府開放資料依「政府資料開放授權條款－第 1 版」。
 - **地圖邊界**：台灣縣市與鄉鎮邊界取自 [g0v twgeojson](https://github.com/g0v/twgeojson)，世界國界取自 [Natural Earth](https://www.naturalearthdata.com/)（公眾領域），依各自的授權使用。
+- **NEXT GEN 的 MV 與主視覺**（`src/ng/kv-*.webp`、`src/ng/og.jpg`，以及 YouTube 上的 MV）：版權屬於 popo890827，MV 的配樂屬於原權利人，不採 CC BY 授權。
+- **3D 地圖底圖**（`viz/map.bin.gz`）：道路 © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors（經 [Overture Maps](https://overturemaps.org/)，ODbL）、地形 [AWS Terrain Tiles](https://registry.opendata.aws/terrain-tiles/)（SRTM 等）、行政區界 內政部；分享者位置依 [WorldPop](https://www.worldpop.org/) 人口密度（CC BY 4.0）隨機分布。`viz/veg/` 的植被地形素材含 [ESA WorldCover 2021](https://esa-worldcover.org/)（含 Copernicus Sentinel 資料，CC BY 4.0）。依各自的授權使用。
 - **字型**：Noto Serif TC、Noto Sans TC、LXGW WenKai TC、DotGothic16 由 Google Fonts 載入，採 SIL Open Font License。

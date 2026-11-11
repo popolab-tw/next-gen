@@ -725,6 +725,7 @@ p { margin: 0; }
 .cvd-toggle input:checked + .sw::after { transform: translateX(16px); }
 .cvd-toggle input:focus-visible + .sw { outline: 2px solid var(--pen); outline-offset: 2px; }
 .cvd-chips { display: inline-flex; gap: 3px; }
+.cover-toggles { display: flex; flex-wrap: wrap; gap: 0 26px; }
 .cvd-chips i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .bc-notes { transition: opacity .15s; }
 
@@ -758,7 +759,7 @@ p { margin: 0; }
   .cover .sheet-in { display: flex; flex-direction: column; }
   .cover .cover-cta { order: 1; margin-top: 20px; }
   .cover .cover-fields { order: 2; margin: 24px 0 18px; }
-  .cover .cvd-toggle { order: 3; }
+  .cover .cover-toggles { order: 3; }
   .cover .cover-lede { font-size: 16px; }
 }
 /* 意見與回報 */
@@ -855,6 +856,48 @@ button.wd-li:hover { background: var(--sheet-2); }
   .report-side.drawer { overscroll-behavior: contain; }
 }
 
+/* ===================== 頁尾上方：NEXT GEN 小欄（介紹另一個網站） ===================== */
+.xp { width: 100%; max-width: 1180px; margin: 48px auto 0; padding: 0 16px 28px; box-sizing: border-box; }
+.xp-in { display: grid; grid-template-columns: minmax(200px, 300px) 1fr auto; gap: 28px; align-items: center; background: var(--sheet); border: 1px solid var(--rule-soft); border-radius: var(--r); padding: 18px 24px 18px 18px; box-shadow: var(--shadow); }
+.xp-kv { display: block; border-radius: 3px; overflow: hidden; background: #050506; aspect-ratio: 16 / 9; }
+.xp-kv img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.xp-kv:hover img { transform: scale(1.03); }
+.xp-k { display: flex; gap: 10px; font-size: 12px; letter-spacing: .14em; color: var(--ink-3); margin-bottom: 6px; }
+.xp-k span + span::before { content: "・"; margin-right: 10px; color: var(--rule); }
+.xp-t { margin: 0 0 8px; font-family: var(--f-serif); font-weight: 900; font-size: 21px; line-height: 1.3; color: var(--ink); letter-spacing: .02em; }
+.xp-txt p { margin: 0 0 14px; font-size: 14.5px; line-height: 1.75; color: var(--ink-2); max-width: 38em; }
+.xp-go { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.xp-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border-radius: 3px; background: #0b0b0d; color: #f1f1ec; font-weight: 700; font-size: 14px; letter-spacing: .04em; text-decoration: none; }
+.xp-btn:hover { background: #26262b; }
+.xp-btn:focus-visible { outline: 2px solid var(--pen); outline-offset: 2px; }
+.xp-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+:root[data-theme="dark"] .xp-btn { background: #f1f1ec; color: #0b0b0d; }
+:root[data-theme="dark"] .xp-btn:hover { background: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .xp-btn { background: #f1f1ec; color: #0b0b0d; } }
+.xp-url { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 12px; color: var(--ink-3); word-break: break-all; }
+.xp-qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.xp-qr-box { display: block; width: 104px; height: 104px; padding: 8px; box-sizing: border-box; background: #fff; color: #111; border-radius: 4px; border: 1px solid var(--rule-soft); }
+.xp-qr-box svg { display: block; width: 100%; height: 100%; shape-rendering: crispEdges; }
+.xp-qr figcaption { font-size: 11.5px; letter-spacing: .1em; color: var(--ink-3); }
+@media (max-width: 860px) {
+  .xp-in { grid-template-columns: 200px 1fr auto; gap: 18px 20px; padding-right: 18px; }
+  .xp-qr-box { width: 88px; height: 88px; padding: 6px; }
+}
+@media (max-width: 560px) {
+  .xp { margin-top: 32px; }
+  .xp-in { grid-template-columns: 1fr auto; gap: 0 14px; padding: 14px 14px 16px; }
+  .xp-kv { grid-column: 1 / -1; margin-bottom: 14px; }
+  .xp-txt { display: contents; }
+  .xp-k, .xp-t, .xp-txt p { grid-column: 1 / -1; }
+  .xp-go { grid-column: 1; align-self: center; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .xp-qr { grid-column: 2; align-self: end; }
+  .xp-qr-box { width: 76px; height: 76px; padding: 5px; }
+  .xp-qr figcaption { display: none; }
+  .xp-url { font-size: 10.5px; white-space: nowrap; word-break: normal; }
+  .xp-t { font-size: 19px; }
+  .xp-txt p { font-size: 14px; }
+}
+
 </style>
 <script>window.TWKIDS = {"target":"web","siteUrl":"https://jasontzeng123.github.io/next-gen/","repoUrl":"https://github.com/jasontzeng123/next-gen","sb":{"url":"https://yzmqgrtxbibufjmllimv.supabase.co","key":"sb_publishable_BOnfiTrQN53RzycO4nffGg_b8o-i0Nk"},"worldSrc":"world.a90062cc20.js"};</script>
 </head>
@@ -862,6 +905,18 @@ button.wd-li:hover { background: var(--sheet-2); }
 <div id="app">
   <header id="topbar" class="topbar"></header>
   <main id="main" class="main" tabindex="-1"></main>
+  <aside class="xp" aria-labelledby="xp-t">
+  <div class="xp-in">
+    <a class="xp-kv" href="map/" tabindex="-1" aria-hidden="true"><img src="kv-640.webp" srcset="kv-640.webp 1x, kv-1280.webp 2x" width="640" height="360" alt="" loading="lazy" decoding="async"></a>
+    <div class="xp-txt">
+      <div class="xp-k"><span>延伸作品</span><span>NEXT GEN</span></div>
+      <h3 class="xp-t" id="xp-t">NEXT GEN 生育門檻可視化網頁</h3>
+      <p>把 4,698 位玩家匿名分享的養育標準放到 3D 台灣上：不同縣市、住法、托育方式的人，心中養一個孩子需要多高的收入，一眼就看得出差別。開場有專屬 MV。</p>
+      <div class="xp-go"><a class="xp-btn" href="map/">前往 NEXT GEN <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg></a><span class="xp-url">jasontzeng123.github.io/next-gen/map</span></div>
+    </div>
+    <figure class="xp-qr"><span class="xp-qr-box" role="img" aria-label="NEXT GEN 網址的 QR Code"><svg viewBox="0 0 33 33" class="segno"><path class="qrline" stroke="currentColor" d="M0 0.5h7m1 0h1m1 0h1m3 0h2m1 0h3m2 0h2m2 0h7m-33 1h1m5 0h1m2 0h3m1 0h1m2 0h2m2 0h3m1 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m5 0h2m1 0h2m2 0h1m1 0h3m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m4 0h2m2 0h2m1 0h1m3 0h3m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h2m2 0h1m2 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h3m1 0h2m1 0h3m3 0h2m1 0h1m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-24 1h1m1 0h1m3 0h2m1 0h1m2 0h1m-21 1h7m4 0h1m1 0h1m2 0h1m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m-32 1h4m2 0h1m5 0h2m3 0h2m1 0h3m2 0h2m1 0h2m1 0h1m-33 1h2m1 0h2m1 0h1m1 0h1m2 0h1m3 0h2m1 0h1m3 0h1m2 0h2m1 0h1m1 0h2m-31 1h3m4 0h2m1 0h2m1 0h1m3 0h2m1 0h3m1 0h2m1 0h3m-31 1h2m2 0h5m1 0h2m2 0h1m3 0h1m1 0h1m1 0h2m3 0h3m1 0h1m-31 1h3m1 0h1m1 0h1m1 0h5m1 0h6m2 0h1m2 0h1m4 0h2m-27 1h2m2 0h1m1 0h2m1 0h1m4 0h1m3 0h3m3 0h2m-29 1h1m4 0h1m1 0h1m4 0h1m5 0h1m2 0h7m-25 1h4m3 0h1m6 0h1m1 0h4m1 0h3m2 0h1m-33 1h1m3 0h2m9 0h3m1 0h1m1 0h1m1 0h1m2 0h2m1 0h4m-32 1h2m1 0h1m1 0h2m1 0h3m2 0h1m2 0h1m2 0h3m2 0h4m1 0h2m-29 1h3m1 0h1m4 0h1m1 0h1m1 0h1m4 0h11m-32 1h1m2 0h1m1 0h2m4 0h1m1 0h1m2 0h2m4 0h1m2 0h1m1 0h3m2 0h1m-33 1h3m1 0h1m8 0h2m4 0h3m1 0h1m2 0h1m2 0h2m1 0h1m-33 1h1m4 0h2m4 0h1m1 0h1m1 0h1m2 0h1m1 0h3m3 0h6m-32 1h1m7 0h1m1 0h1m1 0h3m1 0h1m3 0h3m3 0h1m1 0h4m-32 1h1m2 0h6m1 0h1m2 0h1m3 0h4m1 0h1m1 0h5m2 0h2m-25 1h2m2 0h1m1 0h4m1 0h1m3 0h2m3 0h1m1 0h1m1 0h1m-33 1h7m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m2 0h1m2 0h3m2 0h3m1 0h2m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h3m3 0h1m1 0h1m7 0h6m1 0h1m-32 1h1m1 0h3m1 0h1m1 0h6m1 0h6m2 0h3m2 0h1m1 0h1m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m1 0h1m1 0h1m1 0h2m-28 1h1m5 0h1m1 0h1m2 0h2m3 0h1m2 0h3m3 0h2m1 0h1m1 0h1m-31 1h7m2 0h1m3 0h2m1 0h2m1 0h1m2 0h3m1 0h2m3 0h1"/></svg></span><figcaption>手機掃描</figcaption></figure>
+  </div>
+</aside>
   <footer class="foot">
     <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">popo890827</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popo890827</a></div>
     <div class="foot-links"><a href="https://github.com/jasontzeng123/next-gen" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="https://github.com/jasontzeng123/next-gen/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
@@ -869,7 +924,7 @@ button.wd-li:hover { background: var(--sheet-2); }
   </footer>
 </div>
 <script>
-window.__diag = { t0: Date.now(), build: '2026-10-17T05:22', timer: false, mc: false, raf: false, errors: [] };
+window.__diag = { t0: Date.now(), build: '2026-11-11T06:08', timer: false, mc: false, raf: false, errors: [] };
 setTimeout(function () { window.__diag.timer = true; }, 30);
 try { var __mc = new MessageChannel(); __mc.port1.onmessage = function () { window.__diag.mc = true; }; __mc.port2.postMessage(0); } catch (e) {}
 try { requestAnimationFrame(function () { window.__diag.raf = true; }); } catch (e) {}
@@ -2034,7 +2089,8 @@ var ENGINE = (function (D) {
     // zero：存款當成 0（最「乾淨」的版本，留作研究用）；否則以同齡平均存款計（夫妻合計），統計顯示用這個
     s.savings = zero ? 0 : Math.round(typicalSavings(s.ageA) + (s.partner ? typicalSavings(s.ageB) : 0));
     s.giftOnce = 0; s.giftMonthly = 0; s.debtBal = 0;
-    if (s.housing === 'own') { s.housing = 'buy'; s.buyWhen = 'now'; s.build = 'used'; s.loan = DEFAULTS.loan; s.reno = DEFAULTS.reno; }
+    // 已經有房子：保留自己的房貸（房子本身是住的標準，和住長輩家一樣不換成買房）。
+    // 2026-10-24 以前是換成「現在買一間中古屋」，要馬上付頭期款，門檻被高估（舊分享已用 build/own_backfill.js 補算）
     s.carHave = 0;
     s.jobA = { industry: 'all', pr: 50 }; s.jobB = { industry: 'all', pr: 50 };
     s.incomeMode = 'threshold';
@@ -2333,6 +2389,13 @@ var U = (function () {
   // 色盲友善模式（封面切換，存在本機）
   function cvd() { return document.documentElement.getAttribute('data-cvd') === '1'; }
   function setCvd(on) { if (on) document.documentElement.setAttribute('data-cvd', '1'); else document.documentElement.removeAttribute('data-cvd'); store.set('cvd', !!on); }
+  // 深淺色：預設跟著系統；在封面切換後記住（data-theme = light／dark）
+  function theme() { var t = document.documentElement.getAttribute('data-theme'); if (t === 'dark' || t === 'light') return t; try { return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; } catch (e) { return 'light'; } }
+  function setTheme(t, keep) {
+    document.documentElement.setAttribute('data-theme', t);
+    if (keep !== false) store.set('theme', t);
+    try { [].forEach.call(document.querySelectorAll('meta[name="theme-color"]'), function (m) { m.setAttribute('content', t === 'dark' ? '#0d1210' : '#e9eee9'); }); } catch (e) { /* 忽略 */ }
+  }
   function isDark() { try { return /dark/.test(getComputedStyle(document.documentElement).colorScheme || ''); } catch (e) { return false; } }
   function hex3(c) { c = String(c || '').trim(); if (c[0] === '#' && c.length === 4) c = '#' + c[1] + c[1] + c[2] + c[2] + c[3] + c[3]; var m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c); if (m) return [+m[1], +m[2], +m[3]]; return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16) || 0; }); }
   function mix(a, b, t) { var x = hex3(a), y = hex3(b); return 'rgb(' + x.map(function (v, i) { return Math.round(v + (y[i] - v) * t); }).join(',') + ')'; }
@@ -2423,7 +2486,7 @@ var U = (function () {
     var s = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : '') + '>' + (ICONS[name] || '') + '</svg>';
     var t = document.createElement('template'); t.innerHTML = s; return t.content.firstChild;
   }
-  return { task: task, safe: safe, report: report, onError: onError, modalOpen: modalOpen, h: h, svg: svg, clear: clear, sep: sep, wan: wan, wan1: wan1, yuan: yuan, monthly: monthly, pr: prFmt, topPct: topPct, thUp: thUp, cn: cn, debounce: debounce, store: store, toast: toast, cssVar: cssVar, reduceMotion: reduceMotion, cvd: cvd, setCvd: setCvd, isDark: isDark, mix: mix, copy: copy, modal: modal, confirmAmount: confirmAmount, icon: icon };
+  return { task: task, safe: safe, report: report, onError: onError, modalOpen: modalOpen, h: h, svg: svg, clear: clear, sep: sep, wan: wan, wan1: wan1, yuan: yuan, monthly: monthly, pr: prFmt, topPct: topPct, thUp: thUp, cn: cn, debounce: debounce, store: store, toast: toast, cssVar: cssVar, reduceMotion: reduceMotion, cvd: cvd, setCvd: setCvd, theme: theme, setTheme: setTheme, isDark: isDark, mix: mix, copy: copy, modal: modal, confirmAmount: confirmAmount, icon: icon };
 })();
 
 /* ---- people.js ---- */
@@ -2706,6 +2769,7 @@ var COMM = (function () {
     d.perChild = Math.round(res.perChild / 1e5) * 1e5;
     d.expPR = Math.round(res.hhExpensePR);
     d.childSubs = Math.round((res.childSubs || 0) / 1e5) * 1e5;
+    d.sv = 2;   // 標準門檻的算法版本：2 ＝「已經有房子」保留自己的房貸（2026-10-24 起）
     return d;
   }
   // 意見與回報：送到資料庫的 feedback 表（只有作者看得到）
@@ -4159,6 +4223,7 @@ var APP = (function () {
   // ---------- 啟動 ----------
   A.start = function () {
     if (U.store.get('cvd', false)) document.documentElement.setAttribute('data-cvd', '1');
+    var th0 = U.store.get('theme', null); if (th0 === 'dark' || th0 === 'light') U.setTheme(th0, false);
     // 任何未預期的錯誤：記錄並提示，不讓畫面默默卡住
     var lastErrToast = 0;
     U.onError(function () { COMM.diag('error'); var now = Date.now(); if (now - lastErrToast > 4000) { lastErrToast = now; U.toast('發生錯誤，已記錄下來。可以重新整理後再試一次。'); } });
@@ -4234,10 +4299,13 @@ APP.screens.cover = function (main) {
     cta.appendChild(h('button', { class: 'btn seal', onclick: function () { A.startQuiz(); } }, '開始試算', U.icon('next')));
   }
   inn.appendChild(cta);
-  // 色盲友善配色
+  // 色盲友善配色、深色模式
   var cvdIn = h('input', { type: 'checkbox', checked: U.cvd(), onchange: function (e) { U.setCvd(e.target.checked); U.toast(e.target.checked ? '已改用色盲友善配色' : '已改回一般配色'); } });
-  inn.appendChild(h('label', { class: 'cvd-toggle' }, cvdIn, h('span', { class: 'sw', 'aria-hidden': 'true' }), '色盲友善配色',
-    h('span', { class: 'cvd-chips', 'aria-hidden': 'true' }, h('i', { style: { background: 'var(--good)' } }), h('i', { style: { background: '#ecd060' } }), h('i', { style: { background: 'var(--bad)' } }))));
+  var darkIn = h('input', { type: 'checkbox', checked: U.theme() === 'dark', onchange: function (e) { U.setTheme(e.target.checked ? 'dark' : 'light'); } });
+  inn.appendChild(h('div', { class: 'cover-toggles' },
+    h('label', { class: 'cvd-toggle' }, cvdIn, h('span', { class: 'sw', 'aria-hidden': 'true' }), '色盲友善配色',
+      h('span', { class: 'cvd-chips', 'aria-hidden': 'true' }, h('i', { style: { background: 'var(--good)' } }), h('i', { style: { background: '#ecd060' } }), h('i', { style: { background: 'var(--bad)' } }))),
+    h('label', { class: 'cvd-toggle' }, darkIn, h('span', { class: 'sw', 'aria-hidden': 'true' }), '深色模式')));
   sheet.appendChild(inn);
   wrap.appendChild(sheet);
 
@@ -4839,12 +4907,13 @@ APP.screens.notice = function (main) {
   function consentModal(after) {
     U.modal(function (box, close) {
       box.appendChild(h('h3', {}, '要匿名分享你的設定嗎？'));
-      box.appendChild(h('p', {}, '分享後，其他人會在題目旁看到「大家怎麼選」，你也能在報告裡看到自己在所有分享者中的位置。'));
+      box.appendChild(h('p', {}, '分享後，其他人會在題目旁看到「大家怎麼選」，你也能在報告裡看到自己在所有分享者中的位置。你也會成為 NEXT GEN 網站「全台分享地圖」上的一個匿名小點（地圖定期更新）。'));
       box.appendChild(h('ul', {},
         h('li', {}, '會分享：縣市與區域、孩子數、每一題的選擇、收入 PR（四捨五入到 5）、年齡區間（每 5 歲一組）、審查結果。'),
+        h('li', {}, '在地圖上點小點，可以看到年齡區間、縣市與區域、住法、孩子數、門檻 PR 與收入 PR。小點的位置是在縣市裡隨機分布的，不是你的住址；分享少於 5 筆的縣市不顯示收入 PR 與審查結果。'),
         h('li', {}, '不會分享：姓名、帳號資料、確切年齡、確切年薪、存款與貸款金額。'),
         h('li', {}, '只會分享這次送出的答案。之後修改或在報告裡調整設定都不會覆蓋，除非你在報告裡按「更新」。'),
-        h('li', {}, COMM.st.backend === 'web' ? '隨時可以在報告頁取消分享，資料會刪除（請用同一台裝置的同一個瀏覽器）。' : '隨時可以在報告頁取消分享，資料會刪除。')));
+        h('li', {}, COMM.st.backend === 'web' ? '隨時可以在報告頁取消分享，資料會刪除（請用同一台裝置的同一個瀏覽器）；地圖在下次更新時移除。' : '隨時可以在報告頁取消分享，資料會刪除。')));
       box.appendChild(h('div', { class: 'actions' },
         h('button', { class: 'btn ghost', onclick: function () { A.consent = false; U.store.set('consent', false); close(); after(); } }, '不分享'),
         h('button', { class: 'btn', onclick: function () { A.consent = true; U.store.set('consent', true); close(); after(); } }, '匿名分享')));
@@ -6822,7 +6891,7 @@ APP.screens.method = function (main) {
     '存款有餘時以每年 1% 實質報酬計算；不夠時視為借款，以每年 3% 的實質成本計算利息（兩者都能在「進階假設」用加減調整）。65 歲以後，有工作過的人每月另有約 2.5 萬元的勞保年金與勞退（估計）。',
     '報告裡的「年齡」都是「那一年你幾歲」，和存摺明細一致。',
     '<b>核准</b>：第一胎出生後，存款最低時仍有半年以上的家庭開銷。<b>附條件核准</b>：存款從未跌破零，但最低時不到半年開銷。<b>駁回</b>：孩子獨立前存款跌破零（中途得借錢）；若到孩子獨立時仍是負的，就是「入不敷出」。',
-    '<b>門檻 PR</b>：把雙方收入 PR 從 1 調到 99.9（同產業、同年齡），找出存款剛好不會跌破零的最低 PR。若 99.9 仍不夠，就顯示「再高也不夠」。報告與實驗室裡「其他人」的統計用的是<b>標準門檻</b>：把每個人的存款換成同齡的平均存款、家人資助當成 0、收入不分產業，只看他選的養育標準要多少收入。同齡平均存款是依主計總處家庭收支調查各年齡的平均儲蓄，從 22 歲開始累積的推估（每人 25 歲約 28 萬、30 歲約 75 萬、35 歲約 138 萬，夫妻合計；官方沒有各年齡的存款餘額統計，這是平均數，偏樂觀）。比的是大家心中的標準，不受各自的家底與產業影響（不同產業的薪資差很多，例如半導體業的 PR 28，收入大約等於不分產業的 PR 70）。',
+    '<b>門檻 PR</b>：把雙方收入 PR 從 1 調到 99.9（同產業、同年齡），找出存款剛好不會跌破零的最低 PR。若 99.9 仍不夠，就顯示「再高也不夠」。報告與實驗室裡「其他人」的統計用的是<b>標準門檻</b>：把每個人的存款換成同齡的平均存款、家人資助當成 0、收入不分產業，只看他選的養育標準要多少收入。同齡平均存款是依主計總處家庭收支調查各年齡的平均儲蓄，從 22 歲開始累積的推估（每人 25 歲約 28 萬、30 歲約 75 萬、35 歲約 138 萬，夫妻合計；官方沒有各年齡的存款餘額統計，這是平均數，偏樂觀）。比的是大家心中的標準，不受各自的家底與產業影響（不同產業的薪資差很多，例如半導體業的 PR 28，收入大約等於不分產業的 PR 70）。已經有房子的人，標準門檻保留他們自己的房貸（房貸金額不會上傳，只上傳算好的門檻）；2026 年 10 月 24 日以前的分享沒有房貸資料，以 600 萬、利率 2.2%、25 年為全國平均，依縣市與區域的中古屋房價比例調整（例如台北約 1,200–1,800 萬、台南約 300–500 萬）重新計算。',
     '<b>平行世界</b>：同樣的人、同樣的收入與生活水準，只是不生小孩。存款圖上的平行世界是<b>兩人一起租屋</b>（一房一廳；設定住長輩家的人，平行世界也住長輩家；已經有房的人，平行世界也住同一間），用來比較「如果不生，錢會怎麼走」。',
     '<b>養一個孩子要多少</b>：拿「有孩子」和「同樣住法、但沒孩子」的世界相減。租屋的人比較的是租大房子與一房一廳的租金差；<b>買房的人</b>比較的是同樣買房、但只買兩個大人住的 2 房——多出來的頭期款、房貸本息與房屋稅費，就是「為孩子多買的房間」。房子本身仍是你的資產，這筆價值沒有扣回來；報告的存款圖會另外寫出房子扣掉房貸後約值多少。',
     '<b>不填收入時</b>：報告先算出門檻 PR；存摺動畫、逐年明細與「養一個孩子要花多少」則以雙方收入都在中間（PR 50）的家庭演示，可在報告裡切換成「剛好達到門檻」的版本。',
@@ -6922,6 +6991,7 @@ APP.screens.method = function (main) {
 
   inn.appendChild(h('h2', {}, COMM.st.backend === 'local' ? '八、資料與隱私' : '八、匿名資料與隱私'));
   if (COMM.st.backend !== 'local') inn.appendChild(p('只有在你同意後，才會分享你的設定。分享的內容是：縣市與區域、孩子數、每一題的選擇、收入 PR（四捨五入到 5）、年齡區間（每 5 歲一組）、審查結果。不會分享姓名、帳號資料、確切年齡、確切年薪、存款與貸款金額。你可以在報告頁隨時取消分享，資料會刪除。你的存檔只有你自己看得到。'));
+  if (COMM.st.backend !== 'local') inn.appendChild(p('NEXT GEN 網站的「全台分享地圖」是分享資料的固定版本，由作者定期更新。每個小點是一位分享的玩家，點開可以看到年齡區間、縣市與區域、住法、孩子數、門檻 PR 與收入 PR；位置是在縣市（與市中心／一般／外圍）裡依人口密度隨機分布的，不是真實住址。地圖檔不含匿名代號與分享時間，順序也隨機打亂；分享少於 5 筆的縣市不顯示收入 PR 與審查結果。取消分享的人，在下次更新時移除。'));
   inn.appendChild(p(COMM.st.backend === 'local'
     ? '這個版本不會上傳任何資料：你的選擇與存檔只留在自己的瀏覽器裡，所有試算都在你的裝置上完成。'
     : COMM.st.backend === 'web'

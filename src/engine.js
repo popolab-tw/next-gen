@@ -844,7 +844,8 @@ var ENGINE = (function (D) {
     // zero：存款當成 0（最「乾淨」的版本，留作研究用）；否則以同齡平均存款計（夫妻合計），統計顯示用這個
     s.savings = zero ? 0 : Math.round(typicalSavings(s.ageA) + (s.partner ? typicalSavings(s.ageB) : 0));
     s.giftOnce = 0; s.giftMonthly = 0; s.debtBal = 0;
-    if (s.housing === 'own') { s.housing = 'buy'; s.buyWhen = 'now'; s.build = 'used'; s.loan = DEFAULTS.loan; s.reno = DEFAULTS.reno; }
+    // 已經有房子：保留自己的房貸（房子本身是住的標準，和住長輩家一樣不換成買房）。
+    // 2026-10-24 以前是換成「現在買一間中古屋」，要馬上付頭期款，門檻被高估（舊分享已用 build/own_backfill.js 補算）
     s.carHave = 0;
     s.jobA = { industry: 'all', pr: 50 }; s.jobB = { industry: 'all', pr: 50 };
     s.incomeMode = 'threshold';
