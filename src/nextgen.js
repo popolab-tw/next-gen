@@ -37,11 +37,14 @@ var NG = (function () {
     };
   }
 
-  // ---------- 「進入地圖」的聲音：仿配樂約 3:32（第 73 小節）最後畫面亮起的那聲高音 ----------
-  // 分析原曲那一聲：主音是 E♭6（約 1245 Hz），疊一層低約 16 音分的同音（約 1233 Hz），兩者互相拍出每秒約 12 次的微光閃爍；
-  // 下面同時有低八度的 E♭5 和 B♭4。泛音很少（第 2、3 泛音約低 14～18 dB），接近純音。
-  // 先在左邊響起，一個八分音符後右邊回應（曲速 165 BPM 的乒乓回聲），約 0.6 秒才到最亮，餘音約 2 秒，左右很寬。
-  // 這裡用 Web Audio 照這些特徵合成，不使用原曲音訊。
+  // ---------- 「進入地圖」的聲音：仿配樂約 3:32（第 73 小節）最後畫面亮起那一段的所有聲部 ----------
+  // 分析原曲那 3 秒（3:32.24 起）：
+  //  ・高音：E♭6（約 1245 Hz）疊一層低約 16 音分的同音，拍出每秒約 11 次的閃爍；先在左邊響、一個八分音符後右邊回應，約 0.6 秒最亮
+  //  ・和弦：E♭5、B♭4、A♭4、D♭5 一起響，慢慢淡掉；低音區是 A♭2、B♭2，之後換成 E♭3、A♭3、B♭3 的長音一直延續到最後
+  //  ・超低頻：一層沒有明確音高的低沉轟鳴，開頭最強
+  //  ・空氣聲：起音後約 0.15 秒有一陣很高的「沙」聲，之後慢慢退去
+  //  ・最後 1.5 秒：3～4 kHz 一帶的高音光暈（像 E♭6 往上的泛音被殘響放大）和高頻噪音一路往上推，約 3.05 秒整段一起切掉
+  // 這裡照這些特徵用 Web Audio 合成，不使用原曲音訊。
   var actx = null;
   function rippleSound() {
     try {
@@ -49,39 +52,78 @@ var NG = (function () {
       if (!AC) return;
       if (!actx) actx = new AC();
       if (actx.state === 'suspended' && actx.resume) actx.resume();
-      var c = actx, t0 = c.currentTime + 0.03, SR = c.sampleRate, END = t0 + 4;
-      var master = c.createGain(); master.gain.value = 0.75;
-      var lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 8000; lp.Q.value = 0.4;
+      var c = actx, t0 = c.currentTime + 0.03, SR = c.sampleRate, CUT = 2.99, END = t0 + CUT + 0.2;
+      // 總音量：最後一起切掉（殘響也一起），跟原曲收尾一樣
+      var master = c.createGain(); master.gain.setValueAtTime(0.66, t0); master.gain.setValueAtTime(0.66, t0 + CUT); master.gain.linearRampToValueAtTime(0.0001, t0 + CUT + 0.07);
+      var lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 15000; lp.Q.value = 0.3;
       master.connect(lp); lp.connect(c.destination);
-      // 殘響：左右聲道用不同的衰減雜訊（約 2.6 秒），聲音才會開闊
+      // 殘響（左右各自的衰減雜訊，約 2.6 秒）
       var len = Math.round(SR * 2.6), ir = c.createBuffer(2, len, SR), ramp = SR * 0.012;
       for (var ch = 0; ch < 2; ch++) { var d = ir.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.2) * (i < ramp ? i / ramp : 1); }
       var rev = c.createConvolver(); rev.buffer = ir;
       var wet = c.createGain(); wet.gain.value = 0.5; rev.connect(wet); wet.connect(master);
-      // 乒乓回聲：右 → 左 → 右…，間隔一個八分音符，每次輕一些
+      // 乒乓回聲：右 → 左 → 右…，間隔一個八分音符（165 BPM）
       var E = 60 / 165 / 2, send = c.createGain(), d1 = c.createDelay(1), d2 = c.createDelay(1), f1 = c.createGain(), f2 = c.createGain(), mg = c.createChannelMerger(2);
       send.gain.value = 0.6; d1.delayTime.value = E; d2.delayTime.value = E; f1.gain.value = 0.42; f2.gain.value = 0.42;
       send.connect(d1); d1.connect(mg, 0, 1); d1.connect(f1); f1.connect(d2); d2.connect(mg, 0, 0); d2.connect(f2); f2.connect(d1);
       mg.connect(master); mg.connect(rev);
-      function voice(pan) {   // 每個聲部：直接出去（左右位置）、送進殘響、送進回聲
+      // 白雜訊（給轟鳴、空氣聲、光暈用）
+      var nb = c.createBuffer(1, Math.round(SR * 3.5), SR), nd = nb.getChannelData(0);
+      for (var j = 0; j < nd.length; j++) nd[j] = Math.random() * 2 - 1;
+      function bus(pan, toRev, toEcho) {   // 聲部的出口：左右位置、送殘響、送回聲
         var g = c.createGain(), node = g;
-        if (c.createStereoPanner) { var p = c.createStereoPanner(); p.pan.value = pan; g.connect(p); node = p; }
-        node.connect(master); node.connect(rev); g.connect(send);
+        if (c.createStereoPanner && pan) { var p = c.createStereoPanner(); p.pan.value = pan; g.connect(p); node = p; }
+        node.connect(master); if (toRev) { var r = c.createGain(); r.gain.value = toRev; node.connect(r); r.connect(rev); }
+        if (toEcho) { var e = c.createGain(); e.gain.value = toEcho; g.connect(e); e.connect(send); }
         return g;
       }
-      function note(f, pan, harm, env) {   // harm：[倍頻, 音量]；env(gain, t0) 設定音量的起落
-        var g = c.createGain(); g.connect(voice(pan)); env(g.gain, t0);
-        harm.forEach(function (k) { var o = c.createOscillator(), a = c.createGain(); o.frequency.value = f * k[0]; a.gain.value = k[1]; o.connect(a); a.connect(g); o.start(t0); o.stop(END); });
+      function env(prm, pts) {   // pts：[[秒, 值, 'lin'|'exp'|無]]，第一點直接設定
+        pts.forEach(function (q, k) { var at = t0 + q[0], v = Math.max(0.00001, q[1]); if (!k) prm.setValueAtTime(v, at); else if (q[2] === 'lin') prm.linearRampToValueAtTime(v, at); else prm.exponentialRampToValueAtTime(v, at); });
       }
-      // 起音：E♭6 在左邊，快起慢收
-      note(1244.5, -0.45, [[1, 1], [2, 0.25], [3, 0.1]], function (p, t) { p.setValueAtTime(0.0001, t); p.exponentialRampToValueAtTime(0.14, t + 0.006); p.exponentialRampToValueAtTime(0.06, t + 0.6); p.exponentialRampToValueAtTime(0.0001, t + 2.8); });
-      // 慢慢亮起的同音層：1233.5 Hz（左）與 1244.5 Hz（右）互相拍出每秒約 11 次的閃爍，約 0.6 秒最亮
+      function note(f, pan, harm, pts, rv, ec, type) {   // 一個音：harm 是 [倍頻, 音量]
+        var g = c.createGain(); g.connect(bus(pan, rv, ec)); env(g.gain, pts);
+        harm.forEach(function (k) { var o = c.createOscillator(), a = c.createGain(); o.type = type || 'sine'; o.frequency.value = f * k[0]; a.gain.value = k[1]; o.connect(a); a.connect(g); o.start(t0); o.stop(END); });
+      }
+      function noise(pan, filters, pts, rv) {   // 濾過的雜訊：filters 是 [[種類, 頻率, Q, 頻率走勢]]
+        var src = c.createBufferSource(); src.buffer = nb; src.loop = true;
+        var node = src;
+        filters.forEach(function (k) { var b = c.createBiquadFilter(); b.type = k[0]; b.frequency.value = k[1]; b.Q.value = k[2]; if (k[3]) env(b.frequency, k[3]); node.connect(b); node = b; });
+        var g = c.createGain(); node.connect(g); g.connect(bus(pan, rv, 0)); env(g.gain, pts);
+        src.start(t0, Math.random() * 2); src.stop(END);
+      }
+      // 1. 高音 E♭6：左邊先響，快起慢收；加上低約 16 音分的同音層，慢慢亮起、互相拍出閃爍
+      note(1244.5, -0.45, [[1, 1], [2, 0.25], [3, 0.1]], [[0, 0.0001], [0.006, 0.13], [0.6, 0.06], [1.6, 0.026], [3.1, 0.011]], 1, 1);
       [[1233.5, -0.6], [1244.5, 0.6]].forEach(function (k) {
-        note(k[0], k[1], [[1, 1], [2, 0.22], [3, 0.1]], function (p, t) { p.setValueAtTime(0.0001, t); p.linearRampToValueAtTime(0.07, t + 0.6); p.setTargetAtTime(0.0001, t + 0.9, 0.55); });
+        note(k[0], k[1], [[1, 1], [2, 0.22], [3, 0.1]], [[0, 0.0001], [0.6, 0.065, 'lin'], [1.4, 0.028], [2.4, 0.016], [3.1, 0.012]], 1, 1);
       });
-      // 低八度 E♭5 與 B♭4：和起音一起響，比較快淡掉
-      note(622.25, -0.1, [[1, 1], [2, 0.18]], function (p, t) { p.setValueAtTime(0.0001, t); p.exponentialRampToValueAtTime(0.075, t + 0.01); p.setTargetAtTime(0.0001, t + 0.3, 0.45); });
-      note(466.16, 0.15, [[1, 1]], function (p, t) { p.setValueAtTime(0.0001, t); p.exponentialRampToValueAtTime(0.06, t + 0.01); p.setTargetAtTime(0.0001, t + 0.1, 0.22); });
+      // 2. 和弦：E♭5、B♭4、A♭4、D♭5，和高音一起響，慢慢淡掉
+      note(622.25, -0.1, [[1, 1], [2, 0.18]], [[0, 0.0001], [0.01, 0.08], [0.5, 0.05], [1.4, 0.022], [3.1, 0.012]], 0.8, 0.5);
+      note(466.16, 0.2, [[1, 1], [2, 0.12]], [[0, 0.0001], [0.01, 0.085], [0.6, 0.045], [1.6, 0.014], [3.1, 0.004]], 0.8, 0.3);
+      note(415.30, -0.25, [[1, 1], [2, 0.1]], [[0, 0.0001], [0.02, 0.045], [0.8, 0.022], [2.2, 0.006]], 0.8, 0);
+      note(554.37, 0.3, [[1, 1]], [[0, 0.0001], [0.03, 0.032], [0.9, 0.016], [2.2, 0.005]], 0.8, 0);
+      noise(0, [['bandpass', 4000, 1.2]], [[0, 0.0001], [0.006, 0.11], [0.25, 0.016], [0.6, 0.003]], 0.6);
+      // 3. 低音區：先是 A♭2、B♭2，接著 E♭3、A♭3、B♭3 的長音延續到最後（三角波＋低通，比較溫暖）
+      var padLp = c.createBiquadFilter(); padLp.type = 'lowpass'; padLp.frequency.value = 950; padLp.Q.value = 0.5; padLp.connect(bus(0, 0.6, 0));
+      function pad(f, pts) { var g = c.createGain(); g.connect(padLp); env(g.gain, pts); var o = c.createOscillator(); o.type = 'triangle'; o.frequency.value = f; o.connect(g); o.start(t0); o.stop(END); }
+      pad(103.83, [[0, 0.0001], [0.04, 0.045], [0.6, 0.03], [1.6, 0.01], [2.6, 0.003]]);
+      pad(116.54, [[0, 0.0001], [0.04, 0.05], [0.7, 0.035], [1.8, 0.012], [2.8, 0.004]]);
+      [155.56, 207.65, 233.08].forEach(function (f) { pad(f, [[0, 0.0001], [0.5, 0.004], [1.4, 0.016, 'lin'], [2.95, 0.028, 'lin']]); });
+      // 4. 超低頻的轟鳴：沒有明確音高，開頭最強
+      noise(0, [['lowpass', 75, 0.8], ['highpass', 26, 0.7]], [[0, 0.0001], [0.03, 0.9], [0.4, 0.55], [0.9, 0.3], [2.0, 0.3], [2.9, 0.26], [3.1, 0.2]], 0);
+      note(51.91, 0, [[1, 1]], [[0, 0.0001], [0.03, 0.12], [0.8, 0.05], [2.5, 0.035], [3.1, 0.03]], 0, 0);
+      // 5. 空氣聲：起音後約 0.15 秒最大，之後退去
+      noise(-0.3, [['bandpass', 9500, 0.8]], [[0, 0.0001], [0.15, 0.08, 'lin'], [0.35, 0.03], [0.8, 0.014], [1.4, 0.008]], 0.7);
+      noise(0.3, [['bandpass', 11000, 0.8]], [[0, 0.0001], [0.17, 0.065, 'lin'], [0.37, 0.025], [0.8, 0.012], [1.4, 0.007]], 0.7);
+      // 6. 最後 1.5 秒：高音光暈（3～4 kHz 的一群音，帶一點顫音）和高頻噪音一路往上推
+      [[2489, 0.5, -0.5], [3320, 0.45, 0.4], [3733, 1, -0.2], [3830, 0.7, 0.55], [3930, 0.55, -0.6], [4180, 0.35, 0.2]].forEach(function (k) {
+        var g = c.createGain(); g.connect(bus(k[2], 0.8, 0));
+        env(g.gain, [[0, 0.0001], [0.3, 0.003 * k[1]], [1.5, 0.008 * k[1]], [2.2, 0.016 * k[1]], [2.95, 0.026 * k[1]]]);
+        var o = c.createOscillator(); o.frequency.value = k[0]; var lfo = c.createOscillator(), dep = c.createGain(); lfo.frequency.value = 4 + Math.random() * 2.5; dep.gain.value = k[0] * 0.004;
+        lfo.connect(dep); dep.connect(o.frequency); o.connect(g); o.start(t0); lfo.start(t0); o.stop(END); lfo.stop(END);
+      });
+      noise(0, [['bandpass', 3800, 4]], [[0, 0.0001], [0.4, 0.004], [1.6, 0.012], [2.95, 0.05]], 0.6);
+      noise(-0.2, [['bandpass', 7000, 0.9, [[0, 6000], [2.2, 6500, 'exp'], [3.0, 9500, 'exp']]]], [[0, 0.0001], [1.4, 0.008], [2.4, 0.022], [3.0, 0.065]], 0.5);
+      noise(0.25, [['highpass', 4500, 0.7, [[0, 4500], [2.6, 4500], [3.02, 8000, 'exp']]]], [[0, 0.0001], [2.0, 0.003], [2.8, 0.02], [3.0, 0.045]], 0.3);
     } catch (e) { /* 沒有音效也照常轉場 */ }
   }
 
