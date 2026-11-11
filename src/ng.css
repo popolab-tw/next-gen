@@ -121,12 +121,12 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-intro.tap .ng-catch, .ng-intro.tap .ng-wait { display: none !important; }
 .ng-hud { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); display: none; align-items: center; gap: 10px; opacity: 0; transition: opacity .35s ease; pointer-events: none; }
 .ng-intro.playing .ng-hud { display: flex; }
-.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud, .ng-intro.playing.paused .ng-hud { opacity: 1; pointer-events: auto; }
+.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud { opacity: 1; pointer-events: auto; }
 .ng-intro.rot .ng-hud { padding: 0 20px 18px; }   /* 手動轉 90 度時，手機的安全邊距方向不一樣，改用固定邊距 */
-/* 暫停鍵：點畫面叫出控制列時一起出現；暫停中一直顯示 */
+/* 暫停鍵：點畫面叫出控制列時一起出現，再點一下畫面就一起收起來 */
 .ng-pause { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; padding: 0; appearance: none; border: 1px solid rgba(236, 236, 230, .6); border-radius: 50%; background: rgba(0, 0, 0, .45); color: #ececE6; display: none; place-items: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .35s ease, transform .2s ease; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); -webkit-tap-highlight-color: transparent; }
 .ng-intro.playing .ng-pause { display: grid; }
-.ng-intro.playing.hud .ng-pause, .ng-intro.playing.paused .ng-pause { opacity: 1; pointer-events: auto; }
+.ng-intro.playing.hud .ng-pause { opacity: 1; pointer-events: auto; }
 .ng-intro.tap .ng-pause, .ng-intro.playing.wait:not(.paused) .ng-pause { opacity: 0; pointer-events: none; }
 .ng-pause:hover { transform: scale(1.06); border-color: #ececE6; }
 .ng-pause:focus { outline: none; }

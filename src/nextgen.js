@@ -169,6 +169,7 @@ var NG = (function () {
       root.classList.add('hud'); clearTimeout(hudT);
       hudT = setTimeout(function () { if (!root.classList.contains('paused')) root.classList.remove('hud'); }, 3200);   // 暫停中控制列不自動收起
     }
+    function hideHud() { clearTimeout(hudT); root.classList.remove('hud'); }
     // ---- 暫停／繼續 ----
     function isPaused() { return root.classList.contains('paused'); }
     function syncPause() { var p = isPaused(); pauseBtn.setAttribute('aria-label', p ? '繼續播放' : '暫停'); pauseBtn.title = p ? '繼續播放' : '暫停'; }
@@ -281,9 +282,19 @@ var NG = (function () {
     skipAll.addEventListener('click', function (e) { e.preventDefault(); done(); });
     skipBtn.addEventListener('click', function (e) { e.stopPropagation(); done(); });
     muteBtn.addEventListener('click', function (e) { e.stopPropagation(); if (player) { player.mute(!player.muted()); setTimeout(syncMute, 120); } showHud(); });
-    root.querySelector('.ng-catch').addEventListener('click', function () { showHud(); });
+    // 點畫面：控制列和暫停鍵出現；它們在畫面上時再點一下就收起來（暫停中也一樣）
+    // 電腦：用滑鼠點掉之後，要真的移動滑鼠（超過 24px）才再叫出來，不然點完手一晃又跑出來
+    var hidAt = null;
+    root.querySelector('.ng-catch').addEventListener('click', function (e) {
+      if (root.classList.contains('hud')) { hideHud(); hidAt = { x: e.clientX, y: e.clientY }; }
+      else { hidAt = null; showHud(); }
+    });
     // 只有真的滑鼠移動才叫出控制列：手機點一下時瀏覽器也會補發 mousemove，會讓隱形的「略過」在同一下被按到
-    root.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') showHud(); });
+    root.addEventListener('pointermove', function (e) {
+      if (e.pointerType !== 'mouse') return;
+      if (hidAt) { if (Math.abs(e.clientX - hidAt.x) + Math.abs(e.clientY - hidAt.y) < 24) return; hidAt = null; }
+      showHud();
+    });
     document.addEventListener('keydown', function (e) {
       if (root.hidden || state === 'done') return;
       if (e.metaKey || e.ctrlKey || e.altKey || /^(Shift|Control|Alt|Meta|CapsLock|Tab)$/.test(e.key)) return;
