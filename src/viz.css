@@ -123,8 +123,8 @@
 .vz-foot { display: flex; flex-direction: column; gap: 3px; padding-top: 14px; font-family: var(--vz-mono); font-size: 10.5px; line-height: 1.6; color: var(--vz-ink-3); letter-spacing: .02em; }
 .vz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
 /* 全螢幕：整個畫面都給地圖，單指可以任意旋轉 */
-.vz.vz-full, .vz-body.vz-full { position: fixed; inset: 0; z-index: 200; background: var(--vz-bg); display: flex; flex-direction: column; }
-.vz-body.vz-full .vz-stage { flex: 1; height: auto; }
+.vz.vz-full, .vz-body.vz-full { position: fixed; inset: 0; z-index: 200; background: var(--vz-bg); display: flex; flex-direction: column; height: 100%; height: 100dvh; box-sizing: border-box; padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.vz-body.vz-full .vz-stage { flex: 1; height: auto; min-height: 0; }   /* 手機橫放時畫面很矮：不能有最小高度，不然底下的按鈕會被擠出畫面 */
 .vz-body.vz-full .vz-canvas { touch-action: none; }
 .vz-body.vz-full .vz-filters { position: static; padding-top: env(safe-area-inset-top); }
 html.vz-lock, html.vz-lock body { overflow: hidden; }

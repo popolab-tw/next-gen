@@ -1059,18 +1059,33 @@ var VIZ = (function () {
       var sz = stageSize(), upp = 2 * cam.hh / st.zoom / sz.h;
       st.panX -= dx * upp; st.panY += dy * upp; kick();
     }
-    function toggleFull() {
-      st.full = !st.full;
+    // 全螢幕：瀏覽器支援時用真正的全螢幕（手機上會藏起網址列）；不支援時（iPhone）只把地圖鋪滿畫面
+    function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+    var fsOurs = false;
+    function toggleFull(force) {
+      var on = force == null ? !st.full : !!force;
+      if (on === st.full) return;
+      st.full = on;
       host.classList.toggle('vz-full', st.full);
       document.documentElement.classList.toggle('vz-lock', st.full);
       fullBtn.innerHTML = st.full ? I_EXIT : I_FULL; fullBtn.setAttribute('aria-label', st.full ? '離開全螢幕' : '全螢幕'); fullBtn.title = st.full ? '離開全螢幕' : '全螢幕';
+      var req = host.requestFullscreen || host.webkitRequestFullscreen, ex = document.exitFullscreen || document.webkitExitFullscreen;
+      try {
+        if (on && req && !fsEl()) { var p = req.call(host, { navigationUI: 'hide' }); fsOurs = true; if (p && p.catch) p.catch(function () { fsOurs = false; }); }
+        else if (!on && fsOurs && fsEl() === host && ex) { var q = ex.call(document); if (q && q.catch) q.catch(function () { /* 忽略 */ }); }
+      } catch (e) { fsOurs = false; }
+      if (!on) fsOurs = false;
+      kick();
     }
+    function onFsChange() { if (fsOurs && fsEl() !== host) { fsOurs = false; toggleFull(false); } }   // 用返回鍵或 Esc 離開全螢幕：地圖也回到原位
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
     function onKey(e) {
       if (e.key !== 'Escape') return;
       if (!panel.hidden) { panel.hidden = true; setBtn.classList.remove('on'); }
       else if (st.sel >= 0) closeCard();
       else if (st.focus) goBack();
-      else if (st.full) toggleFull();
+      else if (st.full && !fsEl()) toggleFull(false);   // 真正的全螢幕由瀏覽器處理 Esc
     }
     document.addEventListener('keydown', onKey);
     function hideHint() { if (!hint.classList.contains('gone')) hint.classList.add('gone'); }
@@ -1348,6 +1363,7 @@ var VIZ = (function () {
         if (io) io.disconnect(); if (ro) ro.disconnect(); mo.disconnect();
         if (mq && mq.removeEventListener) mq.removeEventListener('change', onTheme);
         document.removeEventListener('keydown', onKey);
+        document.removeEventListener('fullscreenchange', onFsChange); document.removeEventListener('webkitfullscreenchange', onFsChange);
         document.documentElement.classList.remove('vz-lock');
         var ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext();
       },

@@ -102,24 +102,47 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-intro.ext .ng-title { cursor: default; }
 @keyframes ngPulse { 50% { opacity: .45; } }
 @keyframes ngIn { to { opacity: 1; } }
-.ng-skipall { position: relative; z-index: 1; margin-top: 26px; font-size: 12.5px; color: rgba(236, 236, 230, .6) !important; text-decoration: none; letter-spacing: .06em; border-bottom: 1px solid rgba(236, 236, 230, .25); padding-bottom: 1px; opacity: 0; animation: ngIn 1s ease 1.5s forwards; }
+.ng-skipall { position: relative; z-index: 1; margin-top: 20px; font-size: 12.5px; color: rgba(236, 236, 230, .6) !important; text-decoration: none; letter-spacing: .06em; border-bottom: 1px solid rgba(236, 236, 230, .25); padding-bottom: 1px; opacity: 0; animation: ngIn 1s ease 1.5s forwards; }
 .ng-skipall:hover, .ng-skipall:focus-visible { color: #ececE6 !important; border-bottom-color: #ececE6; outline: none; }
+/* 橫向全螢幕播放：標題畫面的第二個按鈕 */
+.ng-landbtn { position: relative; z-index: 1; margin-top: 16px; appearance: none; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border: 1px solid rgba(236, 236, 230, .45); border-radius: 999px; background: rgba(0, 0, 0, .35); color: #ececE6; font: 500 12.5px/1 var(--f-sans); letter-spacing: .1em; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; animation: ngIn 1s ease 1.3s forwards; -webkit-tap-highlight-color: transparent; }
+.ng-landbtn:hover, .ng-landbtn:focus-visible { border-color: #ececE6; background: rgba(236, 236, 230, .12); outline: none; }
+.ng-landbtn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.ng-intro.nomv .ng-landbtn, .ng-intro.ext .ng-landbtn { display: none; }
+/* 播放畫面（影片、暫停鍵、控制列、進度條）放在 ng-vp 裡：橫向播放時整塊轉 90 度 */
+.ng-vp { position: absolute; inset: 0; pointer-events: none; }   /* 本身不接點擊（標題畫面在它底下）；裡面要點的元素各自打開 */
 .ng-mv { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; pointer-events: none; }
 .ng-intro.on .ng-mv { opacity: 1; }
+.ng-intro.on.paused .ng-mv { opacity: .6; }
 .ng-mv video, .ng-yt, .ng-yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: contain; background: #000; }
 .ng-catch { position: absolute; inset: 0; display: none; }
-.ng-intro.playing .ng-catch { display: block; }
+.ng-intro.playing .ng-catch { display: block; pointer-events: auto; }
 .ng-intro.tap .ng-mv { opacity: 1; pointer-events: auto; }
 .ng-intro.tap .ng-catch, .ng-intro.tap .ng-wait { display: none !important; }
-.ng-hud { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 20px calc(18px + env(safe-area-inset-bottom, 0px)); display: none; align-items: center; gap: 10px; opacity: 0; transition: opacity .35s ease; }
+.ng-hud { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); display: none; align-items: center; gap: 10px; opacity: 0; transition: opacity .35s ease; pointer-events: none; }
 .ng-intro.playing .ng-hud { display: flex; }
-.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud { opacity: 1; }
+.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud, .ng-intro.playing.paused .ng-hud { opacity: 1; pointer-events: auto; }
+.ng-intro.rot .ng-hud { padding: 0 20px 18px; }   /* 手動轉 90 度時，手機的安全邊距方向不一樣，改用固定邊距 */
+/* 暫停鍵：點畫面叫出控制列時一起出現；暫停中一直顯示 */
+.ng-pause { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; padding: 0; appearance: none; border: 1px solid rgba(236, 236, 230, .6); border-radius: 50%; background: rgba(0, 0, 0, .45); color: #ececE6; display: none; place-items: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .35s ease, transform .2s ease; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); -webkit-tap-highlight-color: transparent; }
+.ng-intro.playing .ng-pause { display: grid; }
+.ng-intro.playing.hud .ng-pause, .ng-intro.playing.paused .ng-pause { opacity: 1; pointer-events: auto; }
+.ng-intro.tap .ng-pause, .ng-intro.playing.wait:not(.paused) .ng-pause { opacity: 0; pointer-events: none; }
+.ng-pause:hover { transform: scale(1.06); border-color: #ececE6; }
+.ng-pause:focus { outline: none; }
+.ng-pause:focus-visible { outline: 2px solid #ececE6; outline-offset: 4px; }
+.ng-pause svg { width: 22px; height: 22px; fill: currentColor; }
+.ng-pause .i-play { display: none; margin-left: 3px; }
+.ng-intro.paused .ng-pause .i-play { display: block; }
+.ng-intro.paused .ng-pause .i-pause { display: none; }
 .ng-hb { appearance: none; height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; border: 1px solid rgba(236, 236, 230, .45); border-radius: 999px; background: rgba(0, 0, 0, .45); color: #ececE6; font: 500 12.5px/1 var(--f-sans); letter-spacing: .08em; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .ng-hb:hover { border-color: #ececE6; }
 .ng-hb:focus { outline: none; }
 .ng-hb:focus-visible { outline: 2px solid #ececE6; outline-offset: 2px; }
 .ng-hb svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-.ng-skip { margin-left: auto; }
+.ng-fs { margin-left: auto; }
+.ng-fs .i-out, .ng-intro.land .ng-fs .i-in { display: none; }
+.ng-intro.land .ng-fs .i-out { display: block; }
 .ng-esc { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: rgba(236, 236, 230, .5); }
 .ng-tapmsg { position: absolute; left: 50%; top: calc(50% + 64px); transform: translateX(-50%); font-size: 13px; letter-spacing: .06em; background: rgba(0, 0, 0, .6); padding: 7px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
 .ng-wait { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 1.5px solid rgba(236, 236, 230, .2); border-top-color: #ececE6; border-radius: 50%; animation: ngSpin .9s linear infinite; display: none; pointer-events: none; }

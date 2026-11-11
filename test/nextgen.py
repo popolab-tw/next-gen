@@ -31,12 +31,12 @@ BASE = 'http://127.0.0.1:%d/map/' % port
 MOCK = """
 window.__yt = { calls: [] };
 window.YT = { Player: function (el, o) {
-  var self = this, t = 0, muted = false, dur = 3, iv = 0;
+  var self = this, t = 0, muted = false, dur = window.__ytDur || 3, iv = 0;
   var f = document.createElement('iframe'); el.parentNode.replaceChild(f, el); window.__yt.opts = o;
   this.getIframe = function () { return f; };
   this.start = function () { o.events.onStateChange({ data: 1 }); clearInterval(iv); iv = setInterval(function () { t += 0.2; if (t >= dur) { clearInterval(iv); o.events.onStateChange({ data: 0 }); } }, 200); };
   this.playVideo = function () { window.__yt.calls.push('play'); if (window.__ytErr) { setTimeout(function () { o.events.onError({ data: 150 }); }, 100); return; } if (!window.__ytBlock) self.start(); };
-  this.pauseVideo = function () { window.__yt.calls.push('pause'); clearInterval(iv); };
+  this.pauseVideo = function () { window.__yt.calls.push('pause'); clearInterval(iv); o.events.onStateChange({ data: 2 }); };
   this.seekTo = function (s) { t = s; }; this.getCurrentTime = function () { return t; }; this.getDuration = function () { return dur; };
   this.mute = function () { muted = true; }; this.unMute = function () { muted = false; }; this.isMuted = function () { return muted; };
   var vol = 100; window.__yt.vols = []; this.getVolume = function () { return vol; }; this.setVolume = function (v) { vol = v; window.__yt.vols.push(v); };
@@ -85,6 +85,21 @@ with sync_playwright() as p:
         else: pg.mouse.move(300, 300); pg.mouse.move(320, 320)
         pg.wait_for_timeout(300)
         check(mode + ': 互動後出現「略過」', 'hud' in pg.evaluate(I + '.className'))
+        check(mode + ': 互動後出現暫停鍵', pg.evaluate("getComputedStyle(document.querySelector('.ng-pause')).pointerEvents") == 'auto' and float(pg.evaluate("getComputedStyle(document.querySelector('.ng-pause')).opacity")) > 0.5 and pg.evaluate("document.querySelector('.ng-pause').getAttribute('aria-label')") == '暫停')
+        pg.click('.ng-pause') if mode == 'desktop' else pg.tap('.ng-pause')
+        pg.wait_for_timeout(300)
+        t1 = pg.evaluate("document.querySelector('.ng-file').currentTime")
+        check(mode + ': 按暫停鍵暫停', 'paused' in pg.evaluate(I + '.className') and pg.evaluate("document.querySelector('.ng-file').paused") and pg.evaluate("document.querySelector('.ng-pause').getAttribute('aria-label')") == '繼續播放')
+        pg.wait_for_timeout(3600)
+        check(mode + ': 暫停中控制列不收起、影片不動', 'hud' in pg.evaluate(I + '.className') and abs(pg.evaluate("document.querySelector('.ng-file').currentTime") - t1) < 0.05)
+        pg.click('.ng-pause') if mode == 'desktop' else pg.tap('.ng-pause')
+        pg.wait_for_timeout(400)
+        check(mode + ': 再按一次繼續播放', 'paused' not in pg.evaluate(I + '.className') and not pg.evaluate("document.querySelector('.ng-file').paused"))
+        if mode == 'desktop':
+            pg.keyboard.press(' '); pg.wait_for_timeout(300)
+            sp1 = pg.evaluate("document.querySelector('.ng-file').paused")
+            pg.keyboard.press(' '); pg.wait_for_timeout(300)
+            check('desktop: 空白鍵暫停、再按繼續', sp1 and not pg.evaluate("document.querySelector('.ng-file').paused") and pg.evaluate("window.__ng.intro.state()") == 'play')
         pg.evaluate('window.__ng.viz._bare(true)')   # 軟體繪圖太慢，會拖住計時器；量音量時只畫海岸線與點
         if mode == 'mobile': pg.tap('.ng-skip')
         else: pg.keyboard.press('Escape')
@@ -148,6 +163,11 @@ with sync_playwright() as p:
             check(tag + ': 點了之後恢復', 'tap' not in pg.evaluate(I + '.className') and 'on' in pg.evaluate(I + '.className'))
         else:
             check(tag + ': 播放中', 'on' in pg.evaluate(I + '.className'))
+            pg.mouse.click(300, 300); pg.wait_for_timeout(200)
+            pg.click('.ng-pause'); pg.wait_for_timeout(300)
+            check(tag + ': 暫停鍵暫停 YouTube', 'paused' in pg.evaluate(I + '.className') and pg.evaluate('window.__yt.calls')[-1] == 'pause')
+            pg.click('.ng-pause'); pg.wait_for_timeout(300)
+            check(tag + ': 再按繼續', 'paused' not in pg.evaluate(I + '.className') and pg.evaluate('window.__yt.calls')[-1] == 'play' and 'on' in pg.evaluate(I + '.className'))
         pg.wait_for_timeout(5200)
         check(tag + ': 播到最後轉到地圖', pg.evaluate(I + '.hidden') and 'pause' in pg.evaluate('window.__yt.calls'))
         vols = pg.evaluate('window.__yt.vols')
@@ -162,6 +182,74 @@ with sync_playwright() as p:
         pg.goto(BASE + '_nomv.html'); pg.wait_for_timeout(1500)
         check('手機圓點：' + name, pg.evaluate("window.__ng.viz.state.prefs.dot") == want, pg.evaluate("window.__ng.viz.state.prefs.dot"))
         ctx.close()
+    # 控制列收起後：暫停鍵與「略過」點不到（手機上點一下是叫出控制列，不會誤按）
+    ctx = b.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, is_mobile=True)
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.add_init_script('window.__ytDur = 60;')
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1500)
+    pg.evaluate('window.__ng.viz._bare(true)')
+    pg.tap('.ng-play'); pg.wait_for_timeout(4200)
+    pe = pg.evaluate("[getComputedStyle(document.querySelector('.ng-pause')).pointerEvents, getComputedStyle(document.querySelector('.ng-hud')).pointerEvents, document.querySelector('#ng-intro').className]")
+    check('手機：控制列收起時，暫停鍵和略過點不到', pe[0] == 'none' and pe[1] == 'none' and 'hud' not in pe[2], pe)
+    sk = pg.evaluate("(() => { const r = document.querySelector('.ng-skip').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; })()")
+    pg.touchscreen.tap(sk[0], sk[1]); pg.wait_for_timeout(1300)
+    check('手機：點到隱形的「略過」位置只會叫出控制列', not pg.evaluate(I + '.hidden') and 'hud' in pg.evaluate(I + '.className'))
+    # 橫向全螢幕：按鈕在播放器的控制列裡也有
+    check('手機：控制列有「橫向全螢幕」', pg.evaluate("document.querySelector('.ng-fs span').textContent") in ('橫向全螢幕', '橫向播放'))
+    pg.tap('.ng-fs'); pg.wait_for_timeout(700)
+    lv = pg.evaluate("(() => { const v = document.querySelector('.ng-vp'), r = v.getBoundingClientRect(); return { land: window.__ng.intro.land(), rot: document.getElementById('ng-intro').classList.contains('rot'), w: v.offsetWidth, h: v.offsetHeight, bw: Math.round(r.width), bh: Math.round(r.height), tf: getComputedStyle(v).transform, fs: !!document.fullscreenElement, label: document.querySelector('.ng-fs span').textContent }; })()")
+    check('手機：橫向播放（畫面直的時把播放畫面轉 90 度、塞滿螢幕）', lv['land'] and lv['rot'] and lv['w'] == 844 and lv['h'] == 390 and lv['bw'] == 390 and lv['bh'] == 844 and lv['tf'] != 'none', lv)
+    check('手機：全螢幕中按鈕改成「離開全螢幕」', lv['label'] in ('離開全螢幕', '直向播放'), lv)
+    pg.tap('.ng-catch', position={'x': 100, 'y': 300}); pg.wait_for_timeout(200)
+    pg.tap('.ng-fs'); pg.wait_for_timeout(500)
+    lv2 = pg.evaluate("({ land: window.__ng.intro.land(), rot: document.getElementById('ng-intro').classList.contains('rot'), st: document.querySelector('.ng-vp').style.cssText, fs: !!document.fullscreenElement })")
+    check('手機：離開橫向，回到原本的畫面', not lv2['land'] and not lv2['rot'] and lv2['st'] == '' and not lv2['fs'], lv2)
+    check('手機（YouTube）：沒有錯誤', not errs, errs)
+    ctx.close()
+    # 標題畫面的「橫向全螢幕播放」：直接橫向播放；略過後回到直向、離開全螢幕
+    ctx = b.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, is_mobile=True)
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.add_init_script('window.__ytDur = 60;')
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1800)
+    check('手機：標題畫面有「橫向全螢幕播放」', pg.evaluate("document.querySelector('.ng-landbtn').offsetParent !== null") and pg.evaluate("document.querySelector('.ng-landbtn').innerText.trim()") in ('橫向全螢幕播放', '橫向播放'))
+    pg.tap('.ng-landbtn'); pg.wait_for_timeout(900)
+    check('手機：按下就橫向播放', 'on' in pg.evaluate(I + '.className') and pg.evaluate('window.__ng.intro.land()') and pg.evaluate("document.getElementById('ng-intro').classList.contains('rot')"))
+    pg.evaluate("document.querySelector('.ng-skip').click()"); pg.wait_for_timeout(2000)
+    lv3 = pg.evaluate("({ hidden: document.getElementById('ng-intro').hidden, land: window.__ng.intro.land(), fs: document.fullscreenElement && (document.fullscreenElement.id || document.fullscreenElement.className), st: document.querySelector('.ng-vp').style.cssText })")
+    check('手機：略過後回到直向、離開全螢幕', lv3 == {'hidden': True, 'land': False, 'fs': None, 'st': ''}, lv3)
+    check('手機（橫向）：沒有錯誤', not errs, errs)
+    ctx.close()
+    # 電腦：標題畫面是「全螢幕播放」，不轉 90 度
+    ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.add_init_script('window.__ytDur = 60;')
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1800)
+    check('電腦：標題畫面是「全螢幕播放」', pg.evaluate("document.querySelector('.ng-landbtn').innerText.trim()") == '全螢幕播放')
+    pg.click('.ng-landbtn'); pg.wait_for_timeout(900)
+    check('電腦：全螢幕播放、不轉 90 度', 'on' in pg.evaluate(I + '.className') and pg.evaluate('window.__ng.intro.land()') and not pg.evaluate("document.getElementById('ng-intro').classList.contains('rot')"))
+    check('電腦（全螢幕）：沒有錯誤', not errs, errs)
+    ctx.close()
+    # 地圖全螢幕：手機橫放時，按鈕列和圖例都在畫面裡
+    ctx = b.new_context(viewport={'width': 844, 'height': 390}, has_touch=True, is_mobile=True)
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.route('**/*', route)
+    pg.goto(BASE + '_nomv.html'); pg.wait_for_timeout(2000)
+    pg.tap('.vz-ctl .vz-btn[aria-label="全螢幕"]'); pg.wait_for_timeout(600)
+    fv = pg.evaluate("""(() => { const H = innerHeight, W = innerWidth, inV = e => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.bottom <= H + 0.5 && r.left >= 0 && r.right <= W + 0.5; };
+      return { full: document.querySelector('.vz-body').classList.contains('vz-full'), btns: [...document.querySelectorAll('.vz-ctl .vz-btn')].every(inV), legend: inV(document.querySelector('.vz-legend')), tabs: inV(document.querySelector('.vz-filters')), H }; })()""")
+    check('地圖全螢幕（手機橫放）：按鈕列、圖例、分法列都在畫面裡', fv['full'] and fv['btns'] and fv['legend'] and fv['tabs'], fv)
+    pg.tap('.vz-ctl .vz-btn[aria-label="離開全螢幕"]'); pg.wait_for_timeout(1000)
+    fx = pg.evaluate("({ full: document.querySelector('.vz-body').classList.contains('vz-full'), fs: document.fullscreenElement && (document.fullscreenElement.id || document.fullscreenElement.className) })")
+    check('地圖全螢幕：可以離開', fx == {'full': False, 'fs': None}, fx)
+    check('地圖全螢幕：沒有錯誤', not errs, errs)
+    ctx.close()
     # YouTube 回報錯誤（例如不允許嵌入）：轉到地圖、提示，之後 MV 按鈕改開 YouTube 新分頁
     ctx = b.new_context(viewport={'width': 1280, 'height': 800})
     pg = ctx.new_page(); errs = []

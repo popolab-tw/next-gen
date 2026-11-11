@@ -149,8 +149,8 @@
 .vz-foot { display: flex; flex-direction: column; gap: 3px; padding-top: 14px; font-family: var(--vz-mono); font-size: 10.5px; line-height: 1.6; color: var(--vz-ink-3); letter-spacing: .02em; }
 .vz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
 /* 全螢幕：整個畫面都給地圖，單指可以任意旋轉 */
-.vz.vz-full, .vz-body.vz-full { position: fixed; inset: 0; z-index: 200; background: var(--vz-bg); display: flex; flex-direction: column; }
-.vz-body.vz-full .vz-stage { flex: 1; height: auto; }
+.vz.vz-full, .vz-body.vz-full { position: fixed; inset: 0; z-index: 200; background: var(--vz-bg); display: flex; flex-direction: column; height: 100%; height: 100dvh; box-sizing: border-box; padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.vz-body.vz-full .vz-stage { flex: 1; height: auto; min-height: 0; }   /* 手機橫放時畫面很矮：不能有最小高度，不然底下的按鈕會被擠出畫面 */
 .vz-body.vz-full .vz-canvas { touch-action: none; }
 .vz-body.vz-full .vz-filters { position: static; padding-top: env(safe-area-inset-top); }
 html.vz-lock, html.vz-lock body { overflow: hidden; }
@@ -287,24 +287,47 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-intro.ext .ng-title { cursor: default; }
 @keyframes ngPulse { 50% { opacity: .45; } }
 @keyframes ngIn { to { opacity: 1; } }
-.ng-skipall { position: relative; z-index: 1; margin-top: 26px; font-size: 12.5px; color: rgba(236, 236, 230, .6) !important; text-decoration: none; letter-spacing: .06em; border-bottom: 1px solid rgba(236, 236, 230, .25); padding-bottom: 1px; opacity: 0; animation: ngIn 1s ease 1.5s forwards; }
+.ng-skipall { position: relative; z-index: 1; margin-top: 20px; font-size: 12.5px; color: rgba(236, 236, 230, .6) !important; text-decoration: none; letter-spacing: .06em; border-bottom: 1px solid rgba(236, 236, 230, .25); padding-bottom: 1px; opacity: 0; animation: ngIn 1s ease 1.5s forwards; }
 .ng-skipall:hover, .ng-skipall:focus-visible { color: #ececE6 !important; border-bottom-color: #ececE6; outline: none; }
+/* 橫向全螢幕播放：標題畫面的第二個按鈕 */
+.ng-landbtn { position: relative; z-index: 1; margin-top: 16px; appearance: none; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px; border: 1px solid rgba(236, 236, 230, .45); border-radius: 999px; background: rgba(0, 0, 0, .35); color: #ececE6; font: 500 12.5px/1 var(--f-sans); letter-spacing: .1em; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; animation: ngIn 1s ease 1.3s forwards; -webkit-tap-highlight-color: transparent; }
+.ng-landbtn:hover, .ng-landbtn:focus-visible { border-color: #ececE6; background: rgba(236, 236, 230, .12); outline: none; }
+.ng-landbtn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.ng-intro.nomv .ng-landbtn, .ng-intro.ext .ng-landbtn { display: none; }
+/* 播放畫面（影片、暫停鍵、控制列、進度條）放在 ng-vp 裡：橫向播放時整塊轉 90 度 */
+.ng-vp { position: absolute; inset: 0; pointer-events: none; }   /* 本身不接點擊（標題畫面在它底下）；裡面要點的元素各自打開 */
 .ng-mv { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; pointer-events: none; }
 .ng-intro.on .ng-mv { opacity: 1; }
+.ng-intro.on.paused .ng-mv { opacity: .6; }
 .ng-mv video, .ng-yt, .ng-yt iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; object-fit: contain; background: #000; }
 .ng-catch { position: absolute; inset: 0; display: none; }
-.ng-intro.playing .ng-catch { display: block; }
+.ng-intro.playing .ng-catch { display: block; pointer-events: auto; }
 .ng-intro.tap .ng-mv { opacity: 1; pointer-events: auto; }
 .ng-intro.tap .ng-catch, .ng-intro.tap .ng-wait { display: none !important; }
-.ng-hud { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 20px calc(18px + env(safe-area-inset-bottom, 0px)); display: none; align-items: center; gap: 10px; opacity: 0; transition: opacity .35s ease; }
+.ng-hud { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 max(20px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px)); display: none; align-items: center; gap: 10px; opacity: 0; transition: opacity .35s ease; pointer-events: none; }
 .ng-intro.playing .ng-hud { display: flex; }
-.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud { opacity: 1; }
+.ng-intro.playing.hud .ng-hud, .ng-intro.playing.wait .ng-hud, .ng-intro.playing.paused .ng-hud { opacity: 1; pointer-events: auto; }
+.ng-intro.rot .ng-hud { padding: 0 20px 18px; }   /* 手動轉 90 度時，手機的安全邊距方向不一樣，改用固定邊距 */
+/* 暫停鍵：點畫面叫出控制列時一起出現；暫停中一直顯示 */
+.ng-pause { position: absolute; left: 50%; top: 50%; width: 64px; height: 64px; margin: -32px 0 0 -32px; padding: 0; appearance: none; border: 1px solid rgba(236, 236, 230, .6); border-radius: 50%; background: rgba(0, 0, 0, .45); color: #ececE6; display: none; place-items: center; cursor: pointer; opacity: 0; pointer-events: none; transition: opacity .35s ease, transform .2s ease; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); -webkit-tap-highlight-color: transparent; }
+.ng-intro.playing .ng-pause { display: grid; }
+.ng-intro.playing.hud .ng-pause, .ng-intro.playing.paused .ng-pause { opacity: 1; pointer-events: auto; }
+.ng-intro.tap .ng-pause, .ng-intro.playing.wait:not(.paused) .ng-pause { opacity: 0; pointer-events: none; }
+.ng-pause:hover { transform: scale(1.06); border-color: #ececE6; }
+.ng-pause:focus { outline: none; }
+.ng-pause:focus-visible { outline: 2px solid #ececE6; outline-offset: 4px; }
+.ng-pause svg { width: 22px; height: 22px; fill: currentColor; }
+.ng-pause .i-play { display: none; margin-left: 3px; }
+.ng-intro.paused .ng-pause .i-play { display: block; }
+.ng-intro.paused .ng-pause .i-pause { display: none; }
 .ng-hb { appearance: none; height: 34px; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; border: 1px solid rgba(236, 236, 230, .45); border-radius: 999px; background: rgba(0, 0, 0, .45); color: #ececE6; font: 500 12.5px/1 var(--f-sans); letter-spacing: .08em; cursor: pointer; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .ng-hb:hover { border-color: #ececE6; }
 .ng-hb:focus { outline: none; }
 .ng-hb:focus-visible { outline: 2px solid #ececE6; outline-offset: 2px; }
 .ng-hb svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-.ng-skip { margin-left: auto; }
+.ng-fs { margin-left: auto; }
+.ng-fs .i-out, .ng-intro.land .ng-fs .i-in { display: none; }
+.ng-intro.land .ng-fs .i-out { display: block; }
 .ng-esc { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: rgba(236, 236, 230, .5); }
 .ng-tapmsg { position: absolute; left: 50%; top: calc(50% + 64px); transform: translateX(-50%); font-size: 13px; letter-spacing: .06em; background: rgba(0, 0, 0, .6); padding: 7px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
 .ng-wait { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 1.5px solid rgba(236, 236, 230, .2); border-top-color: #ececE6; border-radius: 50%; animation: ngSpin .9s linear infinite; display: none; pointer-events: none; }
@@ -356,18 +379,23 @@ window.NEXTGEN = {"mv":{"yt":"GtedN8SQCFM","len":"3 分半"}};</script>
   <div class="ng-title">
     <img class="ng-kv" src="kv-1920.webp" width="1920" height="1080" alt="NEXT GEN 生育門檻可視化網頁" fetchpriority="high" decoding="async">
     <button class="ng-play" type="button"><span class="ng-play-c" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 3.2v13.6L16.4 10z"/></svg></span><span class="ng-play-t"><span class="k-key">點一下或按任意鍵，播放 MV</span><span class="k-tap">點一下，播放 MV</span></span><span class="ng-play-s">有聲音・約 3 分半</span></button>
+    <button class="ng-landbtn" type="button"><svg class="k-tap" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="5.5" width="16" height="9" rx="1.6"/><path d="M15.5 8.5v3"/></svg><svg class="k-key" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12"/></svg><span class="k-tap ng-land-t">橫向全螢幕播放</span><span class="k-key">全螢幕播放</span></button>
     <a class="ng-skipall" href="#map">略過 MV，直接看地圖 →</a>
   </div>
-  <div class="ng-mv"></div>
-  <div class="ng-wait" aria-hidden="true"></div>
-  <div class="ng-catch" aria-hidden="true"></div>
-  <p class="ng-tapmsg" hidden>瀏覽器擋住了自動播放，請點影片中間的播放鍵</p>
-  <div class="ng-hud">
-    <button class="ng-hb ng-mute" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3h-2.5z"/><path d="M11 5.5c1 1.3 1 3.7 0 5M12.8 3.8c2 2.4 2 6 0 8.4"/></svg><span>靜音</span></button>
-    <span class="ng-esc">ESC 略過</span>
-    <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
+  <div class="ng-vp">
+    <div class="ng-mv"></div>
+    <div class="ng-wait" aria-hidden="true"></div>
+    <div class="ng-catch" aria-hidden="true"></div>
+    <button class="ng-pause" type="button" aria-label="暫停"><svg class="i-pause" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="3.5" width="3.2" height="13" rx=".6"/><rect x="11.8" y="3.5" width="3.2" height="13" rx=".6"/></svg><svg class="i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg></button>
+    <p class="ng-tapmsg" hidden>瀏覽器擋住了自動播放，請點影片中間的播放鍵</p>
+    <div class="ng-hud">
+      <button class="ng-hb ng-mute" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3h-2.5z"/><path d="M11 5.5c1 1.3 1 3.7 0 5M12.8 3.8c2 2.4 2 6 0 8.4"/></svg><span>靜音</span></button>
+      <span class="ng-esc">ESC 略過・空白鍵 暫停</span>
+      <button class="ng-hb ng-fs" type="button"><svg class="i-in" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5"/></svg><span>全螢幕</span></button>
+      <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
+    </div>
+    <div class="ng-prog" aria-hidden="true"><i></i></div>
   </div>
-  <div class="ng-prog" aria-hidden="true"><i></i></div>
 </div>
 <header class="ng-top"><div class="ng-in">
   <a class="ng-brand" href="./" aria-label="NEXT GEN 生育門檻可視化網頁"><span class="ng-word">NEXT GEN</span><span class="ng-sub">生育門檻可視化</span></a>
@@ -1973,18 +2001,33 @@ var VIZ = (function () {
       var sz = stageSize(), upp = 2 * cam.hh / st.zoom / sz.h;
       st.panX -= dx * upp; st.panY += dy * upp; kick();
     }
-    function toggleFull() {
-      st.full = !st.full;
+    // 全螢幕：瀏覽器支援時用真正的全螢幕（手機上會藏起網址列）；不支援時（iPhone）只把地圖鋪滿畫面
+    function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+    var fsOurs = false;
+    function toggleFull(force) {
+      var on = force == null ? !st.full : !!force;
+      if (on === st.full) return;
+      st.full = on;
       host.classList.toggle('vz-full', st.full);
       document.documentElement.classList.toggle('vz-lock', st.full);
       fullBtn.innerHTML = st.full ? I_EXIT : I_FULL; fullBtn.setAttribute('aria-label', st.full ? '離開全螢幕' : '全螢幕'); fullBtn.title = st.full ? '離開全螢幕' : '全螢幕';
+      var req = host.requestFullscreen || host.webkitRequestFullscreen, ex = document.exitFullscreen || document.webkitExitFullscreen;
+      try {
+        if (on && req && !fsEl()) { var p = req.call(host, { navigationUI: 'hide' }); fsOurs = true; if (p && p.catch) p.catch(function () { fsOurs = false; }); }
+        else if (!on && fsOurs && fsEl() === host && ex) { var q = ex.call(document); if (q && q.catch) q.catch(function () { /* 忽略 */ }); }
+      } catch (e) { fsOurs = false; }
+      if (!on) fsOurs = false;
+      kick();
     }
+    function onFsChange() { if (fsOurs && fsEl() !== host) { fsOurs = false; toggleFull(false); } }   // 用返回鍵或 Esc 離開全螢幕：地圖也回到原位
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
     function onKey(e) {
       if (e.key !== 'Escape') return;
       if (!panel.hidden) { panel.hidden = true; setBtn.classList.remove('on'); }
       else if (st.sel >= 0) closeCard();
       else if (st.focus) goBack();
-      else if (st.full) toggleFull();
+      else if (st.full && !fsEl()) toggleFull(false);   // 真正的全螢幕由瀏覽器處理 Esc
     }
     document.addEventListener('keydown', onKey);
     function hideHint() { if (!hint.classList.contains('gone')) hint.classList.add('gone'); }
@@ -2262,6 +2305,7 @@ var VIZ = (function () {
         if (io) io.disconnect(); if (ro) ro.disconnect(); mo.disconnect();
         if (mq && mq.removeEventListener) mq.removeEventListener('change', onTheme);
         document.removeEventListener('keydown', onKey);
+        document.removeEventListener('fullscreenchange', onFsChange); document.removeEventListener('webkitfullscreenchange', onFsChange);
         document.documentElement.classList.remove('vz-lock');
         var ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext();
       },
@@ -2330,7 +2374,7 @@ var NG = (function () {
   }
 
   // ---------- 播放器：YouTube 或影片檔，對外介面一樣 ----------
-  // ev: { playing, waiting, ended, error, time(cur, dur) }
+  // ev: { playing, waiting, paused, ended, error, muted, time(cur, dur) }
   function filePlayer(host, mv, ev) {
     var v = h('video', { class: 'ng-file', playsinline: '', preload: 'metadata' });
     v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
@@ -2342,6 +2386,7 @@ var NG = (function () {
     v.addEventListener('playing', function () { ev.playing(); });
     v.addEventListener('waiting', function () { ev.waiting(); });
     v.addEventListener('ended', function () { ev.ended(); });
+    v.addEventListener('pause', function () { if (!v.ended) ev.paused(); });
     v.addEventListener('error', function () { ev.error('file'); });
     v.addEventListener('timeupdate', function () { ev.time(v.currentTime, v.duration || 0); });
     var fd = fader(function () { return v.volume; }, function (x) { v.volume = Math.max(0, Math.min(1, x)); });
@@ -2349,6 +2394,8 @@ var NG = (function () {
       ready: function () { return true; },
       play: function () { var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; ev.muted(true); v.play().catch(function () { ev.error('blocked'); }); }); },
       fade: function (ms) { fd.out(ms); },
+      pause: function () { try { v.pause(); } catch (e) { /* 忽略 */ } },
+      resume: function () { var p = v.play(); if (p && p.catch) p.catch(function () { /* 忽略 */ }); },
       stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } fd.restore(); },
       mute: function (m) { v.muted = m; },
       muted: function () { return v.muted; },
@@ -2395,7 +2442,7 @@ var NG = (function () {
               if (e.data === 1) { ev.playing(); clearInterval(poll); poll = setInterval(tick, 200); }
               else if (e.data === 3) ev.waiting();
               else if (e.data === 0) { clearInterval(poll); ev.ended(); }
-              else if (e.data === 2) clearInterval(poll);
+              else if (e.data === 2) { clearInterval(poll); ev.paused(); }
             },
             onError: function (e) { fail('yt-' + (e && e.data)); }
           }
@@ -2407,6 +2454,8 @@ var NG = (function () {
       failed: function () { return failed; },
       play: function () { want = true; attach(); if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
       fade: function (ms) { if (isReady && !failed) fd.out(ms); },
+      pause: function () { if (isReady) { try { P.pauseVideo(); } catch (e) { /* 忽略 */ } } },
+      resume: function () { if (isReady) { try { P.playVideo(); } catch (e) { /* 忽略 */ } } },
       stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } fd.restore(); } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
@@ -2422,13 +2471,15 @@ var NG = (function () {
     var title = root.querySelector('.ng-title'), stageEl = root.querySelector('.ng-mv'), hud = root.querySelector('.ng-hud');
     var skipBtn = root.querySelector('.ng-skip'), muteBtn = root.querySelector('.ng-mute'), bar = root.querySelector('.ng-prog i'), tapMsg = root.querySelector('.ng-tapmsg');
     var playBtn = root.querySelector('.ng-play'), skipAll = root.querySelector('.ng-skipall');
+    var landBtn = root.querySelector('.ng-landbtn'), pauseBtn = root.querySelector('.ng-pause'), fsBtn = root.querySelector('.ng-fs'), vp = root.querySelector('.ng-vp');
     var state = 'title', hudT = 0, startT = 0, player = null, nearEnd = false;
     var has = !!(mv.yt || mv.src);
     // ext：MV 不在這頁播，改到 YouTube 新分頁看（claude.ai 預覽版不能內嵌 YouTube；正式網站播放失敗時也改成這樣）
     var ext = !!(mv.yt && mv.ext);
     var ev = {
-      playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); },
+      playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap', 'paused'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); syncPause(); },
       waiting: function () { root.classList.add('wait'); },
+      paused: function () { if (state !== 'play' || !root.classList.contains('on')) return; root.classList.add('paused'); root.classList.remove('wait'); syncPause(); showHud(); },
       ended: function () { done(); },
       error: function (why) { if (mv.yt) setExt(); if (state === 'play') done('fail'); else if (state === 'title' && !mv.yt) noMv(); },
       muted: function () { syncMute(); },
@@ -2452,21 +2503,82 @@ var NG = (function () {
     function showHud() {
       if (state !== 'play') return;
       root.classList.add('hud'); clearTimeout(hudT);
-      hudT = setTimeout(function () { root.classList.remove('hud'); }, 3200);
+      hudT = setTimeout(function () { if (!root.classList.contains('paused')) root.classList.remove('hud'); }, 3200);   // 暫停中控制列不自動收起
     }
+    // ---- 暫停／繼續 ----
+    function isPaused() { return root.classList.contains('paused'); }
+    function syncPause() { var p = isPaused(); pauseBtn.setAttribute('aria-label', p ? '繼續播放' : '暫停'); pauseBtn.title = p ? '繼續播放' : '暫停'; }
+    function togglePause() {
+      if (state !== 'play' || !player || !root.classList.contains('on')) return;
+      if (isPaused()) { root.classList.remove('paused'); syncPause(); player.resume(); showHud(); }
+      else { player.pause(); root.classList.add('paused'); syncPause(); showHud(); }
+    }
+
+    // ---- 橫向全螢幕 ----
+    // 手機：全螢幕（藏起網址列）＋鎖成橫向；不支援全螢幕的瀏覽器（例如 iPhone 的 Safari）改把播放畫面轉 90 度，
+    // 觀眾把手機往左轉（上緣朝左）就是橫向。電腦：一般的全螢幕。
+    var touch = (function () { try { return matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
+    var land = false, fsOurs = false;
+    var reqFs = root.requestFullscreen || root.webkitRequestFullscreen;
+    function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+    if (touch && !reqFs) { landBtn.querySelector('.ng-land-t').textContent = '橫向播放'; }
+    function syncFs() {
+      var t = land ? (reqFs ? '離開全螢幕' : '直向播放') : (touch ? (reqFs ? '橫向全螢幕' : '橫向播放') : '全螢幕');
+      fsBtn.querySelector('span').textContent = t; fsBtn.setAttribute('aria-pressed', land ? 'true' : 'false');
+    }
+    syncFs();
+    function layoutLand() {
+      var W = root.clientWidth, H = root.clientHeight;
+      if (land && touch && H > W) {   // 畫面還是直的（鎖不住橫向，或不支援全螢幕）：播放畫面轉 90 度
+        vp.style.cssText = 'inset:auto;left:50%;top:50%;width:' + H + 'px;height:' + W + 'px;transform:translate(-50%,-50%) rotate(90deg)';
+        root.classList.add('rot');
+      } else { vp.style.cssText = ''; root.classList.remove('rot'); }
+    }
+    function lockLand() {
+      if (!touch) return;
+      try { var o = screen.orientation; if (o && o.lock) { var p = o.lock('landscape'); if (p && p.catch) p.catch(function () { /* 鎖不住：用轉 90 度的畫面 */ }); } } catch (e) { /* 忽略 */ }
+    }
+    function enterLand() {
+      if (land) return;
+      land = true; root.classList.add('land');
+      if (reqFs && !fsEl()) {
+        try {
+          var p = reqFs.call(root, { navigationUI: 'hide' });
+          fsOurs = true;
+          if (p && p.then) p.then(lockLand, function () { fsOurs = false; });
+          else setTimeout(lockLand, 200);
+        } catch (e) { fsOurs = false; }
+      }
+      layoutLand(); setTimeout(layoutLand, 400); syncFs();
+    }
+    function leaveLand() {
+      if (!land) return;
+      land = false; root.classList.remove('land');
+      try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { /* 忽略 */ }
+      if (fsOurs && fsEl() === root) {
+        var ex = document.exitFullscreen || document.webkitExitFullscreen;
+        try { var p = ex.call(document); if (p && p.catch) p.catch(function () { /* 忽略 */ }); } catch (e) { /* 忽略 */ }
+      }
+      fsOurs = false; layoutLand(); syncFs();
+    }
+    function onFsChange() { if (fsOurs && fsEl() !== root) { fsOurs = false; leaveLand(); } else layoutLand(); }   // 觀眾用返回鍵離開全螢幕：回到直向
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    window.addEventListener('resize', layoutLand);
+    window.addEventListener('orientationchange', function () { setTimeout(layoutLand, 250); });
     function syncMute() { if (!player) return; var m = player.muted(); muteBtn.setAttribute('aria-pressed', m ? 'true' : 'false'); muteBtn.querySelector('span').textContent = m ? '開聲音' : '靜音'; }
     function play() {
       if (state !== 'title') return;
       if (ext) { openYT(); done(); return; }
       if (!has || (player.failed && player.failed())) { done(); return; }
       state = 'play'; nearEnd = false;
-      root.classList.add('playing', 'wait'); root.classList.remove('on');
+      root.classList.add('playing', 'wait'); root.classList.remove('on', 'paused'); syncPause();
       bar.style.transform = 'scaleX(0)';
       player.play();
       // 3.5 秒還沒開始：可能是手機擋了自動播放 → 讓觀眾直接點影片
       clearTimeout(startT);
       startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { if (mv.yt) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } else root.classList.add('hud'); } }, 3500);
-      setTimeout(function () { if (state === 'play') skipBtn.focus({ preventScroll: true }); }, 60);
+      setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
     function done(why) {
       if (state === 'done') return;
@@ -2478,7 +2590,8 @@ var NG = (function () {
       if (viz && viz.intro) viz.intro(wasPlay ? 3000 : 2400);
       setTimeout(function () {
         if (player) player.stop();
-        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap'); tapMsg.hidden = true;
+        leaveLand();
+        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap', 'paused'); tapMsg.hidden = true;
         lock(false);
         if (document.activeElement && root.contains(document.activeElement)) document.activeElement.blur();
       }, 950);
@@ -2487,31 +2600,41 @@ var NG = (function () {
     function open(direct) {
       if (direct && ext) { openYT(); return; }
       state = 'title'; root.hidden = false; lock(true);
-      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap');
+      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap', 'paused');
       if (direct) play();
       else setTimeout(function () { playBtn.focus({ preventScroll: true }); }, 30);
     }
 
     // 標題畫面：點任何地方（「直接看地圖」除外）或按任意鍵 → 播放
-    title.addEventListener('click', function (e) { if (e.target.closest('.ng-skipall')) return; if (ext && !e.target.closest('.ng-play')) return; play(); });
+    title.addEventListener('click', function (e) {
+      if (e.target.closest('.ng-skipall')) return;
+      if (e.target.closest('.ng-landbtn')) { if (!ext && has) enterLand(); play(); return; }   // 先進全螢幕（要在點擊當下），再播放
+      if (ext && !e.target.closest('.ng-play')) return;
+      play();
+    });
+    pauseBtn.addEventListener('click', function (e) { e.stopPropagation(); togglePause(); });
+    fsBtn.addEventListener('click', function (e) { e.stopPropagation(); if (land) leaveLand(); else enterLand(); showHud(); });
     skipAll.addEventListener('click', function (e) { e.preventDefault(); done(); });
     skipBtn.addEventListener('click', function (e) { e.stopPropagation(); done(); });
     muteBtn.addEventListener('click', function (e) { e.stopPropagation(); if (player) { player.mute(!player.muted()); setTimeout(syncMute, 120); } showHud(); });
     root.querySelector('.ng-catch').addEventListener('click', function () { showHud(); });
-    root.addEventListener('mousemove', function () { showHud(); });
+    // 只有真的滑鼠移動才叫出控制列：手機點一下時瀏覽器也會補發 mousemove，會讓隱形的「略過」在同一下被按到
+    root.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') showHud(); });
     document.addEventListener('keydown', function (e) {
       if (root.hidden || state === 'done') return;
       if (e.metaKey || e.ctrlKey || e.altKey || /^(Shift|Control|Alt|Meta|CapsLock|Tab)$/.test(e.key)) return;
       if (state === 'title') {
         if (ext) { if (e.key === 'Escape') { e.preventDefault(); done(); } return; }   // 開新分頁只交給按鈕本身（Enter／空白鍵）
-        if (document.activeElement === skipAll && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結自己處理
+        if ((document.activeElement === skipAll || document.activeElement === landBtn) && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結／按鈕自己處理
         e.preventDefault(); play(); return;
       }
-      if (e.key === 'Escape') { e.preventDefault(); done(); return; }
-      if ((e.key === 'Enter' || e.key === ' ') && (document.activeElement === skipBtn || document.activeElement === muteBtn)) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
+      if (e.key === 'Escape') { if (fsEl()) return; e.preventDefault(); done(); return; }   // 全螢幕中的 Esc 交給瀏覽器離開全螢幕，不略過 MV
+      var hb = document.activeElement === skipBtn || document.activeElement === muteBtn || document.activeElement === fsBtn;
+      if ((e.key === 'Enter' || e.key === ' ') && hb) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
+      if (e.key === ' ' || e.key === 'k' || e.key === 'K' || (e.key === 'Enter' && document.activeElement === pauseBtn)) { e.preventDefault(); togglePause(); return; }
       e.preventDefault(); showHud();
     });
-    return { open: open, skip: function () { done(); }, state: function () { return state; } };
+    return { open: open, skip: function () { done(); }, state: function () { return state; }, land: function () { return land; } };
   }
 
   // ---------- 啟動 ----------

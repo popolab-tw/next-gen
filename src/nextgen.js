@@ -38,7 +38,7 @@ var NG = (function () {
   }
 
   // ---------- 播放器：YouTube 或影片檔，對外介面一樣 ----------
-  // ev: { playing, waiting, ended, error, time(cur, dur) }
+  // ev: { playing, waiting, paused, ended, error, muted, time(cur, dur) }
   function filePlayer(host, mv, ev) {
     var v = h('video', { class: 'ng-file', playsinline: '', preload: 'metadata' });
     v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
@@ -50,6 +50,7 @@ var NG = (function () {
     v.addEventListener('playing', function () { ev.playing(); });
     v.addEventListener('waiting', function () { ev.waiting(); });
     v.addEventListener('ended', function () { ev.ended(); });
+    v.addEventListener('pause', function () { if (!v.ended) ev.paused(); });
     v.addEventListener('error', function () { ev.error('file'); });
     v.addEventListener('timeupdate', function () { ev.time(v.currentTime, v.duration || 0); });
     var fd = fader(function () { return v.volume; }, function (x) { v.volume = Math.max(0, Math.min(1, x)); });
@@ -57,6 +58,8 @@ var NG = (function () {
       ready: function () { return true; },
       play: function () { var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; ev.muted(true); v.play().catch(function () { ev.error('blocked'); }); }); },
       fade: function (ms) { fd.out(ms); },
+      pause: function () { try { v.pause(); } catch (e) { /* 忽略 */ } },
+      resume: function () { var p = v.play(); if (p && p.catch) p.catch(function () { /* 忽略 */ }); },
       stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } fd.restore(); },
       mute: function (m) { v.muted = m; },
       muted: function () { return v.muted; },
@@ -103,7 +106,7 @@ var NG = (function () {
               if (e.data === 1) { ev.playing(); clearInterval(poll); poll = setInterval(tick, 200); }
               else if (e.data === 3) ev.waiting();
               else if (e.data === 0) { clearInterval(poll); ev.ended(); }
-              else if (e.data === 2) clearInterval(poll);
+              else if (e.data === 2) { clearInterval(poll); ev.paused(); }
             },
             onError: function (e) { fail('yt-' + (e && e.data)); }
           }
@@ -115,6 +118,8 @@ var NG = (function () {
       failed: function () { return failed; },
       play: function () { want = true; attach(); if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
       fade: function (ms) { if (isReady && !failed) fd.out(ms); },
+      pause: function () { if (isReady) { try { P.pauseVideo(); } catch (e) { /* 忽略 */ } } },
+      resume: function () { if (isReady) { try { P.playVideo(); } catch (e) { /* 忽略 */ } } },
       stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } fd.restore(); } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
@@ -130,13 +135,15 @@ var NG = (function () {
     var title = root.querySelector('.ng-title'), stageEl = root.querySelector('.ng-mv'), hud = root.querySelector('.ng-hud');
     var skipBtn = root.querySelector('.ng-skip'), muteBtn = root.querySelector('.ng-mute'), bar = root.querySelector('.ng-prog i'), tapMsg = root.querySelector('.ng-tapmsg');
     var playBtn = root.querySelector('.ng-play'), skipAll = root.querySelector('.ng-skipall');
+    var landBtn = root.querySelector('.ng-landbtn'), pauseBtn = root.querySelector('.ng-pause'), fsBtn = root.querySelector('.ng-fs'), vp = root.querySelector('.ng-vp');
     var state = 'title', hudT = 0, startT = 0, player = null, nearEnd = false;
     var has = !!(mv.yt || mv.src);
     // ext：MV 不在這頁播，改到 YouTube 新分頁看（claude.ai 預覽版不能內嵌 YouTube；正式網站播放失敗時也改成這樣）
     var ext = !!(mv.yt && mv.ext);
     var ev = {
-      playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); },
+      playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap', 'paused'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); syncPause(); },
       waiting: function () { root.classList.add('wait'); },
+      paused: function () { if (state !== 'play' || !root.classList.contains('on')) return; root.classList.add('paused'); root.classList.remove('wait'); syncPause(); showHud(); },
       ended: function () { done(); },
       error: function (why) { if (mv.yt) setExt(); if (state === 'play') done('fail'); else if (state === 'title' && !mv.yt) noMv(); },
       muted: function () { syncMute(); },
@@ -160,21 +167,82 @@ var NG = (function () {
     function showHud() {
       if (state !== 'play') return;
       root.classList.add('hud'); clearTimeout(hudT);
-      hudT = setTimeout(function () { root.classList.remove('hud'); }, 3200);
+      hudT = setTimeout(function () { if (!root.classList.contains('paused')) root.classList.remove('hud'); }, 3200);   // 暫停中控制列不自動收起
     }
+    // ---- 暫停／繼續 ----
+    function isPaused() { return root.classList.contains('paused'); }
+    function syncPause() { var p = isPaused(); pauseBtn.setAttribute('aria-label', p ? '繼續播放' : '暫停'); pauseBtn.title = p ? '繼續播放' : '暫停'; }
+    function togglePause() {
+      if (state !== 'play' || !player || !root.classList.contains('on')) return;
+      if (isPaused()) { root.classList.remove('paused'); syncPause(); player.resume(); showHud(); }
+      else { player.pause(); root.classList.add('paused'); syncPause(); showHud(); }
+    }
+
+    // ---- 橫向全螢幕 ----
+    // 手機：全螢幕（藏起網址列）＋鎖成橫向；不支援全螢幕的瀏覽器（例如 iPhone 的 Safari）改把播放畫面轉 90 度，
+    // 觀眾把手機往左轉（上緣朝左）就是橫向。電腦：一般的全螢幕。
+    var touch = (function () { try { return matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
+    var land = false, fsOurs = false;
+    var reqFs = root.requestFullscreen || root.webkitRequestFullscreen;
+    function fsEl() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+    if (touch && !reqFs) { landBtn.querySelector('.ng-land-t').textContent = '橫向播放'; }
+    function syncFs() {
+      var t = land ? (reqFs ? '離開全螢幕' : '直向播放') : (touch ? (reqFs ? '橫向全螢幕' : '橫向播放') : '全螢幕');
+      fsBtn.querySelector('span').textContent = t; fsBtn.setAttribute('aria-pressed', land ? 'true' : 'false');
+    }
+    syncFs();
+    function layoutLand() {
+      var W = root.clientWidth, H = root.clientHeight;
+      if (land && touch && H > W) {   // 畫面還是直的（鎖不住橫向，或不支援全螢幕）：播放畫面轉 90 度
+        vp.style.cssText = 'inset:auto;left:50%;top:50%;width:' + H + 'px;height:' + W + 'px;transform:translate(-50%,-50%) rotate(90deg)';
+        root.classList.add('rot');
+      } else { vp.style.cssText = ''; root.classList.remove('rot'); }
+    }
+    function lockLand() {
+      if (!touch) return;
+      try { var o = screen.orientation; if (o && o.lock) { var p = o.lock('landscape'); if (p && p.catch) p.catch(function () { /* 鎖不住：用轉 90 度的畫面 */ }); } } catch (e) { /* 忽略 */ }
+    }
+    function enterLand() {
+      if (land) return;
+      land = true; root.classList.add('land');
+      if (reqFs && !fsEl()) {
+        try {
+          var p = reqFs.call(root, { navigationUI: 'hide' });
+          fsOurs = true;
+          if (p && p.then) p.then(lockLand, function () { fsOurs = false; });
+          else setTimeout(lockLand, 200);
+        } catch (e) { fsOurs = false; }
+      }
+      layoutLand(); setTimeout(layoutLand, 400); syncFs();
+    }
+    function leaveLand() {
+      if (!land) return;
+      land = false; root.classList.remove('land');
+      try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) { /* 忽略 */ }
+      if (fsOurs && fsEl() === root) {
+        var ex = document.exitFullscreen || document.webkitExitFullscreen;
+        try { var p = ex.call(document); if (p && p.catch) p.catch(function () { /* 忽略 */ }); } catch (e) { /* 忽略 */ }
+      }
+      fsOurs = false; layoutLand(); syncFs();
+    }
+    function onFsChange() { if (fsOurs && fsEl() !== root) { fsOurs = false; leaveLand(); } else layoutLand(); }   // 觀眾用返回鍵離開全螢幕：回到直向
+    document.addEventListener('fullscreenchange', onFsChange);
+    document.addEventListener('webkitfullscreenchange', onFsChange);
+    window.addEventListener('resize', layoutLand);
+    window.addEventListener('orientationchange', function () { setTimeout(layoutLand, 250); });
     function syncMute() { if (!player) return; var m = player.muted(); muteBtn.setAttribute('aria-pressed', m ? 'true' : 'false'); muteBtn.querySelector('span').textContent = m ? '開聲音' : '靜音'; }
     function play() {
       if (state !== 'title') return;
       if (ext) { openYT(); done(); return; }
       if (!has || (player.failed && player.failed())) { done(); return; }
       state = 'play'; nearEnd = false;
-      root.classList.add('playing', 'wait'); root.classList.remove('on');
+      root.classList.add('playing', 'wait'); root.classList.remove('on', 'paused'); syncPause();
       bar.style.transform = 'scaleX(0)';
       player.play();
       // 3.5 秒還沒開始：可能是手機擋了自動播放 → 讓觀眾直接點影片
       clearTimeout(startT);
       startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { if (mv.yt) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } else root.classList.add('hud'); } }, 3500);
-      setTimeout(function () { if (state === 'play') skipBtn.focus({ preventScroll: true }); }, 60);
+      setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
     function done(why) {
       if (state === 'done') return;
@@ -186,7 +254,8 @@ var NG = (function () {
       if (viz && viz.intro) viz.intro(wasPlay ? 3000 : 2400);
       setTimeout(function () {
         if (player) player.stop();
-        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap'); tapMsg.hidden = true;
+        leaveLand();
+        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap', 'paused'); tapMsg.hidden = true;
         lock(false);
         if (document.activeElement && root.contains(document.activeElement)) document.activeElement.blur();
       }, 950);
@@ -195,31 +264,41 @@ var NG = (function () {
     function open(direct) {
       if (direct && ext) { openYT(); return; }
       state = 'title'; root.hidden = false; lock(true);
-      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap');
+      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap', 'paused');
       if (direct) play();
       else setTimeout(function () { playBtn.focus({ preventScroll: true }); }, 30);
     }
 
     // 標題畫面：點任何地方（「直接看地圖」除外）或按任意鍵 → 播放
-    title.addEventListener('click', function (e) { if (e.target.closest('.ng-skipall')) return; if (ext && !e.target.closest('.ng-play')) return; play(); });
+    title.addEventListener('click', function (e) {
+      if (e.target.closest('.ng-skipall')) return;
+      if (e.target.closest('.ng-landbtn')) { if (!ext && has) enterLand(); play(); return; }   // 先進全螢幕（要在點擊當下），再播放
+      if (ext && !e.target.closest('.ng-play')) return;
+      play();
+    });
+    pauseBtn.addEventListener('click', function (e) { e.stopPropagation(); togglePause(); });
+    fsBtn.addEventListener('click', function (e) { e.stopPropagation(); if (land) leaveLand(); else enterLand(); showHud(); });
     skipAll.addEventListener('click', function (e) { e.preventDefault(); done(); });
     skipBtn.addEventListener('click', function (e) { e.stopPropagation(); done(); });
     muteBtn.addEventListener('click', function (e) { e.stopPropagation(); if (player) { player.mute(!player.muted()); setTimeout(syncMute, 120); } showHud(); });
     root.querySelector('.ng-catch').addEventListener('click', function () { showHud(); });
-    root.addEventListener('mousemove', function () { showHud(); });
+    // 只有真的滑鼠移動才叫出控制列：手機點一下時瀏覽器也會補發 mousemove，會讓隱形的「略過」在同一下被按到
+    root.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') showHud(); });
     document.addEventListener('keydown', function (e) {
       if (root.hidden || state === 'done') return;
       if (e.metaKey || e.ctrlKey || e.altKey || /^(Shift|Control|Alt|Meta|CapsLock|Tab)$/.test(e.key)) return;
       if (state === 'title') {
         if (ext) { if (e.key === 'Escape') { e.preventDefault(); done(); } return; }   // 開新分頁只交給按鈕本身（Enter／空白鍵）
-        if (document.activeElement === skipAll && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結自己處理
+        if ((document.activeElement === skipAll || document.activeElement === landBtn) && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結／按鈕自己處理
         e.preventDefault(); play(); return;
       }
-      if (e.key === 'Escape') { e.preventDefault(); done(); return; }
-      if ((e.key === 'Enter' || e.key === ' ') && (document.activeElement === skipBtn || document.activeElement === muteBtn)) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
+      if (e.key === 'Escape') { if (fsEl()) return; e.preventDefault(); done(); return; }   // 全螢幕中的 Esc 交給瀏覽器離開全螢幕，不略過 MV
+      var hb = document.activeElement === skipBtn || document.activeElement === muteBtn || document.activeElement === fsBtn;
+      if ((e.key === 'Enter' || e.key === ' ') && hb) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
+      if (e.key === ' ' || e.key === 'k' || e.key === 'K' || (e.key === 'Enter' && document.activeElement === pauseBtn)) { e.preventDefault(); togglePause(); return; }
       e.preventDefault(); showHud();
     });
-    return { open: open, skip: function () { done(); }, state: function () { return state; } };
+    return { open: open, skip: function () { done(); }, state: function () { return state; }, land: function () { return land; } };
   }
 
   // ---------- 啟動 ----------

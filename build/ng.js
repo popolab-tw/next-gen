@@ -91,18 +91,23 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
   <div class="ng-title">
     <img class="ng-kv" src="${o.kv}" width="1920" height="1080" alt="NEXT GEN 生育門檻可視化網頁" fetchpriority="high" decoding="async">
     <button class="ng-play" type="button"><span class="ng-play-c" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 3.2v13.6L16.4 10z"/></svg></span><span class="ng-play-t"><span class="k-key">點一下或按任意鍵，播放 MV</span><span class="k-tap">點一下，播放 MV</span></span><span class="ng-play-s">有聲音${mvLen ? '・' + mvLen : ''}</span></button>
+    <button class="ng-landbtn" type="button"><svg class="k-tap" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="5.5" width="16" height="9" rx="1.6"/><path d="M15.5 8.5v3"/></svg><svg class="k-key" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 8V3.5H8M12 3.5h4.5V8M16.5 12v4.5H12M8 16.5H3.5V12"/></svg><span class="k-tap ng-land-t">橫向全螢幕播放</span><span class="k-key">全螢幕播放</span></button>
     <a class="ng-skipall" href="#map">略過 MV，直接看地圖 →</a>
   </div>
-  <div class="ng-mv"></div>
-  <div class="ng-wait" aria-hidden="true"></div>
-  <div class="ng-catch" aria-hidden="true"></div>
-  <p class="ng-tapmsg" hidden>瀏覽器擋住了自動播放，請點影片中間的播放鍵</p>
-  <div class="ng-hud">
-    <button class="ng-hb ng-mute" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3h-2.5z"/><path d="M11 5.5c1 1.3 1 3.7 0 5M12.8 3.8c2 2.4 2 6 0 8.4"/></svg><span>靜音</span></button>
-    <span class="ng-esc">ESC 略過</span>
-    <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
+  <div class="ng-vp">
+    <div class="ng-mv"></div>
+    <div class="ng-wait" aria-hidden="true"></div>
+    <div class="ng-catch" aria-hidden="true"></div>
+    <button class="ng-pause" type="button" aria-label="暫停"><svg class="i-pause" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="3.5" width="3.2" height="13" rx=".6"/><rect x="11.8" y="3.5" width="3.2" height="13" rx=".6"/></svg><svg class="i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg></button>
+    <p class="ng-tapmsg" hidden>瀏覽器擋住了自動播放，請點影片中間的播放鍵</p>
+    <div class="ng-hud">
+      <button class="ng-hb ng-mute" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3h-2.5z"/><path d="M11 5.5c1 1.3 1 3.7 0 5M12.8 3.8c2 2.4 2 6 0 8.4"/></svg><span>靜音</span></button>
+      <span class="ng-esc">ESC 略過・空白鍵 暫停</span>
+      <button class="ng-hb ng-fs" type="button"><svg class="i-in" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5"/></svg><span>全螢幕</span></button>
+      <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
+    </div>
+    <div class="ng-prog" aria-hidden="true"><i></i></div>
   </div>
-  <div class="ng-prog" aria-hidden="true"><i></i></div>
 </div>
 <header class="ng-top"><div class="ng-in">
   <a class="ng-brand" href="./" aria-label="NEXT GEN 生育門檻可視化網頁"><span class="ng-word">NEXT GEN</span><span class="ng-sub">生育門檻可視化</span></a>
