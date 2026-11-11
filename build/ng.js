@@ -107,6 +107,10 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
       <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
     </div>
     <div class="ng-prog" aria-hidden="true"><i></i></div>
+    <div class="ng-end" role="group" aria-label="MV 播完了">
+      <button class="ng-end-b ng-replay" type="button" aria-label="重播 MV"><span class="ng-end-c"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.6 8.4A5.8 5.8 0 1 1 5.2 13"/><path d="M4.2 4.3v4.3h4.3"/></svg></span><span class="ng-end-t">重播</span></button>
+      <button class="ng-end-b ng-next" type="button" aria-label="下一步：進入 3D 台灣"><span class="ng-end-c"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg></span><span class="ng-end-t">進入地圖</span></button>
+    </div>
   </div>
 </div>
 <header class="ng-top"><div class="ng-in">

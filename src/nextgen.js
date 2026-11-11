@@ -37,6 +37,51 @@ var NG = (function () {
     };
   }
 
+  // ---------- 「進入地圖」的漣漪聲：用 Web Audio 現場合成（不用音檔） ----------
+  // 一聲水滴（音高往上滑），接著像磬／古琴泛音的鐘聲，再兩聲越來越遠的回聲，最後是長殘響。
+  // 音都取 D 宮五聲音階（D、E、A），配樂是中國風的編曲，這幾個音不會突兀；MV 這時已經播完，不會和配樂重疊。
+  var actx = null;
+  function rippleSound() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      if (!actx) actx = new AC();
+      if (actx.state === 'suspended' && actx.resume) actx.resume();
+      var c = actx, t0 = c.currentTime + 0.03;
+      var master = c.createGain(); master.gain.value = 0.55;
+      var lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5600; lp.Q.value = 0.3;
+      master.connect(lp); lp.connect(c.destination);
+      // 殘響：用指數衰減的雜訊當空間（約 3.4 秒），讓聲音像在大廳裡散開
+      var len = Math.round(c.sampleRate * 3.4), ir = c.createBuffer(2, len, c.sampleRate);
+      for (var ch = 0; ch < 2; ch++) { var d = ir.getChannelData(ch); for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+      var rev = c.createConvolver(); rev.buffer = ir;
+      var wet = c.createGain(); wet.gain.value = 0.62; rev.connect(wet); wet.connect(master);
+      function out(pan) {   // 每個聲部：一路直接出去、一路送進殘響
+        var g = c.createGain(), node = g;
+        if (c.createStereoPanner && pan) { var p = c.createStereoPanner(); p.pan.value = pan; g.connect(p); node = p; }
+        var dry = c.createGain(); dry.gain.value = 0.75; node.connect(dry); dry.connect(master); node.connect(rev);
+        return g;
+      }
+      function tone(f, at, vol, dec, pan, glide) {
+        var o = c.createOscillator(), g = c.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(glide ? f * 0.62 : f, at);
+        if (glide) o.frequency.exponentialRampToValueAtTime(f, at + glide);
+        g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + dec);
+        o.connect(g); g.connect(out(pan)); o.start(at); o.stop(at + dec + 0.05);
+      }
+      // 水滴：短促、音高往上滑
+      tone(1174.66, t0, 0.16, 0.22, 0, 0.07);
+      // 鐘聲：D4 的泛音列（稍微不和諧的高泛音，像金屬或石磬），越高的泛音消失得越快
+      [[1, 0.30, 3.6], [2, 0.12, 2.4], [3.01, 0.06, 1.5], [4.18, 0.03, 0.9]].forEach(function (k) { tone(293.66 * k[0], t0 + 0.02, k[1], k[2], 0); });
+      tone(146.83, t0 + 0.02, 0.12, 3.2, 0);   // 低八度托底
+      // 漣漪回聲：一左一右、越來越輕
+      tone(880, t0 + 0.2, 0.05, 1.2, -0.45);
+      tone(1318.51, t0 + 0.42, 0.03, 1.0, 0.45);
+      tone(1760, t0 + 0.66, 0.016, 0.8, -0.2);
+    } catch (e) { /* 沒有音效也照常轉場 */ }
+  }
+
   // ---------- 播放器：YouTube 或影片檔，對外介面一樣 ----------
   // ev: { playing, waiting, paused, ended, error, muted, time(cur, dur) }
   function filePlayer(host, mv, ev) {
@@ -60,6 +105,7 @@ var NG = (function () {
       fade: function (ms) { fd.out(ms); },
       pause: function () { try { v.pause(); } catch (e) { /* 忽略 */ } },
       resume: function () { var p = v.play(); if (p && p.catch) p.catch(function () { /* 忽略 */ }); },
+      restart: function () { try { v.currentTime = 0; } catch (e) { /* 忽略 */ } var p = v.play(); if (p && p.catch) p.catch(function () { /* 忽略 */ }); },
       stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } fd.restore(); },
       mute: function (m) { v.muted = m; },
       muted: function () { return v.muted; },
@@ -120,6 +166,7 @@ var NG = (function () {
       fade: function (ms) { if (isReady && !failed) fd.out(ms); },
       pause: function () { if (isReady) { try { P.pauseVideo(); } catch (e) { /* 忽略 */ } } },
       resume: function () { if (isReady) { try { P.playVideo(); } catch (e) { /* 忽略 */ } } },
+      restart: function () { if (isReady) { try { P.seekTo(0, true); P.playVideo(); } catch (e) { /* 忽略 */ } } },
       stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } fd.restore(); } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
@@ -136,6 +183,7 @@ var NG = (function () {
     var skipBtn = root.querySelector('.ng-skip'), muteBtn = root.querySelector('.ng-mute'), bar = root.querySelector('.ng-prog i'), tapMsg = root.querySelector('.ng-tapmsg');
     var playBtn = root.querySelector('.ng-play'), skipAll = root.querySelector('.ng-skipall');
     var landBtn = root.querySelector('.ng-landbtn'), pauseBtn = root.querySelector('.ng-pause'), fsBtn = root.querySelector('.ng-fs'), vp = root.querySelector('.ng-vp');
+    var replayBtn = root.querySelector('.ng-replay'), nextBtn = root.querySelector('.ng-next');
     var state = 'title', hudT = 0, startT = 0, player = null, nearEnd = false;
     var has = !!(mv.yt || mv.src);
     // ext：MV 不在這頁播，改到 YouTube 新分頁看（claude.ai 預覽版不能內嵌 YouTube；正式網站播放失敗時也改成這樣）
@@ -143,12 +191,12 @@ var NG = (function () {
     var ev = {
       playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap', 'paused'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); syncPause(); },
       waiting: function () { root.classList.add('wait'); },
-      paused: function () { if (state !== 'play' || !root.classList.contains('on')) return; root.classList.add('paused'); root.classList.remove('wait'); syncPause(); showHud(); },
-      ended: function () { done(); },
+      paused: function () { if (state !== 'play' || !root.classList.contains('on') || root.classList.contains('ended')) return; root.classList.add('paused'); root.classList.remove('wait'); syncPause(); showHud(); },
+      ended: function () { showEnd(); },
       error: function (why) { if (mv.yt) setExt(); if (state === 'play') done('fail'); else if (state === 'title' && !mv.yt) noMv(); },
       muted: function () { syncMute(); },
       time: function (c, d) {
-        if (d > 0) { bar.style.transform = 'scaleX(' + Math.min(1, c / d).toFixed(4) + ')'; if (!nearEnd && d - c < 0.35) { nearEnd = true; done(); } }   // 搶在 YouTube 片尾畫面出現前轉場
+        if (d > 0) { bar.style.transform = 'scaleX(' + Math.min(1, c / d).toFixed(4) + ')'; if (!nearEnd && d - c < 0.35) { nearEnd = true; showEnd(); } }   // 搶在 YouTube 片尾畫面（推薦影片）出現前停下
       }
     };
     if (ext) setExt();
@@ -245,27 +293,79 @@ var NG = (function () {
       startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { if (mv.yt) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } else root.classList.add('hud'); } }, 3500);
       setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
-    function done(why) {
+    // ---- 播完：結束畫面 ----
+    function showEnd() {
+      if (state !== 'play') return;
+      state = 'end'; nearEnd = true;
+      clearTimeout(startT); clearTimeout(hudT);
+      if (player) player.pause();   // 停在最後，不讓 YouTube 的片尾推薦出現；畫面淡成黑底
+      root.classList.remove('hud', 'paused', 'wait', 'tap'); root.classList.add('ended'); tapMsg.hidden = true;
+      setTimeout(function () { if (state === 'end') nextBtn.focus({ preventScroll: true }); }, 900);
+    }
+    function replay() {
+      if (state !== 'end') return;
+      state = 'play'; nearEnd = false;
+      root.classList.remove('ended'); bar.style.transform = 'scaleX(0)';
+      player.restart();
+      setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
+    }
+    // ---- 進入地圖：漣漪聲＋從按鈕擴散的圓，把開場畫面揭開，露出底下的 3D 台灣 ----
+    function rippleTo() {
+      if (state !== 'end') return;
+      var muted = player && player.muted && player.muted();
+      if (!muted) rippleSound();   // 要在點擊當下發聲（手機瀏覽器的規定）
+      root.classList.add('going');
+      var reduce = U.reduceMotion && U.reduceMotion();
+      function go() {
+        var r = nextBtn.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+        var x = r.width ? r.left + r.width / 2 : W / 2, y = r.height ? r.top + r.height / 2 : H / 2;
+        if (fsEl()) { x = W / 2; y = H / 2; }
+        if (reduce) { done(); return; }
+        // 水波圈：三圈，間隔出現
+        var far = Math.hypot(Math.max(x, W - x), Math.max(y, H - y));
+        var box = h('div', { class: 'ng-ripples', 'aria-hidden': 'true' });
+        [0, 220, 470].forEach(function (dl, i) { var e = h('i'); e.style.cssText = 'left:' + x + 'px;top:' + y + 'px;animation-delay:' + dl + 'ms;--d:' + Math.round(far * 2 * (1.05 - i * 0.12)) + 'px'; box.appendChild(e); });
+        document.body.appendChild(box);
+        setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 2800);
+        done('ripple', { x: x, y: y, far: far });
+      }
+      // 全螢幕裡看不到底下的地圖：先離開全螢幕（畫面轉回直向）再揭開
+      if (fsEl()) { leaveLand(); setTimeout(go, 380); } else go();
+    }
+    function done(why, rp) {
       if (state === 'done') return;
-      var wasPlay = state === 'play';
+      var wasPlay = state === 'play', wasEnd = state === 'end';
       state = 'done'; ss(KEY_SEEN, '1');
       clearTimeout(startT); clearTimeout(hudT);
-      root.classList.add('out');
       if (wasPlay && player && player.fade) player.fade(900);   // 音樂和畫面一起在 0.9 秒內淡出
-      if (viz && viz.intro) viz.intro(wasPlay ? 3000 : 2400);
+      if (viz && viz.intro) viz.intro(wasPlay || wasEnd ? 3000 : 2400);
+      var hideIn = 950;
+      if (rp) {   // 圓形揭開：半徑從 0 長到蓋滿整個畫面
+        hideIn = 1500;
+        var t0 = performance.now(), D = 1350, edge = 70;
+        (function step(now) {
+          var k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+          var rr = Math.max(0, e * (rp.far + edge)) - edge * (1 - e);
+          var m = 'radial-gradient(circle at ' + rp.x + 'px ' + rp.y + 'px, transparent ' + Math.max(0, rr).toFixed(1) + 'px, #000 ' + (Math.max(0, rr) + edge).toFixed(1) + 'px)';
+          root.style.webkitMaskImage = m; root.style.maskImage = m;
+          if (k < 1 && state === 'done' && !root.hidden) requestAnimationFrame(step);
+        })(t0);
+      } else root.classList.add('out');
       setTimeout(function () {
         if (player) player.stop();
         leaveLand();
-        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap', 'paused'); tapMsg.hidden = true;
+        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap', 'paused', 'ended', 'going'); tapMsg.hidden = true;
+        root.style.webkitMaskImage = ''; root.style.maskImage = '';
         lock(false);
         if (document.activeElement && root.contains(document.activeElement)) document.activeElement.blur();
-      }, 950);
+      }, hideIn);
       if (why === 'fail') U.toast && U.toast('MV 無法在這裡播放，先帶你看地圖。按上方的 MV，可以到 YouTube 看。');
     }
     function open(direct) {
       if (direct && ext) { openYT(); return; }
       state = 'title'; root.hidden = false; lock(true);
-      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap', 'paused');
+      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap', 'paused', 'ended', 'going');
+      root.style.webkitMaskImage = ''; root.style.maskImage = '';
       if (direct) play();
       else setTimeout(function () { playBtn.focus({ preventScroll: true }); }, 30);
     }
@@ -278,6 +378,8 @@ var NG = (function () {
       play();
     });
     pauseBtn.addEventListener('click', function (e) { e.stopPropagation(); togglePause(); });
+    replayBtn.addEventListener('click', function (e) { e.stopPropagation(); replay(); });
+    nextBtn.addEventListener('click', function (e) { e.stopPropagation(); rippleTo(); });
     fsBtn.addEventListener('click', function (e) { e.stopPropagation(); if (land) leaveLand(); else enterLand(); showHud(); });
     skipAll.addEventListener('click', function (e) { e.preventDefault(); done(); });
     skipBtn.addEventListener('click', function (e) { e.stopPropagation(); done(); });
@@ -303,13 +405,19 @@ var NG = (function () {
         if ((document.activeElement === skipAll || document.activeElement === landBtn) && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結／按鈕自己處理
         e.preventDefault(); play(); return;
       }
+      if (state === 'end') {   // 結束畫面：Enter／空白鍵交給按鈕本身；R 重播；Esc 直接看地圖
+        if (e.key === 'Escape') { if (fsEl()) return; e.preventDefault(); done(); }
+        else if (e.key === 'r' || e.key === 'R') { e.preventDefault(); replay(); }
+        return;
+      }
+      if (state !== 'play') return;
       if (e.key === 'Escape') { if (fsEl()) return; e.preventDefault(); done(); return; }   // 全螢幕中的 Esc 交給瀏覽器離開全螢幕，不略過 MV
       var hb = document.activeElement === skipBtn || document.activeElement === muteBtn || document.activeElement === fsBtn;
       if ((e.key === 'Enter' || e.key === ' ') && hb) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
       if (e.key === ' ' || e.key === 'k' || e.key === 'K' || (e.key === 'Enter' && document.activeElement === pauseBtn)) { e.preventDefault(); togglePause(); return; }
       e.preventDefault(); showHud();
     });
-    return { open: open, skip: function () { done(); }, state: function () { return state; }, land: function () { return land; } };
+    return { open: open, skip: function () { done(); }, state: function () { return state; }, land: function () { return land; }, _end: function () { showEnd(); } };
   }
 
   // ---------- 啟動 ----------

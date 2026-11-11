@@ -148,6 +148,29 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-wait { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 1.5px solid rgba(236, 236, 230, .2); border-top-color: #ececE6; border-radius: 50%; animation: ngSpin .9s linear infinite; display: none; pointer-events: none; }
 .ng-intro.playing.wait .ng-wait { display: block; }
 @keyframes ngSpin { to { transform: rotate(360deg); } }
+/* ---------- 播完：影片淡成黑底，出現「重播」與「進入地圖」 ---------- */
+.ng-intro.on.ended .ng-mv { opacity: 0; transition-duration: .9s; }
+.ng-intro.ended .ng-hud, .ng-intro.ended .ng-pause, .ng-intro.ended .ng-catch, .ng-intro.ended .ng-prog, .ng-intro.ended .ng-wait, .ng-intro.ended .ng-tapmsg { display: none !important; }
+.ng-end { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; gap: clamp(36px, 7vw, 72px); pointer-events: auto; }
+.ng-intro.ended .ng-end { display: flex; }
+.ng-end-b { appearance: none; background: none; border: 0; padding: 6px; color: #ececE6; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 14px; opacity: 0; animation: ngIn .9s ease .7s forwards; -webkit-tap-highlight-color: transparent; }
+.ng-end-c { display: grid; place-items: center; border: 1px solid rgba(236, 236, 230, .7); border-radius: 50%; transition: transform .25s ease, background .25s ease; }
+.ng-replay .ng-end-c { width: 52px; height: 52px; border-color: rgba(236, 236, 230, .45); }
+.ng-replay .ng-end-c svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.ng-next .ng-end-c { width: 76px; height: 76px; }
+.ng-next .ng-end-c svg { width: 24px; height: 24px; fill: currentColor; margin-left: 4px; }
+.ng-end-t { font-family: var(--ng-mono); font-size: 12px; letter-spacing: .22em; color: rgba(236, 236, 230, .6); }
+.ng-next .ng-end-t { color: #ececE6; animation: ngPulse 2.6s ease-in-out 1.6s infinite; }
+.ng-replay { margin-top: 24px; }   /* 重播比較小：和「進入地圖」的圓心對齊 */
+.ng-end-b:hover .ng-end-c, .ng-end-b:focus-visible .ng-end-c { background: rgba(236, 236, 230, .12); transform: scale(1.06); }
+.ng-end-b:focus { outline: none; }
+.ng-end-b:focus-visible .ng-end-c { outline: 2px solid #ececE6; outline-offset: 4px; }
+.ng-intro.going .ng-end { pointer-events: none; }
+.ng-intro.going .ng-end-b { animation: none; opacity: 0; transition: opacity .35s ease; }
+/* 漣漪：從「進入地圖」往外擴散的圓圈；放在最上層，越過開場畫面延伸到地圖上（difference：黑底上是白圈，白底上是黑圈） */
+.ng-ripples { position: fixed; inset: 0; z-index: 301; pointer-events: none; overflow: hidden; mix-blend-mode: difference; }
+.ng-ripples i { position: absolute; width: 0; height: 0; transform: translate(-50%, -50%); border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .85); box-sizing: border-box; opacity: 0; animation: ngRipple 1.9s cubic-bezier(.2, .6, .3, 1) forwards; }
+@keyframes ngRipple { 0% { width: 0; height: 0; opacity: 0; } 8% { opacity: .9; } 100% { width: var(--d, 2000px); height: var(--d, 2000px); opacity: 0; } }
 .ng-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(236, 236, 230, .12); display: none; pointer-events: none; }
 .ng-intro.playing .ng-prog { display: block; }
 .ng-prog i { position: absolute; inset: 0; background: rgba(236, 236, 230, .75); transform-origin: 0 50%; transform: scaleX(0); }
