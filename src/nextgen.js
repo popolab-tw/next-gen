@@ -109,6 +109,9 @@ var NG = (function () {
       pause: function () { try { v.pause(); } catch (e) { /* 忽略 */ } },
       resume: function () { var p = v.play(); if (p && p.catch) p.catch(function () { /* 忽略 */ }); },
       restart: function () { try { v.currentTime = 0; } catch (e) { /* 忽略 */ } var p = v.play(); if (p && p.catch) p.catch(function () { /* 忽略 */ }); },
+      seek: function (sec) { try { v.currentTime = sec; } catch (e) { /* 忽略 */ } },
+      dur: function () { return v.duration || 0; },
+      cur: function () { return v.currentTime || 0; },
       stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } fd.restore(); },
       mute: function (m) { v.muted = m; },
       muted: function () { return v.muted; },
@@ -170,6 +173,9 @@ var NG = (function () {
       pause: function () { if (isReady) { try { P.pauseVideo(); } catch (e) { /* 忽略 */ } } },
       resume: function () { if (isReady) { try { P.playVideo(); } catch (e) { /* 忽略 */ } } },
       restart: function () { if (isReady) { try { P.seekTo(0, true); P.playVideo(); } catch (e) { /* 忽略 */ } } },
+      seek: function (sec, final) { if (isReady) { try { P.seekTo(sec, !!final); } catch (e) { /* 忽略 */ } } },   // 拖曳途中 final=false：只預覽畫面，不下載
+      dur: function () { return isReady && P.getDuration ? P.getDuration() || 0 : 0; },
+      cur: function () { return isReady && P.getCurrentTime ? P.getCurrentTime() || 0 : 0; },
       stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } fd.restore(); } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
@@ -187,6 +193,8 @@ var NG = (function () {
     var playBtn = root.querySelector('.ng-play'), skipAll = root.querySelector('.ng-skipall');
     var landBtn = root.querySelector('.ng-landbtn'), pauseBtn = root.querySelector('.ng-pause'), fsBtn = root.querySelector('.ng-fs'), vp = root.querySelector('.ng-vp');
     var replayBtn = root.querySelector('.ng-replay'), nextBtn = root.querySelector('.ng-next');
+    var seekEl = root.querySelector('.ng-seek'), trackEl = root.querySelector('.ng-track'), fillEl = root.querySelector('.ng-fill'), knobEl = root.querySelector('.ng-knob'), tmC = root.querySelector('.ng-tm-c'), tmD = root.querySelector('.ng-tm-d');
+    var dragging = false;
     var state = 'title', hudT = 0, startT = 0, player = null, nearEnd = false;
     var has = !!(mv.yt || mv.src);
     // ext：MV 不在這頁播，改到 YouTube 新分頁看（claude.ai 預覽版不能內嵌 YouTube；正式網站播放失敗時也改成這樣）
@@ -199,7 +207,7 @@ var NG = (function () {
       error: function (why) { if (mv.yt) setExt(); if (state === 'play') done('fail'); else if (state === 'title' && !mv.yt) noMv(); },
       muted: function () { syncMute(); },
       time: function (c, d) {
-        if (d > 0) { bar.style.transform = 'scaleX(' + Math.min(1, c / d).toFixed(4) + ')'; if (!nearEnd && d - c < 0.35) { nearEnd = true; showEnd(); } }   // 搶在 YouTube 片尾畫面（推薦影片）出現前停下
+        if (d > 0) { if (!dragging) showPos(c, d); if (!nearEnd && !dragging && d - c < 0.35) { nearEnd = true; showEnd(); } }   // 搶在 YouTube 片尾畫面（推薦影片）出現前停下
       }
     };
     if (ext) setExt();
@@ -289,13 +297,55 @@ var NG = (function () {
       if (!has || (player.failed && player.failed())) { done(); return; }
       state = 'play'; nearEnd = false;
       root.classList.add('playing', 'wait'); root.classList.remove('on', 'paused'); syncPause();
-      bar.style.transform = 'scaleX(0)';
+      showPos(0, player && player.dur ? player.dur() : 0);
       player.play();
       // 3.5 秒還沒開始：可能是手機擋了自動播放 → 讓觀眾直接點影片
       clearTimeout(startT);
       startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { if (mv.yt) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } else root.classList.add('hud'); } }, 3500);
       setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
+    // ---- 進度條：點一下或拖曳跳到想看的地方 ----
+    function fmtT(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ':' + ('0' + (t % 60)).slice(-2); }
+    function showPos(c, d) {
+      var k = d > 0 ? Math.max(0, Math.min(1, c / d)) : 0;
+      bar.style.transform = 'scaleX(' + k.toFixed(4) + ')';
+      fillEl.style.width = (k * 100).toFixed(3) + '%'; knobEl.style.left = (k * 100).toFixed(3) + '%';
+      tmC.textContent = fmtT(c); tmD.textContent = fmtT(d);
+      seekEl.setAttribute('aria-valuemax', String(Math.round(d))); seekEl.setAttribute('aria-valuenow', String(Math.round(c)));
+      seekEl.setAttribute('aria-valuetext', fmtT(c) + ' / ' + fmtT(d));
+    }
+    function seekTo(sec, final) {
+      var d = player && player.dur ? player.dur() : 0;
+      if (!(d > 0) || state !== 'play') return;
+      sec = Math.max(0, Math.min(d - 0.6, sec));   // 不直接跳到最後一刻：留一點播完，才會接上結束畫面
+      player.seek(sec, final); showPos(sec, d);
+    }
+    var seekT = 0, seekLast = 0;
+    function fracAt(e) {
+      var r = trackEl.getBoundingClientRect();
+      var k = root.classList.contains('rot') ? (e.clientY - r.top) / (r.height || 1) : (e.clientX - r.left) / (r.width || 1);   // 轉 90 度時，進度條在螢幕上是直的
+      return Math.max(0, Math.min(1, k));
+    }
+    function dragAt(e, final) {
+      var d = player && player.dur ? player.dur() : 0; if (!(d > 0)) return;
+      var sec = fracAt(e) * d, now = Date.now();
+      showPos(Math.min(sec, d - 0.6), d);
+      if (final) { clearTimeout(seekT); seekTo(sec, true); return; }
+      if (now - seekLast > 180) { seekLast = now; seekTo(sec, false); }   // 拖曳中每 0.18 秒更新一次畫面
+    }
+    seekEl.addEventListener('pointerdown', function (e) {
+      if (state !== 'play' || e.button > 0) return;
+      e.preventDefault(); e.stopPropagation();
+      dragging = true; seekEl.classList.add('drag'); clearTimeout(hudT); root.classList.add('hud');
+      try { seekEl.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ }
+      dragAt(e, false);
+    });
+    seekEl.addEventListener('pointermove', function (e) { if (dragging) { e.stopPropagation(); dragAt(e, false); } });
+    function endDrag(e) { if (!dragging) return; dragAt(e, true); dragging = false; seekEl.classList.remove('drag'); showHud(); }
+    seekEl.addEventListener('pointerup', endDrag);
+    seekEl.addEventListener('pointercancel', function () { dragging = false; seekEl.classList.remove('drag'); showHud(); });
+    seekEl.addEventListener('click', function (e) { e.stopPropagation(); });
+    function nudge(dt) { if (!player || !player.cur) return; seekTo(player.cur() + dt, true); showHud(); }
     var maskRun = 0;
     // ---- 播完：結束畫面 ----
     // byEnd：YouTube 已經真的播到底（片長多算了零點幾秒，沒在最後一刻前停住）→ 影片立刻藏起來，不讓片尾推薦影片閃出來
@@ -311,7 +361,7 @@ var NG = (function () {
     function replay() {
       if (state !== 'end') return;
       state = 'play'; nearEnd = false;
-      root.classList.remove('ended', 'cut'); bar.style.transform = 'scaleX(0)';
+      root.classList.remove('ended', 'cut'); showPos(0, player && player.dur ? player.dur() : 0);
       player.restart();
       setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
@@ -419,6 +469,8 @@ var NG = (function () {
       }
       if (state !== 'play') return;
       if (e.key === 'Escape') { if (fsEl()) return; e.preventDefault(); done(); return; }   // 全螢幕中的 Esc 交給瀏覽器離開全螢幕，不略過 MV
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); nudge(e.key === 'ArrowLeft' ? -5 : 5); return; }
+      if (document.activeElement === seekEl && (e.key === 'Home' || e.key === 'End')) { e.preventDefault(); seekTo(e.key === 'Home' ? 0 : 1e9, true); showHud(); return; }
       var hb = document.activeElement === skipBtn || document.activeElement === muteBtn || document.activeElement === fsBtn;
       if ((e.key === 'Enter' || e.key === ' ') && hb) { if (!root.classList.contains('hud')) { e.preventDefault(); showHud(); } return; }
       if (e.key === ' ' || e.key === 'k' || e.key === 'K' || (e.key === 'Enter' && document.activeElement === pauseBtn)) { e.preventDefault(); togglePause(); return; }

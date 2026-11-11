@@ -37,7 +37,7 @@ window.YT = { Player: function (el, o) {
   this.start = function () { o.events.onStateChange({ data: 1 }); clearInterval(iv); iv = setInterval(function () { t += 0.2; if (t >= dur) { clearInterval(iv); o.events.onStateChange({ data: 0 }); } }, 200); };
   this.playVideo = function () { window.__yt.calls.push('play'); if (window.__ytErr) { setTimeout(function () { o.events.onError({ data: 150 }); }, 100); return; } if (!window.__ytBlock) self.start(); };
   this.pauseVideo = function () { window.__yt.calls.push('pause'); clearInterval(iv); o.events.onStateChange({ data: 2 }); };
-  this.seekTo = function (s) { t = s; }; this.getCurrentTime = function () { return t; }; this.getDuration = function () { return dur; };
+  this.seekTo = function (s, ahead) { t = s; (window.__yt.seeks = window.__yt.seeks || []).push([Math.round(s * 10) / 10, !!ahead]); }; this.getCurrentTime = function () { return t; }; this.getDuration = function () { return dur; };
   this.mute = function () { muted = true; }; this.unMute = function () { muted = false; }; this.isMuted = function () { return muted; };
   var vol = 100; window.__yt.vols = []; this.getVolume = function () { return vol; }; this.setVolume = function (v) { vol = v; window.__yt.vols.push(v); };
   window.__ytp = this; setTimeout(function () { o.events.onReady({ target: self }); }, 50);
@@ -292,6 +292,56 @@ with sync_playwright() as p:
     pg.click('.ng-landbtn'); pg.wait_for_timeout(900)
     check('電腦：全螢幕播放、不轉 90 度', 'on' in pg.evaluate(I + '.className') and pg.evaluate('window.__ng.intro.land()') and not pg.evaluate("document.getElementById('ng-intro').classList.contains('rot')"))
     check('電腦（全螢幕）：沒有錯誤', not errs, errs)
+    ctx.close()
+    # 進度條：點一下、拖曳、方向鍵跳轉（電腦）
+    ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.add_init_script('window.__ytDur = 60;')
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1500)
+    pg.evaluate('window.__ng.viz._bare(true)')
+    pg.click('.ng-play'); pg.wait_for_timeout(700)
+    pg.mouse.move(400, 300); pg.mouse.move(420, 320); pg.wait_for_timeout(300)
+    tr = pg.evaluate("(() => { const r = document.querySelector('.ng-track').getBoundingClientRect(); return [r.left, r.top + r.height / 2, r.width]; })()")
+    pg.mouse.move(tr[0] + tr[2] * 0.1, tr[1]); pg.mouse.down(); pg.mouse.move(tr[0] + tr[2] * 0.3, tr[1], steps=4); pg.mouse.move(tr[0] + tr[2] * 0.5, tr[1], steps=4); pg.mouse.up(); pg.wait_for_timeout(300)
+    sk = pg.evaluate('window.__yt.seeks'); t = pg.evaluate('window.__ytp.getCurrentTime()')
+    check('電腦：拖曳進度條跳到 50%（放開時才完整跳轉）', 29 <= t <= 31.5 and sk[-1][1] is True and any(not a for _, a in sk[:-1]), (t, sk))
+    check('電腦：時間顯示跟著更新', pg.evaluate("document.querySelector('.ng-tm-c').textContent") in ('0:30', '0:31') and pg.evaluate("document.querySelector('.ng-tm-d').textContent") == '1:00')
+    pg.mouse.click(tr[0] + tr[2] * 0.25, tr[1]); pg.wait_for_timeout(300)
+    t = pg.evaluate('window.__ytp.getCurrentTime()')
+    check('電腦：點一下進度條跳到 25%', 14.5 <= t <= 16, t)
+    pg.keyboard.press('ArrowRight'); pg.wait_for_timeout(200)
+    t2 = pg.evaluate('window.__ytp.getCurrentTime()')
+    check('電腦：方向鍵 → 快轉 5 秒', 4.5 <= t2 - t <= 5.8, (t, t2))
+    pg.mouse.click(tr[0] + tr[2] * 0.995, tr[1]); pg.wait_for_timeout(100)
+    t3 = pg.evaluate('window.__yt.seeks')[-1][0]
+    check('電腦：跳到最後時留一點播完、接上結束畫面', t3 == 59.4 and pg.evaluate("window.__ng.intro.state()") == 'play', t3)
+    pg.wait_for_timeout(1300)
+    check('電腦：播完後出現結束畫面', pg.evaluate("window.__ng.intro.state()") == 'end')
+    check('電腦（進度條）：沒有錯誤', not errs, errs)
+    ctx.close()
+    # 進度條：手機、橫向（轉 90 度）時點一下跳轉
+    ctx = b.new_context(viewport={'width': 390, 'height': 844}, has_touch=True, is_mobile=True)
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.add_init_script('window.__ytDur = 60;')
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1500)
+    pg.evaluate('window.__ng.viz._bare(true)')
+    pg.tap('.ng-play'); pg.wait_for_timeout(700)
+    pg.tap('.ng-catch', position={'x': 100, 'y': 300}); pg.wait_for_timeout(300)
+    tr = pg.evaluate("(() => { const r = document.querySelector('.ng-track').getBoundingClientRect(); return [r.left, r.top + r.height / 2, r.width]; })()")
+    pg.touchscreen.tap(tr[0] + tr[2] * 0.75, tr[1]); pg.wait_for_timeout(300)
+    t = pg.evaluate('window.__ytp.getCurrentTime()')
+    check('手機：點進度條跳到 75%', 44 <= t <= 46.5 and not pg.evaluate(I + '.hidden'), t)
+    pg.tap('.ng-fs'); pg.wait_for_timeout(700)
+    if 'hud' not in pg.evaluate(I + '.className'): pg.tap('.ng-catch', position={'x': 100, 'y': 300}); pg.wait_for_timeout(300)
+    rr = pg.evaluate("(() => { const r = document.querySelector('.ng-track').getBoundingClientRect(); return [r.left + r.width / 2, r.top, r.height, document.getElementById('ng-intro').classList.contains('rot')]; })()")
+    pg.touchscreen.tap(rr[0], rr[1] + rr[2] * 0.2); pg.wait_for_timeout(300)
+    t = pg.evaluate('window.__ytp.getCurrentTime()')
+    check('手機橫向（轉 90 度）：點進度條跳到 20%', rr[3] and rr[2] > 200 and 11 <= t <= 13.5, (t, rr))
+    check('手機（進度條）：沒有錯誤', not errs, errs)
     ctx.close()
     # 地圖全螢幕：手機橫放時，按鈕列和圖例都在畫面裡
     ctx = b.new_context(viewport={'width': 844, 'height': 390}, has_touch=True, is_mobile=True)

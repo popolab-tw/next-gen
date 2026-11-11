@@ -172,7 +172,22 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-ripples { position: fixed; inset: 0; z-index: 301; pointer-events: none; overflow: hidden; mix-blend-mode: difference; }
 .ng-ripples i { position: absolute; width: 0; height: 0; transform: translate(-50%, -50%); border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .85); box-sizing: border-box; opacity: 0; animation: ngRipple 1.9s cubic-bezier(.2, .6, .3, 1) forwards; }
 @keyframes ngRipple { 0% { width: 0; height: 0; opacity: 0; } 8% { opacity: .9; } 100% { width: var(--d, 2000px); height: var(--d, 2000px); opacity: 0; } }
-.ng-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(236, 236, 230, .12); display: none; pointer-events: none; }
+/* 進度條：控制列出現時在按鈕上方，可以點或拖曳跳轉；控制列收起時只剩底部的細線 */
+.ng-seek { position: absolute; left: max(20px, env(safe-area-inset-left, 0px)); right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(100% + 4px); height: 30px; display: flex; align-items: center; gap: 12px; cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+.ng-intro.rot .ng-seek { left: 20px; right: 20px; }
+.ng-tm { flex: none; min-width: 3.1em; font-family: var(--ng-mono); font-size: 11px; letter-spacing: .06em; color: rgba(236, 236, 230, .78); font-variant-numeric: tabular-nums; }
+.ng-tm-d { text-align: right; color: rgba(236, 236, 230, .5); }
+.ng-track { position: relative; flex: 1; height: 3px; border-radius: 2px; background: rgba(236, 236, 230, .24); transition: height .15s ease; }
+.ng-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 2px; background: rgba(236, 236, 230, .92); }
+.ng-knob { position: absolute; top: 50%; left: 0; width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; border-radius: 50%; background: #ececE6; box-shadow: 0 0 0 4px rgba(0, 0, 0, .28); transform: scale(0); transition: transform .15s ease; }
+.ng-seek:hover .ng-track, .ng-seek.drag .ng-track { height: 5px; }
+.ng-seek:hover .ng-knob, .ng-seek.drag .ng-knob, .ng-seek:focus-visible .ng-knob { transform: scale(1); }
+@media (pointer: coarse) { .ng-knob { transform: scale(1); } }
+.ng-seek:focus { outline: none; }
+.ng-seek:focus-visible .ng-track { outline: 2px solid #ececE6; outline-offset: 7px; }
+.ng-intro.tap .ng-seek { display: none; }
+.ng-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(236, 236, 230, .12); display: none; pointer-events: none; transition: opacity .35s ease; }
+.ng-intro.hud .ng-prog { opacity: 0; }
 .ng-intro.playing .ng-prog { display: block; }
 .ng-prog i { position: absolute; inset: 0; background: rgba(236, 236, 230, .75); transform-origin: 0 50%; transform: scaleX(0); }
 @media (prefers-reduced-motion: reduce) { .ng-kv, .ng-play, .ng-skipall { animation-duration: .01s; animation-delay: 0s; } .ng-play-t, .ng-more i { animation: none; } }

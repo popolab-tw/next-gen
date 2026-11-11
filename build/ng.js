@@ -101,8 +101,9 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
     <button class="ng-pause" type="button" aria-label="暫停"><svg class="i-pause" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="3.5" width="3.2" height="13" rx=".6"/><rect x="11.8" y="3.5" width="3.2" height="13" rx=".6"/></svg><svg class="i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg></button>
     <p class="ng-tapmsg" hidden>瀏覽器擋住了自動播放，請點影片中間的播放鍵</p>
     <div class="ng-hud">
+      <div class="ng-seek" role="slider" tabindex="0" aria-label="MV 播放進度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"><span class="ng-tm ng-tm-c">0:00</span><span class="ng-track"><i class="ng-fill"></i><b class="ng-knob"></b></span><span class="ng-tm ng-tm-d">0:00</span></div>
       <button class="ng-hb ng-mute" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6h2.5l3.5-3v10l-3.5-3h-2.5z"/><path d="M11 5.5c1 1.3 1 3.7 0 5M12.8 3.8c2 2.4 2 6 0 8.4"/></svg><span>靜音</span></button>
-      <span class="ng-esc">ESC 略過・空白鍵 暫停</span>
+      <span class="ng-esc">ESC 略過・空白鍵 暫停・← → 快轉</span>
       <button class="ng-hb ng-fs" type="button"><svg class="i-in" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"/></svg><svg class="i-out" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2.5V6H2.5M13.5 6H10V2.5M10 13.5V10h3.5M2.5 10H6v3.5"/></svg><span>全螢幕</span></button>
       <button class="ng-hb ng-skip" type="button">略過 MV<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
     </div>
