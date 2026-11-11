@@ -9,7 +9,7 @@ APP.screens.method = function (main) {
   function ul(items) { var u = h('ul'); items.forEach(function (t) { u.appendChild(h('li', { html: t })); }); return u; }
   inn.appendChild(p('這不是理財建議，而是一個盡量貼近現實的試算。每個數字都有出處；查不到可靠資料的地方，我們標成估計值，並寫出理由。你可以在報告「調整設定」裡的「進階假設」調整大部分假設。'));
   // 頁首就放驗算與回報的入口，不用滑到最底
-  var REPO0 = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+  var REPO0 = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
   inn.appendChild(h('div', { class: 'verify-callout' },
     h('b', {}, '想檢查我們怎麼算、資料從哪來，或發現錯誤？'),
     h('div', { class: 'verify-links' },
@@ -141,13 +141,13 @@ APP.screens.method = function (main) {
   inn.appendChild(src);
 
   inn.appendChild(h('h2', { id: 'verify' }, '十、自己驗算、回報錯誤與授權'));
-  var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+  var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
   inn.appendChild(p('這個作品的程式碼、每個數字的出處與研究筆記，都公開在 GitHub。想自己驗算的話，可以在報告「你的存摺」段落按「下載逐年明細」，用 Excel 或 Google 試算表一年一年對帳：每一年的年底存款，都等於年初存款加上可用收入、再減掉支出。'));
   inn.appendChild(h('div', { class: 'src src-wide' }, h('a', { href: REPO, target: '_blank', rel: 'noopener' }, '原始碼（GitHub）'), h('span', {}, '計算引擎在 src/engine.js，所有參數在 src/data.js')));
   inn.appendChild(h('div', { class: 'src src-wide' }, h('a', { href: REPO + '/blob/main/docs/資料來源.md', target: '_blank', rel: 'noopener' }, '資料來源清單'), h('span', {}, '每個來源的名稱、連結與資料時間')));
   inn.appendChild(h('div', { class: 'src src-wide' }, h('a', { href: REPO + '/issues/new', target: '_blank', rel: 'noopener' }, '回報錯誤'), h('span', {}, '在 GitHub 留言，需要 GitHub 帳號')));
   inn.appendChild(A_feedback());
-  inn.appendChild(p('授權：程式碼採 <a href="' + REPO + '/blob/main/LICENSE" target="_blank" rel="noopener">MIT 授權</a>；本作品自己撰寫的文字、圖表與整理後的資料採 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY 4.0</a>，轉用時請標明出處「popo890827《你有資格生下一代嗎？》」。引用的原始資料仍屬各來源，依各自的條款使用。'));
+  inn.appendChild(p('授權：程式碼採 <a href="' + REPO + '/blob/main/LICENSE" target="_blank" rel="noopener">MIT 授權</a>；本作品自己撰寫的文字、圖表與整理後的資料採 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY 4.0</a>，轉用時請標明出處「海島上的波波（@popolab_tw）《你有資格生下一代嗎？》」。引用的原始資料仍屬各來源，依各自的條款使用。'));
   inn.appendChild(h('div', { class: 'cover-cta', style: { marginTop: '28px' } }, h('button', { class: 'btn', onclick: function () { if (APP.unlocked) APP.compute(true); APP.go(APP.unlocked ? 'report' : 'cover'); } }, U.icon('back'), APP.unlocked ? '回到審查報告' : '回到封面')));
   sheet.appendChild(inn); wrap.appendChild(sheet); main.appendChild(wrap);
 };

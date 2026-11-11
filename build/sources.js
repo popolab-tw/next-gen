@@ -45,7 +45,7 @@ ${rows.join('\n')}
 ${worldMd()}
 ---
 
-發現數字有誤或過時？請到 [GitHub Issues](https://github.com/jasontzeng123/next-gen/issues/new) 回報，附上正確的來源連結會更好。
+發現數字有誤或過時？請到 [GitHub Issues](https://github.com/popolab-tw/next-gen/issues/new) 回報，附上正確的來源連結會更好。
 `;
 fs.mkdirSync(path.join(__dirname, '..', 'docs'), { recursive: true });
 fs.writeFileSync(path.join(__dirname, '..', 'docs', '資料來源.md'), md);

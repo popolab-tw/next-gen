@@ -2,8 +2,8 @@
 
 用你心中養孩子的標準，加上台灣真實的房價、薪資、補助與稅制，從孩子出生一路算到他獨立，看看存款撐不撐得過去，或者收入要在前百分之幾才撐得住。
 
-- 網站：<https://jasontzeng123.github.io/next-gen/>
-- 製作：[popo890827](https://www.threads.com/@popo890827) × Claude
+- 網站：<https://popolab-tw.github.io/next-gen/>
+- 製作：海島上的波波（[@popolab_tw](https://www.threads.com/@popolab_tw)）× Claude
 - 授權：程式碼 [MIT](LICENSE)；文字、圖表與整理的資料 [CC BY 4.0](LICENSE-CONTENT.md)
 
 ## 想驗證計算？
@@ -25,7 +25,7 @@
 
 ## 發現錯誤？
 
-請到 [Issues](https://github.com/jasontzeng123/next-gen/issues/new) 回報，最好附上你認為正確的數字與來源連結。
+請到 [Issues](https://github.com/popolab-tw/next-gen/issues/new) 回報，最好附上你認為正確的數字與來源連結。
 
 ## 自己組裝與測試
 
@@ -53,6 +53,7 @@ python3 test/pg_bridge.py  # 接上本機 PostgreSQL，用真正的 supabase/*.s
 
 ## 維運
 
+- 2026 年 11 月網站從 `jasontzeng123.github.io/next-gen` 搬到現在的網址。舊網址由 `jasontzeng123/next-gen` 放 [build/redirect/](build/redirect/) 的跳轉頁接住：路徑、參數和 # 後面的部分都會保留；遊戲首頁會把那台裝置的匿名代號等紀錄一起帶過來（[src/migrate.js](src/migrate.js)），之前分享過的人再分享時會更新原本那一筆，不會重複。測試：`python3 test/move.py`。
 - 免費方案的 Supabase 閒置一週會暫停。`.github/workflows/keepalive.yml` 每 3 天讀一次資料庫，避免暫停。萬一暫停了，到 Supabase 專案頁按 **Restore project** 即可，資料不會遺失；暫停期間網站仍可正常試算。
 - 查看或匯出資料：Supabase → Table Editor → `submissions` → Export → CSV。
 - 玩家的意見與回報：Supabase → Table Editor → `feedback`（只有你看得到；玩家勾選時會附上當時的設定，方便重現問題）。

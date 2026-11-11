@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>網站已搬到新網址</title>
+<link rel="canonical" href="https://popolab-tw.github.io/next-gen/">
+<script>
+/* 舊網址跳轉頁：jasontzeng123.github.io/next-gen/... → popolab-tw.github.io/next-gen/...
+   路徑、? 後面的參數、# 後面的部分都原封不動帶過去。
+   遊戲首頁：這台裝置在舊網址存的紀錄（匿名代號、分享狀態、答案、存檔）一起放在 # 後面帶過去，
+   新網站收下後會立刻從網址列拿掉；# 後面的內容不會送到伺服器。 */
+(function () {
+  var NEW = 'https://popolab-tw.github.io/next-gen/';
+  var rest = location.pathname.replace(/^\/[^\/]*\/?/, '');   // 去掉第一段（repo 名稱）
+  var hash = location.hash || '';
+  if (rest === '' || rest === 'index.html') {
+    try {
+      var keep = {}, n = 0;
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf('tw-kids:') === 0) { keep[k.slice(8)] = localStorage.getItem(k); n++; }
+      }
+      if (n) {
+        var b64 = btoa(unescape(encodeURIComponent(JSON.stringify(keep)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        hash = (hash.length > 1 ? hash + '&' : '#') + 'tkmig=' + b64;
+      }
+    } catch (e) { /* 讀不到紀錄時照樣跳轉 */ }
+  }
+  location.replace(NEW + rest + location.search + hash);
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=https://popolab-tw.github.io/next-gen/"></noscript>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font: 16px/1.7 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: #e9eee9; color: #1b2420; padding: 0 20px; box-sizing: border-box; }
+  @media (prefers-color-scheme: dark) { body { background: #0d1210; color: #e4ebe6; } a { color: #9db7ff; } }
+  a { color: #1f3f94; }
+</style>
+</head>
+<body>
+<p>網站已搬到新網址：<a href="https://popolab-tw.github.io/next-gen/">popolab-tw.github.io/next-gen</a></p>
+</body>
+</html>

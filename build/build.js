@@ -21,7 +21,7 @@ try { requestAnimationFrame(function () { window.__diag.raf = true; }); } catch 
 `;
 const CFGP = path.join(__dirname, 'web.config.json');
 const CFG = fs.existsSync(CFGP) ? JSON.parse(fs.readFileSync(CFGP, 'utf8')) : {};
-const REPO = CFG.repoUrl || 'https://github.com/jasontzeng123/next-gen';
+const REPO = CFG.repoUrl || 'https://github.com/popolab-tw/next-gen';
 const DESC = '用你心中養孩子的標準，加上台灣真實的房價、薪資、補助與稅制，算算你有沒有足夠的錢把孩子養大。';
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@ const APPBODY = `<div id="app">
   <header id="topbar" class="topbar"></header>
   <main id="main" class="main" tabindex="-1"></main>
   <footer class="foot">
-    <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">popo890827</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popo890827</a></div>
+    <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popolab_tw</a></div>
     <div class="foot-links"><a href="${REPO}" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="${REPO}/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
     <div class="foot-meta"><span>依 2026 年 10 月公開資料試算，不是理財建議。</span><span>主計總處・內政部・勞動部・衛福部・財政部・樂居・591</span></div>
   </footer>
@@ -105,6 +105,8 @@ ${FONTS_WEB}
 ${R('styles.css')}
 </style>
 <script>window.TWKIDS = ${JSON.stringify({ target: 'web', siteUrl: site, repoUrl: REPO, sb: sb, worldSrc: WORLD_FILE })};</script>
+<script>
+${R('migrate.js')}</script>
 </head>
 <body>
 ${APPBODY}

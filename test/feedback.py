@@ -12,7 +12,7 @@ def sql(stmt, role='anon', ip='5.5.5.5'):
     out = r.stdout.strip().splitlines(); return out[-1] if out else ''
 sql('truncate public.feedback; truncate public.rate_log;', role='postgres')
 html = open(ROOT + '/index.html').read()
-cfg = {'target': 'web', 'siteUrl': 'https://jasontzeng123.github.io/next-gen/', 'sb': {'url': 'https://test.supabase.co', 'key': 'sb_publishable_TESTKEY'}}
+cfg = {'target': 'web', 'siteUrl': 'https://popolab-tw.github.io/next-gen/', 'sb': {'url': 'https://test.supabase.co', 'key': 'sb_publishable_TESTKEY'}}
 open(ROOT + '/test/web.html', 'w').write(re.sub(r'<script>window\.TWKIDS = .*?;</script>', '<script>window.TWKIDS = ' + json.dumps(cfg) + ';</script>', html))
 def rpc(route):
     name = route.request.url.rsplit('/', 1)[-1]; body = json.loads(route.request.post_data or '{}')
