@@ -69,7 +69,7 @@ ${o.web ? `<link rel="canonical" href="${o.ngUrl}">
 <meta property="og:title" content="NEXT GEN・生育門檻可視化網頁">
 <meta property="og:description" content="${esc(o.desc)}">
 <meta property="og:url" content="${o.ngUrl}">
-<meta property="og:image" content="${o.ngUrl}og.jpg">
+<meta property="og:image" content="${o.ngUrl}og.jpg?v=${hash(RB('src/ng/og.jpg'))}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="NEXT GEN 生育門檻可視化網頁：3D 台灣上的 ${sep(N)} 個光點">
