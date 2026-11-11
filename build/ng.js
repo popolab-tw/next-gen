@@ -51,7 +51,7 @@ function page(o) {
     '分享少於 5 筆的縣市不顯示收入 PR 與審查結果。',
     '地形高度放大 5 倍，才看得出起伏；可以在右下角的設定調整。',
     '地圖：道路 © OpenStreetMap contributors（經 Overture Maps）・地形 AWS Terrain Tiles（SRTM 等）・人口密度 WorldPop・行政區界 內政部',
-    o.mv && o.mv.yt ? 'MV 由 YouTube 播放（隱私強化模式：按下播放前不會設定 YouTube 的 cookie）。' : null
+    o.mv && o.mv.yt ? (o.mv.ext ? 'MV 放在 YouTube，按下後在新分頁播放。' : 'MV 由 YouTube 播放（隱私強化模式：按下播放前不會設定 YouTube 的 cookie）。') : null
   ].filter(Boolean);
   // claude.ai 版：平台會補上 <html><head><body> 外框，所以不寫這幾個標籤
   const open = o.web ? `<!doctype html>
@@ -175,7 +175,8 @@ function build(o) {
   const inline = `<script>window.__VIZ_MAP = "${mapB.toString('base64')}";
 window.__VIZ_PTS = ${ptsB.toString('utf8').trim()};</script>
 `;
-  const mvDist = mvCfg.yt ? { yt: mvCfg.yt, len: mvCfg.len } : { src: dataUrl('viz/mv-placeholder.mp4', 'video/mp4'), len: mvCfg.len };
+  // claude.ai 預覽版不能內嵌 YouTube：有 MV 代號時改成「到 YouTube 看」（ext）；還沒有代號時用暫代影片
+  const mvDist = mvCfg.yt ? { yt: mvCfg.yt, len: mvCfg.len, ext: true } : { src: dataUrl('viz/mv-placeholder.mp4', 'video/mp4'), len: mvCfg.len };
   const dist = page({ web: false, siteUrl: site, ngUrl, repo: o.repo, desc, kv: dataUrl('src/ng/kv-1920.webp', 'image/webp'), mv: mvDist, inline,
     twkids: { target: 'nextgen-artifact', local: true, vizN: N, vizDate: DATE, vizWheel: true } });
   fs.mkdirSync(path.join(ROOT, 'dist'), { recursive: true });

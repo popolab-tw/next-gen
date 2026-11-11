@@ -37,7 +37,7 @@
 | `viz/map.bin.gz` | 底圖：海岸線、行政區界、道路、等高線與地形高度網格 |
 | `viz/points.json` | 分享資料的固定版本：位置依縣市與人口密度隨機撒（不是真實住址），不含匿名代號與分享時間，順序打亂；分享少於 5 筆的縣市不放收入 PR 與審查結果 |
 
-MV 的 YouTube 影片代號設定在 `build/web.config.json` 的 `nextgenMv`（例：`{"yt": "影片代號", "len": "3 分半"}`）；沒有設定時用 `viz/mv-placeholder.mp4` 暫代。
+MV 的 YouTube 影片代號設定在 `build/web.config.json` 的 `nextgenMv`（例：`{"yt": "影片代號", "len": "3 分半"}`）。網站上用 youtube-nocookie.com 的播放器；控制播放器的 YouTube API 會設定 cookie，所以等觀眾按下播放才載入。YouTube 回報無法播放時，先轉到地圖，上方的 MV 按鈕改成開 YouTube 新分頁。claude.ai 預覽版不能內嵌 YouTube，一律改成「到 YouTube 看 MV」；還沒有影片代號時，網站不放開場，預覽版用 `viz/mv-placeholder.mp4` 暫代。
 
 ## 發現錯誤？
 

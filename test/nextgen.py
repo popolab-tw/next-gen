@@ -17,6 +17,9 @@ WEBM = open(webm, 'rb').read()
 html = open(os.path.join(ROOT, 'map', 'index.html'), encoding='utf8').read()
 open(os.path.join(ROOT, 'map', '_yt.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID"}};', html, count=1, flags=re.S))
 open(os.path.join(ROOT, 'map', '_file.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"src":"../viz/mv-placeholder.mp4"}};', html, count=1, flags=re.S))
+open(os.path.join(ROOT, 'map', '_nomv.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":null};', html, count=1, flags=re.S))
+open(os.path.join(ROOT, 'map', '_ext.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID","len":"3 分半","ext":true}};', html, count=1, flags=re.S))
+CFG = json.load(open(os.path.join(ROOT, 'build', 'web.config.json'), encoding='utf8')).get('nextgenMv') or {}
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -32,7 +35,7 @@ window.YT = { Player: function (el, o) {
   var f = document.createElement('iframe'); el.parentNode.replaceChild(f, el); window.__yt.opts = o;
   this.getIframe = function () { return f; };
   this.start = function () { o.events.onStateChange({ data: 1 }); clearInterval(iv); iv = setInterval(function () { t += 0.2; if (t >= dur) { clearInterval(iv); o.events.onStateChange({ data: 0 }); } }, 200); };
-  this.playVideo = function () { window.__yt.calls.push('play'); if (!window.__ytBlock) self.start(); };
+  this.playVideo = function () { window.__yt.calls.push('play'); if (window.__ytErr) { setTimeout(function () { o.events.onError({ data: 150 }); }, 100); return; } if (!window.__ytBlock) self.start(); };
   this.pauseVideo = function () { window.__yt.calls.push('pause'); clearInterval(iv); };
   this.seekTo = function (s) { t = s; }; this.getCurrentTime = function () { return t; }; this.getDuration = function () { return dur; };
   this.mute = function () { muted = true; }; this.unMute = function () { muted = false; }; this.isMuted = function () { return muted; };
@@ -43,10 +46,12 @@ if (window.onYouTubeIframeAPIReady) window.onYouTubeIframeAPIReady();
 def route(r):
     u = r.request.url
     if u.endswith('.mp4'): return r.fulfill(status=200, body=WEBM, headers={'Content-Type': 'video/webm'})
-    if u.startswith('https://www.youtube.com/iframe_api'): return r.fulfill(status=200, body=MOCK, headers={'Content-Type': 'text/javascript'})
+    if u.startswith('https://www.youtube.com/iframe_api'):
+        API.append(u); return r.fulfill(status=200, body=MOCK, headers={'Content-Type': 'text/javascript'})
     if u.startswith(BASE[:-4]): return r.continue_()
     return r.abort()
 I = "document.getElementById('ng-intro')"
+API = []
 
 with sync_playwright() as p:
     b = p.chromium.launch(args=['--use-gl=swiftshader', '--enable-unsafe-swiftshader'])
@@ -57,8 +62,16 @@ with sync_playwright() as p:
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.route('**/*', route)
         if mode == 'desktop':
-            pg.goto(BASE); pg.wait_for_timeout(1500)
-            check('網站版還沒有 MV：直接看地圖、不顯示 MV 按鈕', pg.evaluate(I + '.hidden') and pg.evaluate("document.getElementById('ng-mvbtn').hidden") and not pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
+            pg.goto(BASE + '_nomv.html'); pg.wait_for_timeout(1500)
+            check('沒有 MV：直接看地圖、不顯示 MV 按鈕', pg.evaluate(I + '.hidden') and pg.evaluate("document.getElementById('ng-mvbtn').hidden") and not pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
+            if CFG.get('yt'):
+                del API[:]
+                pg.goto(BASE); pg.wait_for_timeout(1500)
+                fsrc = pg.evaluate("(document.getElementById('ng-yt-frame') || {}).src || ''")
+                check('網站版：有 MV 開場與 MV 按鈕', not pg.evaluate(I + '.hidden') and not pg.evaluate("document.getElementById('ng-mvbtn').hidden"))
+                check('網站版：YouTube 隱私強化模式、影片代號正確', fsrc.startswith('https://www.youtube-nocookie.com/embed/' + CFG['yt'] + '?') and 'enablejsapi=1' in fsrc, fsrc)
+                check('網站版：按下播放前不載入 youtube.com 的 API（不設 cookie）', not API, API)
+                check('網站版：標題畫面顯示 MV 長度', ('約 ' + CFG.get('len', '')) in pg.evaluate("document.querySelector('.ng-play-s').textContent"))
         pg.goto(BASE + '_file.html'); pg.wait_for_timeout(2000)
         check(mode + ': 開場標題畫面', pg.evaluate(I + '.hidden') is False and pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
         check(mode + ': 預設深色', pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'dark')
@@ -97,8 +110,10 @@ with sync_playwright() as p:
         pg.route('**/*', route)
         pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1500)
         tag = 'YouTube' + ('（擋自動播放）' if block else '')
-        check(tag + ': 隱私強化模式', pg.evaluate("window.__yt.opts.host") == 'https://www.youtube-nocookie.com' and pg.evaluate("window.__yt.opts.videoId") == 'TESTID')
+        check(tag + ': 隱私強化模式', pg.evaluate("document.getElementById('ng-yt-frame').src").startswith('https://www.youtube-nocookie.com/embed/TESTID?'))
+        check(tag + ': 按下播放前不載入 API', not pg.evaluate("!!window.__yt"))
         pg.click('.ng-title', position={'x': 600, 'y': 300}); pg.wait_for_timeout(800)
+        check(tag + ': 按下播放後才載入 API', pg.evaluate("!!window.__yt && window.__yt.calls.indexOf('play') >= 0"))
         if block:
             pg.wait_for_timeout(3300)
             check(tag + ': 3.5 秒沒開始 → 讓觀眾點播放器', 'tap' in pg.evaluate(I + '.className') and not pg.evaluate("document.querySelector('.ng-tapmsg').hidden"))
@@ -110,8 +125,42 @@ with sync_playwright() as p:
         check(tag + ': 播到最後轉到地圖', pg.evaluate(I + '.hidden') and 'pause' in pg.evaluate('window.__yt.calls'))
         check(tag + ': 沒有錯誤', not errs, errs)
         ctx.close()
+    # YouTube 回報錯誤（例如不允許嵌入）：轉到地圖、提示，之後 MV 按鈕改開 YouTube 新分頁
+    ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.add_init_script('window.__ytErr = true; window.__opened = []; window.open = function (u) { window.__opened.push(u); return null; };')
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1500)
+    pg.click('.ng-play'); pg.wait_for_timeout(2200)
+    check('YouTube 錯誤: 轉到地圖並提示', pg.evaluate(I + '.hidden') and 'YouTube' in (pg.evaluate("(document.querySelector('.toast') || {}).textContent || ''")))
+    pg.click('#ng-mvbtn'); pg.wait_for_timeout(300)
+    check('YouTube 錯誤: MV 按鈕改開 YouTube', pg.evaluate('window.__opened') == ['https://youtu.be/TESTID'] and pg.evaluate(I + '.hidden'), pg.evaluate('window.__opened'))
+    check('YouTube 錯誤: 沒有錯誤', not errs, errs)
+    ctx.close()
+    # ext（claude.ai 預覽版）：不放播放器，按鈕開 YouTube 新分頁
+    for mode in ('desktop', 'mobile'):
+        vw = (1440, 900) if mode == 'desktop' else (390, 844)
+        ctx = b.new_context(viewport={'width': vw[0], 'height': vw[1]}, has_touch=mode == 'mobile', is_mobile=mode == 'mobile')
+        pg = ctx.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.add_init_script('window.__opened = []; window.open = function (u) { window.__opened.push(u); return null; };')
+        pg.route('**/*', route); del API[:]
+        pg.goto(BASE + '_ext.html'); pg.wait_for_timeout(1800)
+        tag = 'ext ' + mode
+        check(tag + ': 標題畫面改成「到 YouTube 看 MV」', '到 YouTube 看 MV' in pg.evaluate("document.querySelector('.ng-play-t').innerText") and '新分頁' in pg.evaluate("document.querySelector('.ng-play-s').textContent"))
+        check(tag + ': 不放播放器、不載入 API', not pg.evaluate("!!document.getElementById('ng-yt-frame')") and not API)
+        if mode == 'desktop': pg.keyboard.press('k')
+        else: pg.tap('.ng-title', position={'x': 195, 'y': 200})
+        pg.wait_for_timeout(300)
+        check(tag + ': 按任意鍵／點空白處不會開新分頁', pg.evaluate('window.__opened') == [] and not pg.evaluate(I + '.hidden'))
+        pg.click('.ng-play') if mode == 'desktop' else pg.tap('.ng-play')
+        pg.wait_for_timeout(1300)
+        check(tag + ': 按鈕開 YouTube、轉到地圖', pg.evaluate('window.__opened') == ['https://youtu.be/TESTID'] and pg.evaluate(I + '.hidden'))
+        check(tag + ': 沒有錯誤', not errs, errs)
+        ctx.close()
     b.close()
 srv.shutdown()
-os.remove(os.path.join(ROOT, 'map', '_yt.html')); os.remove(os.path.join(ROOT, 'map', '_file.html'))
+for f in ('_yt.html', '_file.html', '_nomv.html', '_ext.html'): os.remove(os.path.join(ROOT, 'map', f))
 print('全部通過' if ok else '有失敗')
 sys.exit(0 if ok else 1)

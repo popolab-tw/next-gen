@@ -99,6 +99,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-play-s { font-size: 11.5px; letter-spacing: .12em; color: rgba(236, 236, 230, .55); margin-top: -6px; }
 .ng-intro.nomv .ng-play-c svg { margin-left: 0; }
 .ng-intro.nomv .ng-play-s { display: none; }
+.ng-intro.ext .ng-title { cursor: default; }
 @keyframes ngPulse { 50% { opacity: .45; } }
 @keyframes ngIn { to { opacity: 1; } }
 .ng-skipall { position: relative; z-index: 1; margin-top: 26px; font-size: 12.5px; color: rgba(236, 236, 230, .6) !important; text-decoration: none; letter-spacing: .06em; border-bottom: 1px solid rgba(236, 236, 230, .25); padding-bottom: 1px; opacity: 0; animation: ngIn 1s ease 1.5s forwards; }
@@ -120,7 +121,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-hb svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .ng-skip { margin-left: auto; }
 .ng-esc { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: rgba(236, 236, 230, .5); }
-.ng-tapmsg { position: absolute; left: 50%; top: 18px; transform: translateX(-50%); font-size: 13px; letter-spacing: .06em; background: rgba(0, 0, 0, .6); padding: 7px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
+.ng-tapmsg { position: absolute; left: 50%; top: calc(50% + 64px); transform: translateX(-50%); font-size: 13px; letter-spacing: .06em; background: rgba(0, 0, 0, .6); padding: 7px 14px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
 .ng-wait { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px 0 0 -13px; border: 1.5px solid rgba(236, 236, 230, .2); border-top-color: #ececE6; border-radius: 50%; animation: ngSpin .9s linear infinite; display: none; pointer-events: none; }
 .ng-intro.playing.wait .ng-wait { display: block; }
 @keyframes ngSpin { to { transform: rotate(360deg); } }

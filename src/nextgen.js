@@ -61,33 +61,41 @@ var NG = (function () {
     });
     return ytApi;
   }
+  function ytWatch(mv) { return 'https://youtu.be/' + encodeURIComponent(mv.yt); }
+  // 隱私強化模式：網頁打開時只先放 youtube-nocookie.com 的播放器（這一步不會設定 cookie）。
+  // 控制播放器的 YouTube API 只能從 youtube.com 載入，而且會設定 cookie，所以等觀眾按下播放才載入。
   function ytPlayer(host, mv, ev) {
-    var box = h('div', { class: 'ng-yt' }), slot = h('div');
-    box.appendChild(slot); host.appendChild(box);
-    var P = null, isReady = false, want = false, poll = 0, failed = false;
+    var q = { enablejsapi: 1, autoplay: 0, controls: 0, rel: 0, playsinline: 1, iv_load_policy: 3, fs: 0, disablekb: 1, cc_load_policy: 0, modestbranding: 1 };
+    if (/^https?:$/.test(location.protocol)) q.origin = location.origin;
+    var src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(mv.yt) + '?' + Object.keys(q).map(function (k) { return k + '=' + encodeURIComponent(q[k]); }).join('&');
+    var box = h('div', { class: 'ng-yt' });
+    var frame = h('iframe', { id: 'ng-yt-frame', src: src, title: 'NEXT GEN MV', tabindex: '-1', allow: 'autoplay; encrypted-media; picture-in-picture', referrerpolicy: 'strict-origin-when-cross-origin' });
+    box.appendChild(frame); host.appendChild(box);
+    var P = null, isReady = false, want = false, poll = 0, failed = false, started = false;
     function tick() { if (!P || !P.getCurrentTime) return; var c = P.getCurrentTime() || 0, d = P.getDuration() || 0; ev.time(c, d); }
-    loadYT().then(function (YT) {
-      P = new YT.Player(slot, {
-        host: 'https://www.youtube-nocookie.com',
-        videoId: mv.yt,
-        width: '100%', height: '100%',
-        playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1, iv_load_policy: 3, fs: 0, disablekb: 1, cc_load_policy: 0, modestbranding: 1, origin: location.origin },
-        events: {
-          onReady: function () { isReady = true; var f = P.getIframe && P.getIframe(); if (f) { f.setAttribute('title', 'NEXT GEN MV'); f.setAttribute('tabindex', '-1'); } if (want) P.playVideo(); },
-          onStateChange: function (e) {
-            if (e.data === 1) { ev.playing(); clearInterval(poll); poll = setInterval(tick, 200); }
-            else if (e.data === 3) ev.waiting();
-            else if (e.data === 0) { clearInterval(poll); ev.ended(); }
-            else if (e.data === 2) clearInterval(poll);
-          },
-          onError: function () { failed = true; ev.error('yt'); }
-        }
-      });
-    }).catch(function () { failed = true; ev.error('yt-api'); });
+    function fail(why) { if (failed) return; failed = true; clearInterval(poll); ev.error(why); }
+    function attach() {
+      if (started) return; started = true;
+      setTimeout(function () { if (!isReady) fail('yt-timeout'); }, 15000);
+      loadYT().then(function (YT) {
+        P = new YT.Player(frame, {
+          events: {
+            onReady: function () { isReady = true; if (failed) return; if (want) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
+            onStateChange: function (e) {
+              if (e.data === 1) { ev.playing(); clearInterval(poll); poll = setInterval(tick, 200); }
+              else if (e.data === 3) ev.waiting();
+              else if (e.data === 0) { clearInterval(poll); ev.ended(); }
+              else if (e.data === 2) clearInterval(poll);
+            },
+            onError: function (e) { fail('yt-' + (e && e.data)); }
+          }
+        });
+      }).catch(function () { fail('yt-api'); });
+    }
     return {
       ready: function () { return isReady; },
       failed: function () { return failed; },
-      play: function () { want = true; if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
+      play: function () { want = true; attach(); if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
       stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
@@ -105,19 +113,29 @@ var NG = (function () {
     var playBtn = root.querySelector('.ng-play'), skipAll = root.querySelector('.ng-skipall');
     var state = 'title', hudT = 0, startT = 0, player = null, nearEnd = false;
     var has = !!(mv.yt || mv.src);
+    // ext：MV 不在這頁播，改到 YouTube 新分頁看（claude.ai 預覽版不能內嵌 YouTube；正式網站播放失敗時也改成這樣）
+    var ext = !!(mv.yt && mv.ext);
     var ev = {
       playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); },
       waiting: function () { root.classList.add('wait'); },
       ended: function () { done(); },
-      error: function (why) { if (state === 'play') done('fail'); else if (state === 'title') noMv(); },
+      error: function (why) { if (mv.yt) setExt(); if (state === 'play') done('fail'); else if (state === 'title' && !mv.yt) noMv(); },
       muted: function () { syncMute(); },
       time: function (c, d) {
         if (d > 0) { bar.style.transform = 'scaleX(' + Math.min(1, c / d).toFixed(4) + ')'; if (!nearEnd && d - c < 0.35) { nearEnd = true; done(); } }   // 搶在 YouTube 片尾畫面出現前轉場
       }
     };
-    if (has) player = mv.yt ? ytPlayer(stageEl, mv, ev) : filePlayer(stageEl, mv, ev);
+    if (ext) setExt();
+    else if (has) player = mv.yt ? ytPlayer(stageEl, mv, ev) : filePlayer(stageEl, mv, ev);
     else noMv();
     function noMv() { root.classList.add('nomv'); playBtn.querySelector('.ng-play-t').textContent = '進入地圖'; }
+    function setExt() {
+      ext = true; root.classList.add('ext');
+      [].forEach.call(playBtn.querySelectorAll('.k-key, .k-tap'), function (s) { s.textContent = '到 YouTube 看 MV'; });
+      playBtn.querySelector('.ng-play-s').textContent = '在新分頁開啟' + (mv.len ? '・約 ' + mv.len : '');
+      var b = document.getElementById('ng-mvbtn'); if (b) { b.title = '到 YouTube 看 MV（新分頁）'; b.setAttribute('aria-label', b.title); }
+    }
+    function openYT() { try { window.open(ytWatch(mv), '_blank', 'noopener'); } catch (e) { /* 忽略 */ } }
 
     function lock(on) { document.documentElement.classList.toggle('ng-lock', on); }
     function showHud() {
@@ -128,6 +146,7 @@ var NG = (function () {
     function syncMute() { if (!player) return; var m = player.muted(); muteBtn.setAttribute('aria-pressed', m ? 'true' : 'false'); muteBtn.querySelector('span').textContent = m ? '開聲音' : '靜音'; }
     function play() {
       if (state !== 'title') return;
+      if (ext) { openYT(); done(); return; }
       if (!has || (player.failed && player.failed())) { done(); return; }
       state = 'play'; nearEnd = false;
       root.classList.add('playing', 'wait'); root.classList.remove('on');
@@ -151,9 +170,10 @@ var NG = (function () {
         lock(false);
         if (document.activeElement && root.contains(document.activeElement)) document.activeElement.blur();
       }, 950);
-      if (why === 'fail') U.toast && U.toast('MV 載入失敗，先帶你看地圖。可以稍後按上方的 MV 再試一次。');
+      if (why === 'fail') U.toast && U.toast('MV 無法在這裡播放，先帶你看地圖。按上方的 MV，可以到 YouTube 看。');
     }
     function open(direct) {
+      if (direct && ext) { openYT(); return; }
       state = 'title'; root.hidden = false; lock(true);
       root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap');
       if (direct) play();
@@ -161,7 +181,7 @@ var NG = (function () {
     }
 
     // 標題畫面：點任何地方（「直接看地圖」除外）或按任意鍵 → 播放
-    title.addEventListener('click', function (e) { if (e.target.closest('.ng-skipall')) return; play(); });
+    title.addEventListener('click', function (e) { if (e.target.closest('.ng-skipall')) return; if (ext && !e.target.closest('.ng-play')) return; play(); });
     skipAll.addEventListener('click', function (e) { e.preventDefault(); done(); });
     skipBtn.addEventListener('click', function (e) { e.stopPropagation(); done(); });
     muteBtn.addEventListener('click', function (e) { e.stopPropagation(); if (player) { player.mute(!player.muted()); setTimeout(syncMute, 120); } showHud(); });
@@ -171,6 +191,7 @@ var NG = (function () {
       if (root.hidden || state === 'done') return;
       if (e.metaKey || e.ctrlKey || e.altKey || /^(Shift|Control|Alt|Meta|CapsLock|Tab)$/.test(e.key)) return;
       if (state === 'title') {
+        if (ext) { if (e.key === 'Escape') { e.preventDefault(); done(); } return; }   // 開新分頁只交給按鈕本身（Enter／空白鍵）
         if (document.activeElement === skipAll && (e.key === 'Enter' || e.key === ' ')) return;   // 交給連結自己處理
         e.preventDefault(); play(); return;
       }
