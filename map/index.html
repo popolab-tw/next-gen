@@ -191,7 +191,7 @@ html.vz-lock, html.vz-lock body { overflow: hidden; }
   color-scheme: dark;
 }
 :root[data-theme="light"] { --ng-bg: #ffffff; --ng-ink: #111113; --ng-ink-2: rgba(17, 17, 19, .62); --ng-ink-3: rgba(17, 17, 19, .42); --ng-rule: rgba(17, 17, 19, .16); --ng-chip: rgba(17, 17, 19, .04); color-scheme: light; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--ng-top) + var(--ng-tabs)); }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--ng-top) + var(--ng-tabs)); scrollbar-gutter: stable; }   /* 開場鎖住捲動時捲軸位置照留，地圖寬度不跳 */
 body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/1.6 var(--f-sans); -webkit-font-smoothing: antialiased; }
 .ng a { color: inherit; }
 .ng [hidden] { display: none !important; }
@@ -344,7 +344,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 }
 
 </style>
-<script>window.TWKIDS = {"target":"nextgen","vizN":4698,"vizDate":"2026-10-24","vizMap":"viz-map.ab97b4251d.bin.gz","vizPts":"viz-pts.6f94f5586c.json"};
+<script>window.TWKIDS = {"target":"nextgen","vizN":4698,"vizDate":"2026-10-24","vizMap":"viz-map.ab97b4251d.bin.gz","vizPts":"viz-pts.6f94f5586c.json","vizWheel":true};
 window.NEXTGEN = {"mv":null};</script>
 </head>
 <body class="ng">
@@ -1194,7 +1194,8 @@ var VIZ = (function () {
     var legend = h('div', { class: 'vz-legend' });
     var panel = h('div', { class: 'vz-set', hidden: true, role: 'dialog', 'aria-label': '顯示設定' });
     var touchy = (function () { try { return window.matchMedia('(pointer: coarse)').matches; } catch (e) { return false; } })();
-    var hint = h('div', { class: 'vz-hint' }, touchy ? '拖曳：轉動・雙指：縮放與移動・捲動網頁請滑地圖外面' : '拖曳：轉動・點兩下再拖：移動・Ctrl＋滾輪：縮放');
+    var WHEEL = !!cfg.vizWheel;   // NEXT GEN：滾輪直接縮放（遊戲頁裡要按 Ctrl，一般滾動留給網頁）
+    var hint = h('div', { class: 'vz-hint' }, touchy ? '拖曳：轉動・雙指：縮放與移動・捲動網頁請滑地圖外面' : WHEEL ? '拖曳：轉動・中鍵拖曳：移動・滾輪：縮放' : '拖曳：轉動・中鍵拖曳或點兩下再拖：移動・Ctrl＋滾輪：縮放');
     var back = h('button', { type: 'button', class: 'vz-back', hidden: true, 'aria-label': '回到上一步', title: '回到上一步', onclick: function () { goBack(); } });
     back.innerHTML = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5L7 10l5.5 5.5"/></svg><span>上一步</span>';
     // 微縮攝影：畫面上下漸進模糊（只模糊地圖，名稱與按鈕不受影響）
@@ -2067,15 +2068,18 @@ var VIZ = (function () {
     var ptrs = {}, moved = 0, lastTap = null;
     function ptList() { return Object.keys(ptrs).map(function (k) { return ptrs[k]; }); }
     canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    // 中鍵：不要出現瀏覽器的自動捲動
+    canvas.addEventListener('mousedown', function (e) { if (e.button === 1) e.preventDefault(); });
+    canvas.addEventListener('auxclick', function (e) { if (e.button === 1) e.preventDefault(); });
     canvas.addEventListener('pointerdown', function (e) {
       ptrs[e.pointerId] = { x: e.clientX, y: e.clientY, type: e.pointerType };
       moved = 0; stopCam(); hideHint(); st.vy = 0;
       var L = ptList(), t = now();
       if (L.length === 1) {
-        // 點兩下（第二下按住）、右鍵或 Shift：移動畫面
+        // 點兩下（第二下按住）、滑鼠中鍵、右鍵或 Shift：移動畫面
         var dbl = lastTap && t - lastTap.t < 380 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 34;
         if (dbl) clearTimeout(st.tapTimer);   // 是點兩下：取消第一下的動作
-        drag = { x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitch, type: e.pointerType, pan: dbl || e.button === 2 || e.shiftKey, dbl: dbl, px: e.clientX, py: e.clientY, rot: false };
+        drag = { x: e.clientX, y: e.clientY, yaw: st.yaw, pitch: st.pitch, type: e.pointerType, pan: dbl || e.button === 1 || e.button === 2 || e.shiftKey, dbl: dbl, px: e.clientX, py: e.clientY, rot: false };
         if (drag.pan) canvas.classList.add('panning');
       } else if (L.length === 2) drag = { pinch: Math.hypot(L[0].x - L[1].x, L[0].y - L[1].y), my: (L[0].y + L[1].y) / 2, mx: (L[0].x + L[1].x) / 2 };
       try { canvas.setPointerCapture(e.pointerId); } catch (x) { /* 忽略 */ }
@@ -2142,7 +2146,7 @@ var VIZ = (function () {
     canvas.addEventListener('pointercancel', up);
     canvas.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && st.hov >= 0) { st.hov = -1; kick(); } });
     canvas.addEventListener('wheel', function (e) {
-      if (!(e.ctrlKey || e.metaKey || st.full)) return;   // 一般滾動留給網頁；觸控板雙指縮放、按住 Ctrl 才縮放
+      if (!(WHEEL || e.ctrlKey || e.metaKey || st.full)) return;   // 一般滾動留給網頁；觸控板雙指縮放、按住 Ctrl 才縮放
       e.preventDefault(); hideHint();
       var r = canvas.getBoundingClientRect();
       zoomBy(Math.exp(-e.deltaY * 0.0025), e.clientX - r.left, e.clientY - r.top);
@@ -2170,6 +2174,7 @@ var VIZ = (function () {
         var sz = stageSize();
         if (lastSz && Math.abs(sz.w - lastSz.w) < 2 && Math.abs(sz.h - lastSz.h) < 90) { kick(); return; }
         lastSz = sz;
+        if (D && cam.from) { var t = cam.to, n = fitTarget(t.yaw, t.pitch); cam.to = Object.assign({}, t, { cx: n.cx, cy: n.cy, hh: n.hh }); kick(); return; }
         if (D) { if (st.focus) refit(false, { yaw: st.yaw, pitch: st.pitch }); else setFilter(st.filter, true); }
       });
       ro.observe(stage);

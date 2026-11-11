@@ -9,7 +9,7 @@
   color-scheme: dark;
 }
 :root[data-theme="light"] { --ng-bg: #ffffff; --ng-ink: #111113; --ng-ink-2: rgba(17, 17, 19, .62); --ng-ink-3: rgba(17, 17, 19, .42); --ng-rule: rgba(17, 17, 19, .16); --ng-chip: rgba(17, 17, 19, .04); color-scheme: light; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--ng-top) + var(--ng-tabs)); }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--ng-top) + var(--ng-tabs)); scrollbar-gutter: stable; }   /* 開場鎖住捲動時捲軸位置照留，地圖寬度不跳 */
 body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/1.6 var(--f-sans); -webkit-font-smoothing: antialiased; }
 .ng a { color: inherit; }
 .ng [hidden] { display: none !important; }

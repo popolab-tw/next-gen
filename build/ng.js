@@ -165,7 +165,7 @@ function build(o) {
   ['kv-1920.webp', 'og.jpg'].forEach(f => { fs.copyFileSync(path.join(ROOT, 'src', 'ng', f), path.join(out, f)); keep.add(f); });
   fs.writeFileSync(path.join(out, 'favicon.svg'), NG_ICON); keep.add('favicon.svg');
   const web = page({ web: true, siteUrl: site, ngUrl, repo: o.repo, desc, kv: 'kv-1920.webp', mv: mvWeb,
-    twkids: { target: 'nextgen', vizN: N, vizDate: DATE, vizMap: mapF, vizPts: ptsF } });
+    twkids: { target: 'nextgen', vizN: N, vizDate: DATE, vizMap: mapF, vizPts: ptsF, vizWheel: true } });
   fs.writeFileSync(path.join(out, 'index.html'), web); keep.add('index.html');
   // 舊的雜湊檔：只留最近一個版本（剛更新時，快取裡的舊網頁還找得到它要的檔案）
   const old = fs.readdirSync(out).filter(f => !keep.has(f)).map(f => ({ f, t: fs.statSync(path.join(out, f)).mtimeMs })).sort((a, b) => b.t - a.t);
@@ -177,7 +177,7 @@ window.__VIZ_PTS = ${ptsB.toString('utf8').trim()};</script>
 `;
   const mvDist = mvCfg.yt ? { yt: mvCfg.yt, len: mvCfg.len } : { src: dataUrl('viz/mv-placeholder.mp4', 'video/mp4'), len: mvCfg.len };
   const dist = page({ web: false, siteUrl: site, ngUrl, repo: o.repo, desc, kv: dataUrl('src/ng/kv-1920.webp', 'image/webp'), mv: mvDist, inline,
-    twkids: { target: 'nextgen-artifact', local: true, vizN: N, vizDate: DATE } });
+    twkids: { target: 'nextgen-artifact', local: true, vizN: N, vizDate: DATE, vizWheel: true } });
   fs.mkdirSync(path.join(ROOT, 'dist'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'dist', 'map.html'), dist);
   console.log('map/index.html', (Buffer.byteLength(web) / 1024).toFixed(1) + ' KB', '｜' + mapF, ptsF, mvWeb ? '｜MV：YouTube ' + mvWeb.yt : '｜MV：尚未設定（直接看地圖）', '｜dist/map.html', (Buffer.byteLength(dist) / 1024 / 1024).toFixed(2) + ' MB');
