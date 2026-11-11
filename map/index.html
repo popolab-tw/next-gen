@@ -109,6 +109,7 @@
 .vz-btn { width: 34px; height: 34px; display: grid; place-items: center; background: var(--vz-bg); color: var(--vz-ink); border: 1px solid var(--vz-rule); border-radius: 2px; cursor: pointer; padding: 0; }
 .vz-btn:hover { border-color: var(--vz-ink); }
 .vz-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.vz-btn.vz-txt { width: auto; padding: 0 12px; font: 500 12.5px/1 var(--f-sans); letter-spacing: .1em; white-space: nowrap; }
 .vz-card { position: absolute; left: 0; top: 0; width: 212px; padding: 10px 12px 11px; z-index: 4; color: var(--vz-ink); font-size: 11px; line-height: 1.35; }
 .vz-card.dock { left: auto; right: 12px; top: 12px; width: 178px; transform: none !important; padding: 9px 11px 10px; }
 .vz-card-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -153,6 +154,8 @@
 .vz-body.vz-full .vz-canvas { touch-action: none; }
 .vz-body.vz-full .vz-filters { position: static; padding-top: env(safe-area-inset-top); }
 html.vz-lock, html.vz-lock body { overflow: hidden; }
+/* 窄螢幕：按鈕列加上「微縮攝影」會壓到左邊的圖例，改排到按鈕列上方 */
+@media (max-width: 640px) { .vz-btn.vz-txt { position: absolute; right: 0; bottom: calc(100% + 6px); padding: 0 10px; font-size: 12px; } }
 @media (max-width: 560px) {
   .vz { padding-top: 44px; }
   .vz-in { padding-inline: 16px; }
@@ -1170,8 +1173,22 @@ var VIZ = (function () {
   // la：台灣線條（道路、等高線、海岸線、縣市界）的透明度倍率
   var PREF0 = { stem: 1, gap: 0.75, terrain: 5, dot: 1, la: 1, glass: 0.9, blur: 2, contour: false, pal: 'neon', lock: false, veg: false, tilt: false };
   var VEG_UI = false;   // 植被地形的開關先藏起來（功能保留；藏起來時一律關閉）
-  function loadPrefs() { var p = Object.assign({}, PREF0); try { var s = JSON.parse(localStorage.getItem('tw-kids:vizPrefs3') || 'null'); if (s && typeof s === 'object') Object.keys(PREF0).forEach(function (k) { if (typeof s[k] === typeof PREF0[k]) p[k] = s[k]; }); } catch (e) { /* 忽略 */ } return p; }
-  function savePrefs(p) { try { localStorage.setItem('tw-kids:vizPrefs3', JSON.stringify(p)); } catch (e) { /* 忽略 */ } }
+  // 手機（觸控、螢幕短邊不到 600px）：畫面小，圓點預設小一點
+  function isPhone() { try { return window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600; } catch (e) { return false; } }
+  function prefDefaults() { var p = Object.assign({}, PREF0); if (isPhone()) p.dot = 0.6; return p; }
+  function loadPrefs() {
+    var p = prefDefaults();
+    try {
+      var s = JSON.parse(localStorage.getItem('tw-kids:vizPrefs3') || 'null');
+      if (s && typeof s === 'object') {
+        Object.keys(PREF0).forEach(function (k) { if (typeof s[k] === typeof PREF0[k]) p[k] = s[k]; });
+        // 2026-11 手機圓點預設改成 0.6：之前存下來的還是舊預設 1 的話，跟著改（d2 = 已經換過）
+        if (!s.d2 && s.dot === 1 && isPhone()) p.dot = 0.6;
+      }
+    } catch (e) { /* 忽略 */ }
+    return p;
+  }
+  function savePrefs(p) { try { localStorage.setItem('tw-kids:vizPrefs3', JSON.stringify(Object.assign({}, p, { d2: true }))); } catch (e) { /* 忽略 */ } }
 
   // 同一次瀏覽只下載、解析一次（回到首頁時重用）
   var cache = null;
@@ -1885,6 +1902,10 @@ var VIZ = (function () {
       if (isTop()) { var v = st.focus ? { yaw: st.yaw, pitch: 52 } : (S.view || viewFor(st.filter)); camTo(fitTarget(YAW0, v.pitch), true, 800); }
       else camTo(fitTarget(0, 90, true), true, 800);   // 固定北邊朝上、整張地圖放進畫面
     });
+    // 微縮攝影：長方形文字按鈕，放在按鈕列最前面（手機上排在按鈕列上方）
+    var tiltBtn = h('button', { class: 'vz-btn vz-txt', type: 'button', 'aria-pressed': 'false', title: '微縮攝影：畫面上下模糊，像拍微縮模型', onclick: function () { st.prefs.tilt = !st.prefs.tilt; savePrefs(st.prefs); applyTilt(st.prefs.tilt); if (!panel.hidden) buildPanel(); kick(); } }, '微縮攝影');
+    syncTiltBtn(st.prefs.tilt);
+    ctl.appendChild(tiltBtn);
     ctl.appendChild(setBtn);
     ctl.appendChild(topBtn);
     ctl.appendChild(btn(I_PLUS, '放大', function () { zoomBy(1.35); }));
@@ -1900,7 +1921,8 @@ var VIZ = (function () {
       row.appendChild(h('span', {}, label)); row.appendChild(inp); row.appendChild(val);
       return row;
     }
-    function applyTilt(on) { tilt.hidden = !on; stage.classList.toggle('vz-mini', !!on); }
+    function syncTiltBtn(on) { tiltBtn.classList.toggle('on', !!on); tiltBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    function applyTilt(on) { tilt.hidden = !on; stage.classList.toggle('vz-mini', !!on); syncTiltBtn(on); }
     function applyGlass() { host.style.setProperty('--vz-glass-a', (1 - st.prefs.glass).toFixed(3)); host.style.setProperty('--vz-glass-blur', st.prefs.blur + 'px'); }
     applyGlass();
     function toggle(label, key, onChange) {
@@ -1933,7 +1955,7 @@ var VIZ = (function () {
         pals.appendChild(b);
       });
       panel.appendChild(pals);
-      panel.appendChild(h('button', { type: 'button', class: 'vz-reset', onclick: function () { st.prefs = Object.assign({}, PREF0); savePrefs(st.prefs); recolor(); relayout(); applyVeg(false); applyTilt(false); applyGlass(); refit(true, st.focus ? { yaw: st.yaw, pitch: st.pitch } : viewFor(st.filter)); buildPanel(); } }, '恢復預設'));
+      panel.appendChild(h('button', { type: 'button', class: 'vz-reset', onclick: function () { st.prefs = prefDefaults(); savePrefs(st.prefs); recolor(); relayout(); applyVeg(false); applyTilt(false); applyGlass(); refit(true, st.focus ? { yaw: st.yaw, pitch: st.pitch } : viewFor(st.filter)); buildPanel(); } }, '恢復預設'));
     }
     function zoomBy(k, cx, cy) {
       stopCam();
@@ -2292,6 +2314,21 @@ var NG = (function () {
   function initTheme() { var t = null; try { t = localStorage.getItem(KEY_THEME); } catch (e) { /* 忽略 */ } setTheme(t === 'light' ? 'light' : 'dark', false); }
   function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } }
 
+  // ---------- 音量漸弱：略過或播完時，音樂跟著畫面淡出；停下後恢復原本音量，重播才有聲音 ----------
+  // get／set 的音量是 0–1；音量照平方遞減，聽起來比直線遞減平順（直線的話前段幾乎聽不出變小）
+  function fader(get, set) {
+    var t = 0, v0 = null;
+    return {
+      out: function (ms) {
+        clearInterval(t);
+        if (v0 == null) { try { v0 = get(); } catch (e) { v0 = 1; } if (!(v0 >= 0)) v0 = 1; }
+        var a = v0, t0 = Date.now();
+        t = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / ms); try { set(a * (1 - k) * (1 - k)); } catch (e) { /* 忽略 */ } if (k >= 1) clearInterval(t); }, 40);
+      },
+      restore: function () { clearInterval(t); if (v0 != null) { try { set(v0); } catch (e) { /* 忽略 */ } v0 = null; } }
+    };
+  }
+
   // ---------- 播放器：YouTube 或影片檔，對外介面一樣 ----------
   // ev: { playing, waiting, ended, error, time(cur, dur) }
   function filePlayer(host, mv, ev) {
@@ -2307,10 +2344,12 @@ var NG = (function () {
     v.addEventListener('ended', function () { ev.ended(); });
     v.addEventListener('error', function () { ev.error('file'); });
     v.addEventListener('timeupdate', function () { ev.time(v.currentTime, v.duration || 0); });
+    var fd = fader(function () { return v.volume; }, function (x) { v.volume = Math.max(0, Math.min(1, x)); });
     return {
       ready: function () { return true; },
       play: function () { var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; ev.muted(true); v.play().catch(function () { ev.error('blocked'); }); }); },
-      stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } },
+      fade: function (ms) { fd.out(ms); },
+      stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } fd.restore(); },
       mute: function (m) { v.muted = m; },
       muted: function () { return v.muted; },
       native: function () { return false; }
@@ -2344,6 +2383,7 @@ var NG = (function () {
     var P = null, isReady = false, want = false, poll = 0, failed = false, started = false;
     function tick() { if (!P || !P.getCurrentTime) return; var c = P.getCurrentTime() || 0, d = P.getDuration() || 0; ev.time(c, d); }
     function fail(why) { if (failed) return; failed = true; clearInterval(poll); ev.error(why); }
+    var fd = fader(function () { return P.getVolume() / 100; }, function (x) { P.setVolume(Math.round(Math.max(0, Math.min(1, x)) * 100)); });
     function attach() {
       if (started) return; started = true;
       setTimeout(function () { if (!isReady) fail('yt-timeout'); }, 15000);
@@ -2366,7 +2406,8 @@ var NG = (function () {
       ready: function () { return isReady; },
       failed: function () { return failed; },
       play: function () { want = true; attach(); if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
-      stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } } },
+      fade: function (ms) { if (isReady && !failed) fd.out(ms); },
+      stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } fd.restore(); } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
       native: function (on) { box.classList.toggle('tap', !!on); }   // 手機擋自動播放時，改讓觀眾直接點 YouTube 的播放鍵
@@ -2433,6 +2474,7 @@ var NG = (function () {
       state = 'done'; ss(KEY_SEEN, '1');
       clearTimeout(startT); clearTimeout(hudT);
       root.classList.add('out');
+      if (wasPlay && player && player.fade) player.fade(900);   // 音樂和畫面一起在 0.9 秒內淡出
       if (viz && viz.intro) viz.intro(wasPlay ? 3000 : 2400);
       setTimeout(function () {
         if (player) player.stop();

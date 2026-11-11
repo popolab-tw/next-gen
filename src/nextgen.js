@@ -22,6 +22,21 @@ var NG = (function () {
   function initTheme() { var t = null; try { t = localStorage.getItem(KEY_THEME); } catch (e) { /* 忽略 */ } setTheme(t === 'light' ? 'light' : 'dark', false); }
   function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } }
 
+  // ---------- 音量漸弱：略過或播完時，音樂跟著畫面淡出；停下後恢復原本音量，重播才有聲音 ----------
+  // get／set 的音量是 0–1；音量照平方遞減，聽起來比直線遞減平順（直線的話前段幾乎聽不出變小）
+  function fader(get, set) {
+    var t = 0, v0 = null;
+    return {
+      out: function (ms) {
+        clearInterval(t);
+        if (v0 == null) { try { v0 = get(); } catch (e) { v0 = 1; } if (!(v0 >= 0)) v0 = 1; }
+        var a = v0, t0 = Date.now();
+        t = setInterval(function () { var k = Math.min(1, (Date.now() - t0) / ms); try { set(a * (1 - k) * (1 - k)); } catch (e) { /* 忽略 */ } if (k >= 1) clearInterval(t); }, 40);
+      },
+      restore: function () { clearInterval(t); if (v0 != null) { try { set(v0); } catch (e) { /* 忽略 */ } v0 = null; } }
+    };
+  }
+
   // ---------- 播放器：YouTube 或影片檔，對外介面一樣 ----------
   // ev: { playing, waiting, ended, error, time(cur, dur) }
   function filePlayer(host, mv, ev) {
@@ -37,10 +52,12 @@ var NG = (function () {
     v.addEventListener('ended', function () { ev.ended(); });
     v.addEventListener('error', function () { ev.error('file'); });
     v.addEventListener('timeupdate', function () { ev.time(v.currentTime, v.duration || 0); });
+    var fd = fader(function () { return v.volume; }, function (x) { v.volume = Math.max(0, Math.min(1, x)); });
     return {
       ready: function () { return true; },
       play: function () { var p = v.play(); if (p && p.catch) p.catch(function () { v.muted = true; ev.muted(true); v.play().catch(function () { ev.error('blocked'); }); }); },
-      stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } },
+      fade: function (ms) { fd.out(ms); },
+      stop: function () { try { v.pause(); v.currentTime = 0; } catch (e) { /* 忽略 */ } fd.restore(); },
       mute: function (m) { v.muted = m; },
       muted: function () { return v.muted; },
       native: function () { return false; }
@@ -74,6 +91,7 @@ var NG = (function () {
     var P = null, isReady = false, want = false, poll = 0, failed = false, started = false;
     function tick() { if (!P || !P.getCurrentTime) return; var c = P.getCurrentTime() || 0, d = P.getDuration() || 0; ev.time(c, d); }
     function fail(why) { if (failed) return; failed = true; clearInterval(poll); ev.error(why); }
+    var fd = fader(function () { return P.getVolume() / 100; }, function (x) { P.setVolume(Math.round(Math.max(0, Math.min(1, x)) * 100)); });
     function attach() {
       if (started) return; started = true;
       setTimeout(function () { if (!isReady) fail('yt-timeout'); }, 15000);
@@ -96,7 +114,8 @@ var NG = (function () {
       ready: function () { return isReady; },
       failed: function () { return failed; },
       play: function () { want = true; attach(); if (isReady) { P.playVideo(); if (P.isMuted && P.isMuted()) ev.muted(true); } },
-      stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } } },
+      fade: function (ms) { if (isReady && !failed) fd.out(ms); },
+      stop: function () { want = false; clearInterval(poll); if (isReady) { try { P.pauseVideo(); P.seekTo(0, true); } catch (e) { /* 忽略 */ } fd.restore(); } },
       mute: function (m) { if (isReady) { if (m) P.mute(); else P.unMute(); } },
       muted: function () { return isReady && P.isMuted ? P.isMuted() : false; },
       native: function (on) { box.classList.toggle('tap', !!on); }   // 手機擋自動播放時，改讓觀眾直接點 YouTube 的播放鍵
@@ -163,6 +182,7 @@ var NG = (function () {
       state = 'done'; ss(KEY_SEEN, '1');
       clearTimeout(startT); clearTimeout(hudT);
       root.classList.add('out');
+      if (wasPlay && player && player.fade) player.fade(900);   // 音樂和畫面一起在 0.9 秒內淡出
       if (viz && viz.intro) viz.intro(wasPlay ? 3000 : 2400);
       setTimeout(function () {
         if (player) player.stop();

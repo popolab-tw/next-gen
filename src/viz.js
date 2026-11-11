@@ -259,8 +259,22 @@ var VIZ = (function () {
   // la：台灣線條（道路、等高線、海岸線、縣市界）的透明度倍率
   var PREF0 = { stem: 1, gap: 0.75, terrain: 5, dot: 1, la: 1, glass: 0.9, blur: 2, contour: false, pal: 'neon', lock: false, veg: false, tilt: false };
   var VEG_UI = false;   // 植被地形的開關先藏起來（功能保留；藏起來時一律關閉）
-  function loadPrefs() { var p = Object.assign({}, PREF0); try { var s = JSON.parse(localStorage.getItem('tw-kids:vizPrefs3') || 'null'); if (s && typeof s === 'object') Object.keys(PREF0).forEach(function (k) { if (typeof s[k] === typeof PREF0[k]) p[k] = s[k]; }); } catch (e) { /* 忽略 */ } return p; }
-  function savePrefs(p) { try { localStorage.setItem('tw-kids:vizPrefs3', JSON.stringify(p)); } catch (e) { /* 忽略 */ } }
+  // 手機（觸控、螢幕短邊不到 600px）：畫面小，圓點預設小一點
+  function isPhone() { try { return window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 600; } catch (e) { return false; } }
+  function prefDefaults() { var p = Object.assign({}, PREF0); if (isPhone()) p.dot = 0.6; return p; }
+  function loadPrefs() {
+    var p = prefDefaults();
+    try {
+      var s = JSON.parse(localStorage.getItem('tw-kids:vizPrefs3') || 'null');
+      if (s && typeof s === 'object') {
+        Object.keys(PREF0).forEach(function (k) { if (typeof s[k] === typeof PREF0[k]) p[k] = s[k]; });
+        // 2026-11 手機圓點預設改成 0.6：之前存下來的還是舊預設 1 的話，跟著改（d2 = 已經換過）
+        if (!s.d2 && s.dot === 1 && isPhone()) p.dot = 0.6;
+      }
+    } catch (e) { /* 忽略 */ }
+    return p;
+  }
+  function savePrefs(p) { try { localStorage.setItem('tw-kids:vizPrefs3', JSON.stringify(Object.assign({}, p, { d2: true }))); } catch (e) { /* 忽略 */ } }
 
   // 同一次瀏覽只下載、解析一次（回到首頁時重用）
   var cache = null;
@@ -974,6 +988,10 @@ var VIZ = (function () {
       if (isTop()) { var v = st.focus ? { yaw: st.yaw, pitch: 52 } : (S.view || viewFor(st.filter)); camTo(fitTarget(YAW0, v.pitch), true, 800); }
       else camTo(fitTarget(0, 90, true), true, 800);   // 固定北邊朝上、整張地圖放進畫面
     });
+    // 微縮攝影：長方形文字按鈕，放在按鈕列最前面（手機上排在按鈕列上方）
+    var tiltBtn = h('button', { class: 'vz-btn vz-txt', type: 'button', 'aria-pressed': 'false', title: '微縮攝影：畫面上下模糊，像拍微縮模型', onclick: function () { st.prefs.tilt = !st.prefs.tilt; savePrefs(st.prefs); applyTilt(st.prefs.tilt); if (!panel.hidden) buildPanel(); kick(); } }, '微縮攝影');
+    syncTiltBtn(st.prefs.tilt);
+    ctl.appendChild(tiltBtn);
     ctl.appendChild(setBtn);
     ctl.appendChild(topBtn);
     ctl.appendChild(btn(I_PLUS, '放大', function () { zoomBy(1.35); }));
@@ -989,7 +1007,8 @@ var VIZ = (function () {
       row.appendChild(h('span', {}, label)); row.appendChild(inp); row.appendChild(val);
       return row;
     }
-    function applyTilt(on) { tilt.hidden = !on; stage.classList.toggle('vz-mini', !!on); }
+    function syncTiltBtn(on) { tiltBtn.classList.toggle('on', !!on); tiltBtn.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+    function applyTilt(on) { tilt.hidden = !on; stage.classList.toggle('vz-mini', !!on); syncTiltBtn(on); }
     function applyGlass() { host.style.setProperty('--vz-glass-a', (1 - st.prefs.glass).toFixed(3)); host.style.setProperty('--vz-glass-blur', st.prefs.blur + 'px'); }
     applyGlass();
     function toggle(label, key, onChange) {
@@ -1022,7 +1041,7 @@ var VIZ = (function () {
         pals.appendChild(b);
       });
       panel.appendChild(pals);
-      panel.appendChild(h('button', { type: 'button', class: 'vz-reset', onclick: function () { st.prefs = Object.assign({}, PREF0); savePrefs(st.prefs); recolor(); relayout(); applyVeg(false); applyTilt(false); applyGlass(); refit(true, st.focus ? { yaw: st.yaw, pitch: st.pitch } : viewFor(st.filter)); buildPanel(); } }, '恢復預設'));
+      panel.appendChild(h('button', { type: 'button', class: 'vz-reset', onclick: function () { st.prefs = prefDefaults(); savePrefs(st.prefs); recolor(); relayout(); applyVeg(false); applyTilt(false); applyGlass(); refit(true, st.focus ? { yaw: st.yaw, pitch: st.pitch } : viewFor(st.filter)); buildPanel(); } }, '恢復預設'));
     }
     function zoomBy(k, cx, cy) {
       stopCam();

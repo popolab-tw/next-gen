@@ -83,6 +83,7 @@
 .vz-btn { width: 34px; height: 34px; display: grid; place-items: center; background: var(--vz-bg); color: var(--vz-ink); border: 1px solid var(--vz-rule); border-radius: 2px; cursor: pointer; padding: 0; }
 .vz-btn:hover { border-color: var(--vz-ink); }
 .vz-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.vz-btn.vz-txt { width: auto; padding: 0 12px; font: 500 12.5px/1 var(--f-sans); letter-spacing: .1em; white-space: nowrap; }
 .vz-card { position: absolute; left: 0; top: 0; width: 212px; padding: 10px 12px 11px; z-index: 4; color: var(--vz-ink); font-size: 11px; line-height: 1.35; }
 .vz-card.dock { left: auto; right: 12px; top: 12px; width: 178px; transform: none !important; padding: 9px 11px 10px; }
 .vz-card-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -127,6 +128,8 @@
 .vz-body.vz-full .vz-canvas { touch-action: none; }
 .vz-body.vz-full .vz-filters { position: static; padding-top: env(safe-area-inset-top); }
 html.vz-lock, html.vz-lock body { overflow: hidden; }
+/* 窄螢幕：按鈕列加上「微縮攝影」會壓到左邊的圖例，改排到按鈕列上方 */
+@media (max-width: 640px) { .vz-btn.vz-txt { position: absolute; right: 0; bottom: calc(100% + 6px); padding: 0 10px; font-size: 12px; } }
 @media (max-width: 560px) {
   .vz { padding-top: 44px; }
   .vz-in { padding-inline: 16px; }
