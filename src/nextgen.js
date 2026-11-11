@@ -192,7 +192,7 @@ var NG = (function () {
       playing: function () { root.classList.add('on'); root.classList.remove('wait', 'tap', 'paused'); clearTimeout(startT); player.native(false); tapMsg.hidden = true; syncMute(); syncPause(); },
       waiting: function () { root.classList.add('wait'); },
       paused: function () { if (state !== 'play' || !root.classList.contains('on') || root.classList.contains('ended')) return; root.classList.add('paused'); root.classList.remove('wait'); syncPause(); showHud(); },
-      ended: function () { showEnd(); },
+      ended: function () { showEnd(true); },
       error: function (why) { if (mv.yt) setExt(); if (state === 'play') done('fail'); else if (state === 'title' && !mv.yt) noMv(); },
       muted: function () { syncMute(); },
       time: function (c, d) {
@@ -293,9 +293,12 @@ var NG = (function () {
       startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { if (mv.yt) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } else root.classList.add('hud'); } }, 3500);
       setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
+    var maskRun = 0;
     // ---- 播完：結束畫面 ----
-    function showEnd() {
+    // byEnd：YouTube 已經真的播到底（片長多算了零點幾秒，沒在最後一刻前停住）→ 影片立刻藏起來，不讓片尾推薦影片閃出來
+    function showEnd(byEnd) {
       if (state !== 'play') return;
+      if (byEnd) root.classList.add('cut');
       state = 'end'; nearEnd = true;
       clearTimeout(startT); clearTimeout(hudT);
       if (player) player.pause();   // 停在最後，不讓 YouTube 的片尾推薦出現；畫面淡成黑底
@@ -305,7 +308,7 @@ var NG = (function () {
     function replay() {
       if (state !== 'end') return;
       state = 'play'; nearEnd = false;
-      root.classList.remove('ended'); bar.style.transform = 'scaleX(0)';
+      root.classList.remove('ended', 'cut'); bar.style.transform = 'scaleX(0)';
       player.restart();
       setTimeout(function () { if (state === 'play') pauseBtn.focus({ preventScroll: true }); }, 60);
     }
@@ -342,8 +345,9 @@ var NG = (function () {
       var hideIn = 950;
       if (rp) {   // 圓形揭開：半徑從 0 長到蓋滿整個畫面
         hideIn = 1500;
-        var t0 = performance.now(), D = 1350, edge = 70;
+        var t0 = performance.now(), D = 1350, edge = 70, run = ++maskRun;
         (function step(now) {
+          if (run !== maskRun || root.hidden) return;   // 已經收起來了：不要再把遮罩加回去
           var k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
           var rr = Math.max(0, e * (rp.far + edge)) - edge * (1 - e);
           var m = 'radial-gradient(circle at ' + rp.x + 'px ' + rp.y + 'px, transparent ' + Math.max(0, rr).toFixed(1) + 'px, #000 ' + (Math.max(0, rr) + edge).toFixed(1) + 'px)';
@@ -354,8 +358,8 @@ var NG = (function () {
       setTimeout(function () {
         if (player) player.stop();
         leaveLand();
-        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap', 'paused', 'ended', 'going'); tapMsg.hidden = true;
-        root.style.webkitMaskImage = ''; root.style.maskImage = '';
+        root.hidden = true; root.classList.remove('playing', 'on', 'wait', 'hud', 'out', 'tap', 'paused', 'ended', 'going', 'cut'); tapMsg.hidden = true;
+        maskRun++; root.style.webkitMaskImage = ''; root.style.maskImage = '';
         lock(false);
         if (document.activeElement && root.contains(document.activeElement)) document.activeElement.blur();
       }, hideIn);
@@ -364,8 +368,8 @@ var NG = (function () {
     function open(direct) {
       if (direct && ext) { openYT(); return; }
       state = 'title'; root.hidden = false; lock(true);
-      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap', 'paused', 'ended', 'going');
-      root.style.webkitMaskImage = ''; root.style.maskImage = '';
+      root.classList.remove('out', 'playing', 'on', 'hud', 'wait', 'tap', 'paused', 'ended', 'going', 'cut');
+      maskRun++; root.style.webkitMaskImage = ''; root.style.maskImage = '';
       if (direct) play();
       else setTimeout(function () { playBtn.focus({ preventScroll: true }); }, 30);
     }

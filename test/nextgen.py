@@ -149,7 +149,8 @@ with sync_playwright() as p:
         rp_ = pg.evaluate("({ rings: document.querySelectorAll('.ng-ripples i').length, mask: document.getElementById('ng-intro').style.maskImage || document.getElementById('ng-intro').style.webkitMaskImage || '', ac: window.__ac })")
         check(mode + ': 按「進入地圖」：漣漪、圓形揭開、發出聲音', rp_['rings'] == 3 and 'radial-gradient' in rp_['mask'] and rp_['ac'] == 1, rp_)
         pg.wait_for_timeout(1600)
-        check(mode + ': 漣漪之後轉到地圖', pg.evaluate(I + '.hidden') and pg.evaluate("document.getElementById('ng-intro').style.maskImage") == '' and not pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
+        pg.wait_for_timeout(600)
+        check(mode + ': 漣漪之後轉到地圖（遮罩清掉）', pg.evaluate(I + '.hidden') and pg.evaluate("document.getElementById('ng-intro').style.maskImage") == '' and not pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
         check(mode + ': 沒有錯誤', not errs, errs)
         ctx.close()
     # YouTube：正常播放、播到最後轉場；手機擋自動播放時改讓觀眾直接點播放器

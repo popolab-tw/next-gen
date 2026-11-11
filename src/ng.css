@@ -150,6 +150,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 @keyframes ngSpin { to { transform: rotate(360deg); } }
 /* ---------- 播完：影片淡成黑底，出現「重播」與「進入地圖」 ---------- */
 .ng-intro.on.ended .ng-mv { opacity: 0; transition-duration: .9s; }
+.ng-intro.on.ended.cut .ng-mv { transition: none; }
 .ng-intro.ended .ng-hud, .ng-intro.ended .ng-pause, .ng-intro.ended .ng-catch, .ng-intro.ended .ng-prog, .ng-intro.ended .ng-wait, .ng-intro.ended .ng-tapmsg { display: none !important; }
 .ng-end { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; gap: clamp(36px, 7vw, 72px); pointer-events: auto; }
 .ng-intro.ended .ng-end { display: flex; }
