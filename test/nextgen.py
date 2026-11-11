@@ -16,6 +16,7 @@ subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', os.path.join(ROOT, '
 WEBM = open(webm, 'rb').read()
 html = open(os.path.join(ROOT, 'map', 'index.html'), encoding='utf8').read()
 open(os.path.join(ROOT, 'map', '_yt.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID"}};', html, count=1, flags=re.S))
+open(os.path.join(ROOT, 'map', '_file.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"src":"../viz/mv-placeholder.mp4"}};', html, count=1, flags=re.S))
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -55,7 +56,10 @@ with sync_playwright() as p:
         pg = ctx.new_page(); errs = []
         pg.on('pageerror', lambda e: errs.append(str(e)))
         pg.route('**/*', route)
-        pg.goto(BASE); pg.wait_for_timeout(2000)
+        if mode == 'desktop':
+            pg.goto(BASE); pg.wait_for_timeout(1500)
+            check('網站版還沒有 MV：直接看地圖、不顯示 MV 按鈕', pg.evaluate(I + '.hidden') and pg.evaluate("document.getElementById('ng-mvbtn').hidden") and not pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
+        pg.goto(BASE + '_file.html'); pg.wait_for_timeout(2000)
         check(mode + ': 開場標題畫面', pg.evaluate(I + '.hidden') is False and pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
         check(mode + ': 預設深色', pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'dark')
         if mode == 'mobile': pg.tap('.ng-title', position={'x': 195, 'y': 300})
@@ -108,6 +112,6 @@ with sync_playwright() as p:
         ctx.close()
     b.close()
 srv.shutdown()
-os.remove(os.path.join(ROOT, 'map', '_yt.html'))
+os.remove(os.path.join(ROOT, 'map', '_yt.html')); os.remove(os.path.join(ROOT, 'map', '_file.html'))
 print('全部通過' if ok else '有失敗')
 sys.exit(0 if ok else 1)

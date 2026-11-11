@@ -345,7 +345,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 
 </style>
 <script>window.TWKIDS = {"target":"nextgen","vizN":4698,"vizDate":"2026-10-24","vizMap":"viz-map.ab97b4251d.bin.gz","vizPts":"viz-pts.6f94f5586c.json"};
-window.NEXTGEN = {"mv":{"src":"mv-placeholder.7ec317c80a.mp4"}};</script>
+window.NEXTGEN = {"mv":null};</script>
 </head>
 <body class="ng">
 <div class="ng-intro" id="ng-intro" role="dialog" aria-modal="true" aria-label="NEXT GEN 開場">
@@ -2452,9 +2452,12 @@ var NG = (function () {
     if (tb) tb.addEventListener('click', function () { setTheme(getTheme() === 'dark' ? 'light' : 'dark', true); });
     var host = document.querySelector('#map .vz-body');
     var viz = host ? VIZ.mount(host) : null;
+    var hasMv = !!(CFG.mv && (CFG.mv.yt || CFG.mv.src));
     var it = intro(viz);
     var mvb = document.getElementById('ng-mvbtn');
-    if (mvb) mvb.addEventListener('click', function () { it.open(true); });
+    if (mvb) { if (hasMv) mvb.addEventListener('click', function () { it.open(true); }); else mvb.hidden = true; }
+    // 還沒有 MV：不放開場，地圖直接從高處轉進來
+    if (!hasMv) { var r0 = document.getElementById('ng-intro'); if (r0) r0.hidden = true; if (viz && viz.intro) viz.intro(2600); window.__ng = { viz: viz, intro: it }; return; }
     // 已經看過（同一個分頁）或網址帶 #map：直接看地圖
     var skip = ss(KEY_SEEN) === '1' || /^#(map|地圖)$/.test(decodeURIComponent(location.hash || ''));
     if (skip) { var r = document.getElementById('ng-intro'); if (r) r.hidden = true; }

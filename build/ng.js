@@ -161,7 +161,7 @@ function build(o) {
   fs.writeFileSync(path.join(out, mapF), mapB); fs.writeFileSync(path.join(out, ptsF), ptsB);
   let mvWeb = null;
   if (mvCfg.yt) mvWeb = { yt: mvCfg.yt, len: mvCfg.len };
-  else { const b = RB('viz/mv-placeholder.mp4'), f = 'mv-placeholder.' + hash(b) + '.mp4'; fs.writeFileSync(path.join(out, f), b); keep.add(f); mvWeb = { src: f, len: mvCfg.len }; }
+  // 還沒有 MV 的 YouTube 代號：網站版不放開場，直接看地圖（暫代影片只用在 claude.ai 預覽版）
   ['kv-1920.webp', 'og.jpg'].forEach(f => { fs.copyFileSync(path.join(ROOT, 'src', 'ng', f), path.join(out, f)); keep.add(f); });
   fs.writeFileSync(path.join(out, 'favicon.svg'), NG_ICON); keep.add('favicon.svg');
   const web = page({ web: true, siteUrl: site, ngUrl, repo: o.repo, desc, kv: 'kv-1920.webp', mv: mvWeb,
@@ -180,7 +180,7 @@ window.__VIZ_PTS = ${ptsB.toString('utf8').trim()};</script>
     twkids: { target: 'nextgen-artifact', local: true, vizN: N, vizDate: DATE } });
   fs.mkdirSync(path.join(ROOT, 'dist'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'dist', 'map.html'), dist);
-  console.log('map/index.html', (Buffer.byteLength(web) / 1024).toFixed(1) + ' KB', '｜' + mapF, ptsF, mvWeb.yt ? '｜MV：YouTube ' + mvWeb.yt : '｜MV：暫代影片', '｜dist/map.html', (Buffer.byteLength(dist) / 1024 / 1024).toFixed(2) + ' MB');
+  console.log('map/index.html', (Buffer.byteLength(web) / 1024).toFixed(1) + ' KB', '｜' + mapF, ptsF, mvWeb ? '｜MV：YouTube ' + mvWeb.yt : '｜MV：尚未設定（直接看地圖）', '｜dist/map.html', (Buffer.byteLength(dist) / 1024 / 1024).toFixed(2) + ' MB');
 }
 
 module.exports = { xpHtml, build, N, DATE };
