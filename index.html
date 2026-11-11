@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>你有資格生下一代嗎？</title>
 <meta name="description" content="用你心中養孩子的標準，加上台灣真實的房價、薪資、補助與稅制，算算你有沒有足夠的錢把孩子養大。">
-<link rel="canonical" href="https://jasontzeng123.github.io/next-gen/">
+<link rel="canonical" href="https://popolab-tw.github.io/next-gen/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="zh_TW">
 <meta property="og:site_name" content="生育資格審查">
 <meta property="og:title" content="你有資格生下一代嗎？">
 <meta property="og:description" content="用你心中養孩子的標準，加上台灣真實的房價、薪資、補助與稅制，算算你有沒有足夠的錢把孩子養大。">
-<meta property="og:url" content="https://jasontzeng123.github.io/next-gen/">
-<meta property="og:image" content="https://jasontzeng123.github.io/next-gen/og.png">
+<meta property="og:url" content="https://popolab-tw.github.io/next-gen/">
+<meta property="og:image" content="https://popolab-tw.github.io/next-gen/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="你有資格生下一代嗎？2025 年台灣出生 107,812 人，比 2000 年少 65%。">
@@ -899,7 +899,43 @@ button.wd-li:hover { background: var(--sheet-2); }
 }
 
 </style>
-<script>window.TWKIDS = {"target":"web","siteUrl":"https://jasontzeng123.github.io/next-gen/","repoUrl":"https://github.com/jasontzeng123/next-gen","sb":{"url":"https://yzmqgrtxbibufjmllimv.supabase.co","key":"sb_publishable_BOnfiTrQN53RzycO4nffGg_b8o-i0Nk"},"worldSrc":"world.a90062cc20.js"};</script>
+<script>window.TWKIDS = {"target":"web","siteUrl":"https://popolab-tw.github.io/next-gen/","repoUrl":"https://github.com/popolab-tw/next-gen","sb":{"url":"https://yzmqgrtxbibufjmllimv.supabase.co","key":"sb_publishable_BOnfiTrQN53RzycO4nffGg_b8o-i0Nk"},"worldSrc":"world.a90062cc20.js"};</script>
+<script>
+/* 搬家（2026 年 11 月）：網站從 jasontzeng123.github.io/next-gen 搬到 popolab-tw.github.io/next-gen。
+   瀏覽器的紀錄是依網址分開存的，換網址後會看不到舊的紀錄；舊網址的跳轉頁會把那台裝置的紀錄
+  （匿名代號、分享狀態、填到一半的答案、存檔）放在網址 # 後面帶過來，這裡收下後立刻從網址列拿掉。
+   這樣之前分享過的人再分享，會更新原本那一筆，不會多出一筆；也還能用同一台裝置取消分享。
+   只接受從舊網址跳轉頁過來的（看 document.referrer），新網址已經有的紀錄不覆蓋。
+   ＃ 後面的資料不會送到伺服器。 */
+(function () {
+  'use strict';
+  var h = location.hash || '', i = h.indexOf('tkmig=');
+  if (i < 0) return;
+  var raw = h.slice(i + 6), before = h.slice(0, i).replace(/[&#]+$/, '');
+  try { history.replaceState(history.state, '', location.pathname + location.search + (before.length > 1 ? before : '')); } catch (e) { /* 忽略 */ }
+  if (String(document.referrer || '').indexOf('https://jasontzeng123.github.io/') !== 0) return;
+  var data = null;
+  try { data = JSON.parse(decodeURIComponent(escape(atob(raw.replace(/-/g, '+').replace(/_/g, '/'))))); } catch (e) { return; }
+  if (!data || typeof data !== 'object') return;
+  var P = 'tw-kids:', OK = ['anon', 'shared', 'submitted', 'lastResult', 'draft', 'seen', 'qi', 'saves', 'unlocked', 'consent', 'noticeOk', 'cvd', 'theme', 'labTab', 'vizPrefs3'];
+  try {
+    var ls = window.localStorage, sh = ls.getItem(P + 'shared'), sharedHere = !!(sh && sh !== 'null');
+    OK.forEach(function (k) {
+      var v = data[k];
+      if (typeof v !== 'string' || v.length > 300000) return;
+      try { JSON.parse(v); } catch (e) { return; }
+      if (k === 'anon' || k === 'shared') {
+        // 在新網址已經分享過：保留新網址的身分；否則用舊網址的身分（舊的那一筆分享在資料庫裡）
+        if (sharedHere) return;
+        if (k === 'anon') { var a = JSON.parse(v); if (!a || !/^[a-z0-9]{24}$/.test(a.id || '') || !/^[a-z0-9]{40}$/.test(a.secret || '')) return; }
+        ls.setItem(P + k, v); return;
+      }
+      if (ls.getItem(P + k) != null) return;
+      ls.setItem(P + k, v);
+    });
+  } catch (e) { /* 無法儲存時略過 */ }
+})();
+</script>
 </head>
 <body>
 <div id="app">
@@ -912,19 +948,19 @@ button.wd-li:hover { background: var(--sheet-2); }
       <div class="xp-k"><span>延伸作品</span><span>NEXT GEN</span></div>
       <h3 class="xp-t" id="xp-t">NEXT GEN 生育門檻可視化網頁</h3>
       <p>把 4,698 位玩家匿名分享的養育標準放到 3D 台灣上：不同縣市、住法、托育方式的人，心中養一個孩子需要多高的收入，一眼就看得出差別。開場有專屬 MV。</p>
-      <div class="xp-go"><a class="xp-btn" href="map/">前往 NEXT GEN <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg></a><span class="xp-url">jasontzeng123.github.io/next-gen/map</span></div>
+      <div class="xp-go"><a class="xp-btn" href="map/">前往 NEXT GEN <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg></a><span class="xp-url">popolab-tw.github.io/next-gen/map</span></div>
     </div>
-    <figure class="xp-qr"><span class="xp-qr-box" role="img" aria-label="NEXT GEN 網址的 QR Code"><svg viewBox="0 0 33 33" class="segno"><path class="qrline" stroke="currentColor" d="M0 0.5h7m1 0h1m1 0h1m3 0h2m1 0h3m2 0h2m2 0h7m-33 1h1m5 0h1m2 0h3m1 0h1m2 0h2m2 0h3m1 0h1m1 0h1m5 0h1m-33 1h1m1 0h3m1 0h1m5 0h2m1 0h2m2 0h1m1 0h3m2 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m4 0h2m2 0h2m1 0h1m3 0h3m1 0h1m1 0h3m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h2m2 0h1m2 0h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h3m1 0h1m-33 1h1m5 0h1m1 0h3m1 0h2m1 0h3m3 0h2m1 0h1m1 0h1m5 0h1m-33 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-24 1h1m1 0h1m3 0h2m1 0h1m2 0h1m-21 1h7m4 0h1m1 0h1m2 0h1m2 0h1m1 0h1m1 0h1m2 0h2m3 0h1m-32 1h4m2 0h1m5 0h2m3 0h2m1 0h3m2 0h2m1 0h2m1 0h1m-33 1h2m1 0h2m1 0h1m1 0h1m2 0h1m3 0h2m1 0h1m3 0h1m2 0h2m1 0h1m1 0h2m-31 1h3m4 0h2m1 0h2m1 0h1m3 0h2m1 0h3m1 0h2m1 0h3m-31 1h2m2 0h5m1 0h2m2 0h1m3 0h1m1 0h1m1 0h2m3 0h3m1 0h1m-31 1h3m1 0h1m1 0h1m1 0h5m1 0h6m2 0h1m2 0h1m4 0h2m-27 1h2m2 0h1m1 0h2m1 0h1m4 0h1m3 0h3m3 0h2m-29 1h1m4 0h1m1 0h1m4 0h1m5 0h1m2 0h7m-25 1h4m3 0h1m6 0h1m1 0h4m1 0h3m2 0h1m-33 1h1m3 0h2m9 0h3m1 0h1m1 0h1m1 0h1m2 0h2m1 0h4m-32 1h2m1 0h1m1 0h2m1 0h3m2 0h1m2 0h1m2 0h3m2 0h4m1 0h2m-29 1h3m1 0h1m4 0h1m1 0h1m1 0h1m4 0h11m-32 1h1m2 0h1m1 0h2m4 0h1m1 0h1m2 0h2m4 0h1m2 0h1m1 0h3m2 0h1m-33 1h3m1 0h1m8 0h2m4 0h3m1 0h1m2 0h1m2 0h2m1 0h1m-33 1h1m4 0h2m4 0h1m1 0h1m1 0h1m2 0h1m1 0h3m3 0h6m-32 1h1m7 0h1m1 0h1m1 0h3m1 0h1m3 0h3m3 0h1m1 0h4m-32 1h1m2 0h6m1 0h1m2 0h1m3 0h4m1 0h1m1 0h5m2 0h2m-25 1h2m2 0h1m1 0h4m1 0h1m3 0h2m3 0h1m1 0h1m1 0h1m-33 1h7m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h3m1 0h1m1 0h1m1 0h2m-32 1h1m5 0h1m1 0h1m2 0h1m2 0h3m2 0h3m1 0h2m3 0h5m-33 1h1m1 0h3m1 0h1m1 0h3m3 0h1m1 0h1m7 0h6m1 0h1m-32 1h1m1 0h3m1 0h1m1 0h6m1 0h6m2 0h3m2 0h1m1 0h1m1 0h1m-33 1h1m1 0h3m1 0h1m1 0h1m1 0h1m3 0h1m2 0h2m1 0h1m1 0h1m1 0h1m1 0h2m-28 1h1m5 0h1m1 0h1m2 0h2m3 0h1m2 0h3m3 0h2m1 0h1m1 0h1m-31 1h7m2 0h1m3 0h2m1 0h2m1 0h1m2 0h3m1 0h2m3 0h1"/></svg></span><figcaption>手機掃描</figcaption></figure>
+    <figure class="xp-qr"><span class="xp-qr-box" role="img" aria-label="NEXT GEN 網址的 QR Code"><svg viewBox="0 0 29 29" class="segno"><path class="qrline" stroke="currentColor" d="M0 0.5h7m1 0h1m3 0h2m2 0h5m1 0h7m-29 1h1m5 0h1m1 0h3m1 0h2m2 0h2m2 0h1m1 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m1 0h2m5 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m1 0h9m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m4 0h2m1 0h1m3 0h3m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h3m1 0h1m2 0h4m1 0h1m-21 1h1m1 0h2m1 0h3m1 0h3m2 0h1m1 0h3m3 0h1m2 0h1m1 0h2m-29 1h1m1 0h2m1 0h1m2 0h2m1 0h3m2 0h1m1 0h7m3 0h1m-29 1h5m1 0h1m1 0h2m2 0h1m3 0h1m4 0h2m1 0h1m1 0h2m-24 1h2m1 0h2m4 0h2m5 0h1m1 0h3m3 0h1m-29 1h1m5 0h1m3 0h1m2 0h2m2 0h2m6 0h2m-23 1h1m2 0h1m1 0h1m4 0h2m3 0h1m2 0h1m3 0h3m-28 1h2m1 0h1m1 0h1m1 0h3m2 0h1m2 0h4m2 0h1m3 0h3m-28 1h1m1 0h3m1 0h2m1 0h1m3 0h3m1 0h3m3 0h1m2 0h1m-25 1h1m1 0h2m1 0h1m1 0h1m1 0h2m2 0h1m1 0h4m2 0h2m1 0h1m-25 1h1m3 0h1m3 0h5m1 0h1m5 0h1m1 0h3m-28 1h1m5 0h3m1 0h1m1 0h1m2 0h1m2 0h1m1 0h2m1 0h1m2 0h1m-25 1h1m2 0h1m1 0h2m1 0h3m1 0h1m2 0h3m2 0h1m1 0h1m1 0h1m-26 1h6m1 0h1m1 0h1m1 0h1m2 0h1m1 0h10m-19 1h6m2 0h5m3 0h5m-29 1h7m1 0h2m1 0h3m2 0h1m1 0h3m1 0h1m1 0h2m1 0h1m-28 1h1m5 0h1m1 0h2m1 0h1m1 0h2m3 0h1m1 0h1m3 0h2m-26 1h1m1 0h3m1 0h1m3 0h2m3 0h1m1 0h2m1 0h5m1 0h3m-29 1h1m1 0h3m1 0h1m1 0h1m2 0h6m3 0h1m2 0h3m2 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m4 0h1m2 0h1m1 0h1m-29 1h1m5 0h1m2 0h1m2 0h1m3 0h1m2 0h2m1 0h1m1 0h2m1 0h1m-28 1h7m1 0h4m1 0h1m1 0h1m2 0h4m1 0h1m1 0h1m1 0h1"/></svg></span><figcaption>手機掃描</figcaption></figure>
   </div>
 </aside>
   <footer class="foot">
-    <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">popo890827</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popo890827</a></div>
-    <div class="foot-links"><a href="https://github.com/jasontzeng123/next-gen" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="https://github.com/jasontzeng123/next-gen/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
+    <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popolab_tw</a></div>
+    <div class="foot-links"><a href="https://github.com/popolab-tw/next-gen" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="https://github.com/popolab-tw/next-gen/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
     <div class="foot-meta"><span>依 2026 年 10 月公開資料試算，不是理財建議。</span><span>主計總處・內政部・勞動部・衛福部・財政部・樂居・591</span></div>
   </footer>
 </div>
 <script>
-window.__diag = { t0: Date.now(), build: '2026-11-11T06:12', timer: false, mc: false, raf: false, errors: [] };
+window.__diag = { t0: Date.now(), build: '2026-11-11T07:14', timer: false, mc: false, raf: false, errors: [] };
 setTimeout(function () { window.__diag.timer = true; }, 30);
 try { var __mc = new MessageChannel(); __mc.port1.onmessage = function () { window.__diag.mc = true; }; __mc.port2.postMessage(0); } catch (e) {}
 try { requestAnimationFrame(function () { window.__diag.raf = true; }); } catch (e) {}
@@ -5546,7 +5582,7 @@ APP.screens.notice = function (main) {
       d.save({ filename: '生育資格審查-逐年明細.csv', data: blob }).then(function (m) { if (m !== 'shown') U.toast(m === 'shared' ? '完成' : m === 'downloaded' ? '已下載逐年明細' : '已儲存'); }, function (e) { if (e && e.code === 'declined') return; U.toast('無法儲存：' + ((e && e.message) || '請稍後再試')); });
     });
   }
-  var REPO_URL = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+  var REPO_URL = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
 
   // 第二組顏色（Okabe-Ito）給色盲友善模式
   var CATS = [
@@ -5675,10 +5711,10 @@ APP.screens.notice = function (main) {
   var FB_KINDS = [['calc', '計算有誤'], ['data', '資料有誤或過時'], ['bug', '畫面或操作問題'], ['idea', '建議'], ['other', '其他']];
   A.feedbackBox = function (opts) {
     opts = opts || {};
-    var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+    var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
     var box = h('div', { class: 'fb' });
     box.appendChild(h('h3', {}, opts.title || '意見與回報'));
-    var links = h('p', { class: 'xs muted fb-alt', html: '也可以在 Threads 找 <a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener">@popo890827</a>，或到 <a href="' + REPO + '/issues/new" target="_blank" rel="noopener">GitHub 回報</a>（需要帳號，內容會公開）。' });
+    var links = h('p', { class: 'xs muted fb-alt', html: '也可以在 Threads 找 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener">@popolab_tw</a>，或到 <a href="' + REPO + '/issues/new" target="_blank" rel="noopener">GitHub 回報</a>（需要帳號，內容會公開）。' });
     if (!COMM.canFeedback()) {
       box.appendChild(h('p', { class: 'sm' }, '發現計算有誤、資料過時，或有任何想法，歡迎告訴作者。'));
       box.appendChild(links); return box;
@@ -6871,7 +6907,7 @@ APP.screens.method = function (main) {
   function ul(items) { var u = h('ul'); items.forEach(function (t) { u.appendChild(h('li', { html: t })); }); return u; }
   inn.appendChild(p('這不是理財建議，而是一個盡量貼近現實的試算。每個數字都有出處；查不到可靠資料的地方，我們標成估計值，並寫出理由。你可以在報告「調整設定」裡的「進階假設」調整大部分假設。'));
   // 頁首就放驗算與回報的入口，不用滑到最底
-  var REPO0 = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+  var REPO0 = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
   inn.appendChild(h('div', { class: 'verify-callout' },
     h('b', {}, '想檢查我們怎麼算、資料從哪來，或發現錯誤？'),
     h('div', { class: 'verify-links' },
@@ -7004,13 +7040,13 @@ APP.screens.method = function (main) {
   inn.appendChild(src);
 
   inn.appendChild(h('h2', { id: 'verify' }, '十、自己驗算、回報錯誤與授權'));
-  var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+  var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
   inn.appendChild(p('這個作品的程式碼、每個數字的出處與研究筆記，都公開在 GitHub。想自己驗算的話，可以在報告「你的存摺」段落按「下載逐年明細」，用 Excel 或 Google 試算表一年一年對帳：每一年的年底存款，都等於年初存款加上可用收入、再減掉支出。'));
   inn.appendChild(h('div', { class: 'src src-wide' }, h('a', { href: REPO, target: '_blank', rel: 'noopener' }, '原始碼（GitHub）'), h('span', {}, '計算引擎在 src/engine.js，所有參數在 src/data.js')));
   inn.appendChild(h('div', { class: 'src src-wide' }, h('a', { href: REPO + '/blob/main/docs/資料來源.md', target: '_blank', rel: 'noopener' }, '資料來源清單'), h('span', {}, '每個來源的名稱、連結與資料時間')));
   inn.appendChild(h('div', { class: 'src src-wide' }, h('a', { href: REPO + '/issues/new', target: '_blank', rel: 'noopener' }, '回報錯誤'), h('span', {}, '在 GitHub 留言，需要 GitHub 帳號')));
   inn.appendChild(A_feedback());
-  inn.appendChild(p('授權：程式碼採 <a href="' + REPO + '/blob/main/LICENSE" target="_blank" rel="noopener">MIT 授權</a>；本作品自己撰寫的文字、圖表與整理後的資料採 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY 4.0</a>，轉用時請標明出處「popo890827《你有資格生下一代嗎？》」。引用的原始資料仍屬各來源，依各自的條款使用。'));
+  inn.appendChild(p('授權：程式碼採 <a href="' + REPO + '/blob/main/LICENSE" target="_blank" rel="noopener">MIT 授權</a>；本作品自己撰寫的文字、圖表與整理後的資料採 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh-hant" target="_blank" rel="noopener">CC BY 4.0</a>，轉用時請標明出處「海島上的波波（@popolab_tw）《你有資格生下一代嗎？》」。引用的原始資料仍屬各來源，依各自的條款使用。'));
   inn.appendChild(h('div', { class: 'cover-cta', style: { marginTop: '28px' } }, h('button', { class: 'btn', onclick: function () { if (APP.unlocked) APP.compute(true); APP.go(APP.unlocked ? 'report' : 'cover'); } }, U.icon('back'), APP.unlocked ? '回到審查報告' : '回到封面')));
   sheet.appendChild(inn); wrap.appendChild(sheet); main.appendChild(wrap);
 };

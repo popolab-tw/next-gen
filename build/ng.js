@@ -135,10 +135,10 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
   </aside>
 </main>
 <footer class="ng-foot"><div class="ng-in">
-  <span class="ng-credit"><b>CREDIT</b>製作 <a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">popo890827</a> × Claude</span>
+  <span class="ng-credit"><b>CREDIT</b>製作 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a> × Claude</span>
   <a href="${o.repo}" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a>
   <span>程式碼 MIT・地圖與資料 CC BY 4.0・MV 與主視覺不在 CC BY 範圍內</span>
-  <span class="ng-r">在 Threads 上追蹤 <a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener noreferrer">@popo890827</a></span>
+  <span class="ng-r">在 Threads 上追蹤 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">@popolab_tw</a></span>
 </div></footer>
 <script>
 ${['util.js', 'data.js', 'viz.js', 'nextgen.js'].map(f => '/* ---- ' + f + ' ---- */\n' + strip(R(f))).join('\n')}

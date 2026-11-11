@@ -15,7 +15,7 @@ sql('truncate public.submissions; truncate public.stats_cache; truncate public.r
 for d in json.load(open(ROOT + '/seed/demo.json')):
     i = d.pop('_seedId'); sql('select public.submit_choice(%s, %s, %s::jsonb);' % (q(i), q('x' * 40), q(json.dumps(d))), ip='8.8.8.%d' % (hash(i) % 200))
 html = open(ROOT + '/index.html').read()
-cfg = {'target': 'web', 'siteUrl': 'https://jasontzeng123.github.io/next-gen/', 'sb': {'url': 'https://test.supabase.co', 'key': 'sb_publishable_TESTKEY'}}
+cfg = {'target': 'web', 'siteUrl': 'https://popolab-tw.github.io/next-gen/', 'sb': {'url': 'https://test.supabase.co', 'key': 'sb_publishable_TESTKEY'}}
 html = re.sub(r'<script>window\.TWKIDS = .*?;</script>', '<script>window.TWKIDS = ' + json.dumps(cfg) + ';</script>', html)
 open(ROOT + '/test/web.html', 'w').write(html)
 CALLS = []

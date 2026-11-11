@@ -4,7 +4,7 @@ import json, re, sys
 from playwright.sync_api import sync_playwright
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); SH = os.environ.get('SHOTS', ROOT + '/test/shots'); os.makedirs(SH, exist_ok=True)
 html=open(ROOT+'/index.html').read()
-cfg={'target':'web','siteUrl':'https://jasontzeng123.github.io/next-gen/','sb':{'url':'https://test.supabase.co','key':'sb_publishable_TESTKEY'}}
+cfg={'target':'web','siteUrl':'https://popolab-tw.github.io/next-gen/','sb':{'url':'https://test.supabase.co','key':'sb_publishable_TESTKEY'}}
 html=re.sub(r'<script>window\.TWKIDS = .*?;</script>', '<script>window.TWKIDS = '+json.dumps(cfg)+';</script>', html)
 open(ROOT+'/test/web.html','w').write(html)
 DEMO=json.load(open(ROOT + '/seed/demo.json'))

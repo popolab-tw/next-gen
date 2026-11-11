@@ -621,7 +621,7 @@
       d.save({ filename: '生育資格審查-逐年明細.csv', data: blob }).then(function (m) { if (m !== 'shown') U.toast(m === 'shared' ? '完成' : m === 'downloaded' ? '已下載逐年明細' : '已儲存'); }, function (e) { if (e && e.code === 'declined') return; U.toast('無法儲存：' + ((e && e.message) || '請稍後再試')); });
     });
   }
-  var REPO_URL = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+  var REPO_URL = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
 
   // 第二組顏色（Okabe-Ito）給色盲友善模式
   var CATS = [
@@ -750,10 +750,10 @@
   var FB_KINDS = [['calc', '計算有誤'], ['data', '資料有誤或過時'], ['bug', '畫面或操作問題'], ['idea', '建議'], ['other', '其他']];
   A.feedbackBox = function (opts) {
     opts = opts || {};
-    var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/jasontzeng123/next-gen';
+    var REPO = (window.TWKIDS && window.TWKIDS.repoUrl) || 'https://github.com/popolab-tw/next-gen';
     var box = h('div', { class: 'fb' });
     box.appendChild(h('h3', {}, opts.title || '意見與回報'));
-    var links = h('p', { class: 'xs muted fb-alt', html: '也可以在 Threads 找 <a href="https://www.threads.com/@popo890827" target="_blank" rel="noopener">@popo890827</a>，或到 <a href="' + REPO + '/issues/new" target="_blank" rel="noopener">GitHub 回報</a>（需要帳號，內容會公開）。' });
+    var links = h('p', { class: 'xs muted fb-alt', html: '也可以在 Threads 找 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener">@popolab_tw</a>，或到 <a href="' + REPO + '/issues/new" target="_blank" rel="noopener">GitHub 回報</a>（需要帳號，內容會公開）。' });
     if (!COMM.canFeedback()) {
       box.appendChild(h('p', { class: 'sm' }, '發現計算有誤、資料過時，或有任何想法，歡迎告訴作者。'));
       box.appendChild(links); return box;
