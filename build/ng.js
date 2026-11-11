@@ -53,12 +53,14 @@ function page(o) {
     '地圖：道路 © OpenStreetMap contributors（經 Overture Maps）・地形 AWS Terrain Tiles（SRTM 等）・人口密度 WorldPop・行政區界 內政部',
     o.mv && o.mv.yt ? 'MV 由 YouTube 播放（隱私強化模式：按下播放前不會設定 YouTube 的 cookie）。' : null
   ].filter(Boolean);
-  return `<!doctype html>
+  // claude.ai 版：平台會補上 <html><head><body> 外框，所以不寫這幾個標籤
+  const open = o.web ? `<!doctype html>
 <html lang="zh-Hant-TW" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>NEXT GEN・生育門檻可視化網頁</title>
+` : '';
+  return `${open}<title>NEXT GEN・生育門檻可視化網頁</title>
 <meta name="description" content="${esc(o.desc)}">
 ${o.web ? `<link rel="canonical" href="${o.ngUrl}">
 <meta property="og:type" content="website">
@@ -77,15 +79,14 @@ ${o.web ? `<link rel="canonical" href="${o.ngUrl}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
-<script>try { if (localStorage.getItem('ng:theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}</script>
+<script>${o.web ? '' : "document.documentElement.setAttribute('data-theme', 'dark');\n"}try { if (localStorage.getItem('ng:theme') === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {}</script>
 <style>
 ${R('viz.css')}
 ${R('ng.css')}
 </style>
 <script>window.TWKIDS = ${JSON.stringify(o.twkids)};
 window.NEXTGEN = ${JSON.stringify({ mv: o.mv || null })};</script>
-${o.inline || ''}</head>
-<body class="ng">
+${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body.classList.add(\'ng\');</script>'}
 <div class="ng-intro" id="ng-intro" role="dialog" aria-modal="true" aria-label="NEXT GEN 開場">
   <div class="ng-title">
     <img class="ng-kv" src="${o.kv}" width="1920" height="1080" alt="NEXT GEN 生育門檻可視化網頁" fetchpriority="high" decoding="async">
@@ -143,9 +144,7 @@ ${o.inline || ''}</head>
 ${['util.js', 'data.js', 'viz.js', 'nextgen.js'].map(f => '/* ---- ' + f + ' ---- */\n' + strip(R(f))).join('\n')}
 NG.start();
 </script>
-</body>
-</html>
-`;
+${o.web ? '</body>\n</html>\n' : ''}`;
 }
 
 function build(o) {

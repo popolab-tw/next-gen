@@ -2399,7 +2399,7 @@ var NG = (function () {
       player.play();
       // 3.5 秒還沒開始：可能是手機擋了自動播放 → 讓觀眾直接點影片
       clearTimeout(startT);
-      startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } }, 3500);
+      startT = setTimeout(function () { if (state === 'play' && !root.classList.contains('on')) { if (mv.yt) { player.native(true); root.classList.add('tap', 'hud'); tapMsg.hidden = false; } else root.classList.add('hud'); } }, 3500);
       setTimeout(function () { if (state === 'play') skipBtn.focus({ preventScroll: true }); }, 60);
     }
     function done(why) {
