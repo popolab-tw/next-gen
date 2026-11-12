@@ -1,9 +1,9 @@
 /* ===================== NEXT GEN：全台分享地圖（3D） ===================== */
-.vz { --vz-glass-rgb: 255, 255, 255; --vz-glass-b: rgba(17, 17, 19, .12); --vz-bg: #ffffff; --vz-ink: #111113; --vz-ink-2: rgba(17, 17, 19, .62); --vz-ink-3: rgba(17, 17, 19, .42); --vz-rule: rgba(17, 17, 19, .16); --vz-chip: rgba(17, 17, 19, .04);
+.vz { --vz-bg-rgb: 255, 255, 255; --vz-glass-rgb: 255, 255, 255; --vz-glass-b: rgba(17, 17, 19, .12); --vz-bg: #ffffff; --vz-ink: #111113; --vz-ink-2: rgba(17, 17, 19, .62); --vz-ink-3: rgba(17, 17, 19, .42); --vz-rule: rgba(17, 17, 19, .16); --vz-chip: rgba(17, 17, 19, .04);
   --vz-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Noto Sans TC", monospace;
   background: var(--vz-bg); color: var(--vz-ink); border-top: 1px solid var(--vz-rule); padding: 64px 0 28px; font-family: var(--f-sans); width: 100%; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .vz { --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); } }
-:root[data-theme="dark"] .vz { --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .vz { --vz-bg-rgb: 5, 5, 6; --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); } }
+:root[data-theme="dark"] .vz { --vz-bg-rgb: 5, 5, 6; --vz-glass-rgb: 24, 26, 25; --vz-glass-b: rgba(255, 255, 255, .14); --vz-bg: #050506; --vz-ink: #ececE6; --vz-ink-2: rgba(236, 236, 230, .64); --vz-ink-3: rgba(236, 236, 230, .42); --vz-rule: rgba(236, 236, 230, .16); --vz-chip: rgba(236, 236, 230, .05); }
 .vz-in { max-width: 1180px; margin: 0 auto; padding-inline: 24px; }
 .vz-k { display: flex; gap: 14px; font-family: var(--vz-mono); font-size: 11px; letter-spacing: .14em; color: var(--vz-ink-2); text-transform: uppercase; border-top: 1px solid var(--vz-ink); padding-top: 8px; }
 .vz-k span:last-child { margin-left: auto; }
@@ -41,8 +41,76 @@
 .vz-tg input:checked + i::after { transform: translateX(12px); }
 .vz-tg input:focus-visible + i { outline: 1.5px solid var(--vz-ink); outline-offset: 2px; }
 .vz-back:hover { border-color: var(--vz-ink); }
-.vz-hint { position: absolute; left: 24px; top: 14px; font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .04em; color: var(--vz-ink-3); pointer-events: none; transition: opacity .8s ease; }
-.vz-hint.gone { opacity: 0; }
+/* 操作說明按鈕：右上角，淡淡的 */
+.vz-help { position: absolute; right: 24px; top: 14px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; appearance: none; background: rgba(var(--vz-bg-rgb), .55); border: 1px solid var(--vz-rule); border-radius: 999px; padding: 4px 10px 4px 6px; color: var(--vz-ink-2); font: 500 11px/1 var(--f-sans); letter-spacing: .06em; cursor: pointer; transition: opacity .6s ease, color .2s, border-color .2s; }
+.vz-help svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; }
+.vz-help:hover, .vz-help:focus-visible { color: var(--vz-ink); border-color: var(--vz-ink-3); outline: none; }
+.vz-help.on { color: var(--vz-ink); border-color: var(--vz-ink-3); }
+.vz-stage:has(.vz-card.dock:not([hidden])) .vz-help { opacity: 0; pointer-events: none; }   /* 手機上資訊卡固定在右上角時，讓開 */
+/* 操作說明：手勢小動畫（每 8 秒一輪，四個輪流示範）＋兩個標註；不擋操作 */
+.vz-guide { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; transition: opacity .8s ease; color: var(--vz-ink); }
+.vz-guide.on { opacity: 1; transition-duration: 1.1s; }
+.vz-guide[hidden] { display: none; }
+.vz-g-mid { position: absolute; left: 50%; top: 45%; width: max-content; max-width: calc(100% - 8px); box-sizing: border-box; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 44px 72px; background: radial-gradient(closest-side, rgba(var(--vz-bg-rgb), .9) 45%, rgba(var(--vz-bg-rgb), .55) 75%, rgba(var(--vz-bg-rgb), 0) 100%); }
+.vz-g-row { display: grid; grid-template-columns: repeat(4, 104px); gap: 6px; }
+.vz-g-it { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
+.vz-g-ic { width: 64px; height: 64px; margin-bottom: 6px; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.vz-g-it b { font-size: 12.5px; font-weight: 600; letter-spacing: .04em; line-height: 1.3; }
+.vz-g-it span { font-family: var(--vz-mono); font-size: 10.5px; letter-spacing: .06em; color: var(--vz-ink-2); }
+.vz-g-note { font-size: 11px; color: var(--vz-ink-2); letter-spacing: .04em; }
+.vz-g-ic .g-trk { stroke-opacity: .32; stroke-dasharray: 2 3; }
+.vz-g-ic .g-ah { stroke-dasharray: none; }
+.vz-g-ic .g-pt { fill: currentColor; fill-opacity: .2; }
+.vz-g-ic .g-halo { stroke-opacity: .28; }
+.vz-g-ic .g-ms { fill: rgba(var(--vz-bg-rgb), .6); }
+.vz-g-ic .g-btn { fill: currentColor; stroke: none; opacity: 0; }
+.vz-g-ic .g-ln { stroke-opacity: .7; }
+.vz-g-ic .g-wh { stroke-width: 2.2; }
+.vz-g-ic .g-zm { stroke-opacity: .55; }
+.vz-g-ic .g-dots circle { fill: currentColor; stroke: none; opacity: .35; }
+.vz-g-ic .g-dot { fill: currentColor; stroke: none; }
+.vz-g-ic .g-rip { opacity: 0; }
+.vz-g-ic .g-card { opacity: 0; }
+.vz-g-ic .g-card rect { fill: rgba(var(--vz-bg-rgb), .7); }
+.vz-g-ic .g-card path { stroke-opacity: .7; }
+.vz-g-ic .g-arrow { fill: rgba(var(--vz-bg-rgb), .9); stroke-width: 1.1; }
+.vz-g-ic .g-tap { opacity: 0; }
+.vz-guide.on .vz-g-it { animation: vzgIt 8s linear var(--dl) infinite both; }
+.vz-guide.on .g-rot { animation: vzgRot 8s ease-in-out var(--dl) infinite both; }
+.vz-guide.on .g-pan { animation: vzgPan 8s ease-in-out var(--dl) infinite both; }
+.vz-guide.on .g-pa { animation: vzgPinA 8s ease-in-out var(--dl) infinite both; }
+.vz-guide.on .g-pb { animation: vzgPinB 8s ease-in-out var(--dl) infinite both; }
+.vz-guide.on .g-zm { animation: vzgZm 8s ease-in-out var(--dl) infinite both; }
+.vz-guide.on .g-btn { animation: vzgBtn 8s linear var(--dl) infinite both; }
+.vz-guide.on .g-wh { animation: vzgWh 8s linear var(--dl) infinite both; }
+.vz-guide.on .g-tap { animation: vzgTap 8s ease-out var(--dl) infinite both; }
+.vz-guide.on .g-cur { animation: vzgCur 8s ease-in-out var(--dl) infinite both; }
+.vz-guide.on .g-rip { animation: vzgRip 8s ease-out var(--dl) infinite both; }
+.vz-guide.on .g-card { animation: vzgCard 8s ease var(--dl) infinite both; }
+/* 一輪 8 秒：0–25% 是自己示範的時間，其他時間淡淡待著 */
+@keyframes vzgIt { 0%, 25% { opacity: 1; } 29%, 96% { opacity: .55; } 100% { opacity: 1; } }
+@keyframes vzgRot { 0% { transform: translateX(-12px); opacity: .35; } 3% { transform: translateX(-12px); opacity: 1; } 12% { transform: translateX(12px); } 21% { transform: translateX(-12px); opacity: 1; } 25%, 100% { transform: translateX(-12px); opacity: .35; } }
+@keyframes vzgPan { 0% { transform: translate(-7px, -5px); opacity: .35; } 3% { transform: translate(-7px, -5px); opacity: 1; } 12% { transform: translate(7px, 5px); } 21% { transform: translate(-7px, -5px); opacity: 1; } 25%, 100% { transform: translate(-7px, -5px); opacity: .35; } }
+@keyframes vzgPinA { 0% { transform: none; opacity: .35; } 3% { transform: none; opacity: 1; } 11%, 14% { transform: translate(-8px, 8px); } 21% { transform: none; opacity: 1; } 24%, 100% { transform: none; opacity: .35; } }
+@keyframes vzgPinB { 0% { transform: none; opacity: .35; } 3% { transform: none; opacity: 1; } 11%, 14% { transform: translate(8px, -8px); } 21% { transform: none; opacity: 1; } 24%, 100% { transform: none; opacity: .35; } }
+@keyframes vzgZm { 0%, 3% { transform: scale(.8); stroke-opacity: .35; } 11%, 14% { transform: scale(1.12); stroke-opacity: .9; } 21% { transform: scale(.8); stroke-opacity: .6; } 25%, 100% { transform: scale(.8); stroke-opacity: .35; } }
+@keyframes vzgBtn { 0%, 2% { opacity: 0; } 4%, 20% { opacity: .9; } 23%, 100% { opacity: 0; } }
+@keyframes vzgWh { 0%, 2% { transform: none; stroke-opacity: .5; } 4% { transform: translateY(-1.8px); stroke-opacity: 1; } 6.5% { transform: translateY(1.2px); } 9% { transform: translateY(-1.8px); } 11.5% { transform: translateY(1.2px); } 14% { transform: translateY(1.8px); } 16.5% { transform: translateY(-1.2px); } 19% { transform: translateY(1.8px); stroke-opacity: 1; } 23%, 100% { transform: none; stroke-opacity: .5; } }
+@keyframes vzgTap { 0%, 2% { transform: scale(1.8); opacity: 0; } 6% { transform: scale(1); opacity: 1; } 8.5% { transform: scale(.82); } 11% { transform: scale(1); opacity: .9; } 16%, 100% { transform: scale(1); opacity: 0; } }
+@keyframes vzgCur { 0% { transform: translate(12px, 13px); opacity: .35; } 3% { opacity: 1; } 8% { transform: none; } 9.5% { transform: scale(.86); } 11% { transform: none; } 20% { transform: none; opacity: 1; } 25%, 100% { transform: translate(12px, 13px); opacity: .35; } }
+@keyframes vzgRip { 0%, 8.5% { transform: scale(.3); opacity: 0; } 9.5% { opacity: .9; } 17%, 100% { transform: scale(2.3); opacity: 0; } }
+@keyframes vzgCard { 0%, 10% { opacity: 0; transform: translateY(2px); } 13%, 22% { opacity: 1; transform: none; } 26%, 100% { opacity: 0; transform: none; } }
+/* 標註：一條細線＋圓點指向分法列（往上）和右下角的設定（往下） */
+.vz-g-co { position: absolute; font-size: 11.5px; line-height: 1.45; letter-spacing: .04em; color: var(--vz-ink); }
+.vz-g-co > span { display: inline; padding: 2px 7px; border-radius: 3px; background: rgba(var(--vz-bg-rgb), .78); -webkit-box-decoration-break: clone; box-decoration-break: clone; opacity: .85; }
+.vz-g-co::before { content: ""; position: absolute; width: 1px; background: currentColor; opacity: .7; }
+.vz-g-co::after { content: ""; position: absolute; width: 5px; height: 5px; margin-left: -2px; border-radius: 50%; background: currentColor; }
+.vz-g-up { padding-left: 6px; transform: translateX(-.5px); }
+.vz-g-up::before { left: 0; top: calc(-1 * var(--lh, 14px)); height: calc(var(--lh, 14px) + 8px); }   /* 細線從分法列一路連到文字第一行 */
+.vz-g-up::after { left: .5px; top: calc(-1 * var(--lh, 14px) - 2.5px); }
+.vz-g-dn::before { left: var(--lx, 16px); top: 100%; height: var(--lh, 14px); }
+.vz-g-dn::after { left: calc(var(--lx, 16px) + .5px); top: calc(100% + var(--lh, 14px) - 2.5px); }
+@media (prefers-reduced-motion: reduce) { .vz-guide, .vz-guide * { animation: none !important; transition: none !important; } .vz-g-ic .g-btn { opacity: .9; } .vz-g-ic .g-tap { opacity: 1; } .vz-g-ic .g-card { opacity: 1; } }
 .vz-canvas.panning { cursor: move; }
 .vz-btn.on { background: var(--vz-ink); color: var(--vz-bg); border-color: var(--vz-ink); }
 .vz-set { position: absolute; right: 24px; bottom: 64px; width: 284px; color: var(--vz-ink); padding: 10px 14px 12px; font-size: 12px; z-index: 5; max-height: calc(100% - 84px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
@@ -142,7 +210,13 @@ html.vz-lock, html.vz-lock body { overflow: hidden; }
   .vz-btn { width: 31px; height: 31px; }
   .vz-set { left: 12px; right: 12px; width: auto; bottom: 52px; }
   .vz-tilt { top: -38px; }
-  .vz-hint { right: 12px; left: 12px; top: 10px; }
+  .vz-help { right: 12px; top: 10px; }
+  .vz-g-mid { top: 44%; padding: 34px 22px; gap: 10px; }
+  .vz-g-row { grid-template-columns: repeat(4, 80px); gap: 2px; }
+  .vz-g-ic { width: 54px; height: 54px; margin-bottom: 4px; }
+  .vz-g-it b { font-size: 12px; }
+  .vz-g-it span { font-size: 10px; }
+  .vz-g-co { font-size: 11px; }
   .vz-back { left: 12px; bottom: 62px; }
   .vz-card.dock { width: 158px; padding: 8px 10px 9px; }
   .vz-card.dock .vz-card-t { margin-bottom: 5px; font-size: 12px; }
@@ -156,3 +230,6 @@ html.vz-lock, html.vz-lock body { overflow: hidden; }
   .vz-pals { grid-template-columns: repeat(3, 1fr); }
   .vz-filters { padding: 0 8px; }
 }
+@media (max-width: 340px) { .vz-g-row { grid-template-columns: repeat(2, 96px); gap: 10px 6px; } }
+/* 英文的設定名稱比較長 */
+:root[data-lang="en"] .vz-sl { grid-template-columns: 7.4em minmax(0, 1fr) 3.2em; }

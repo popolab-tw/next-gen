@@ -32,12 +32,13 @@
 | --- | --- |
 | `src/viz.js`、`src/viz.css` | 3D 台灣（WebGL）：道路、地形、每位分享者一個點，可以依年齡層、住法、門檻 PR 等分層 |
 | `src/nextgen.js`、`src/ng.css` | 網站外框：開場標題 → MV（YouTube 隱私強化模式）→ 轉場到地圖；地圖下方的說明與「生育門檻測驗」小欄 |
+| `src/i18n.js` | 語言（繁體中文／英文）：網址 `?lang=zh`、`?lang=en` → 上次自己選的 → 瀏覽器語言。HTML 裡的英文寫在 `build/ng.js` 的 `data-en…` 屬性，程式裡的寫成 `T('中文', 'English')`（遊戲網站只有中文） |
 | `build/ng.js` | 組裝 `map/index.html`（網站）與 `dist/map.html`（claude.ai 預覽版） |
 | `build/ng_assets.py` | 主視覺縮圖、社群預覽圖與兩個網站的 QR Code（`src/ng/`） |
 | `viz/map.bin.gz` | 底圖：海岸線、行政區界、道路、等高線與地形高度網格 |
 | `viz/points.json` | 分享資料的固定版本：位置依縣市與人口密度隨機撒（不是真實住址），不含匿名代號與分享時間，順序打亂；分享少於 5 筆的縣市不放收入 PR 與審查結果 |
 
-MV 的 YouTube 影片代號設定在 `build/web.config.json` 的 `nextgenMv`（例：`{"yt": "影片代號", "len": "3 分半"}`）。網站上用 youtube-nocookie.com 的播放器；控制播放器的 YouTube API 會設定 cookie，所以等觀眾按下播放才載入。YouTube 回報無法播放時，先轉到地圖，上方的 MV 按鈕改成開 YouTube 新分頁。claude.ai 預覽版不能內嵌 YouTube，一律改成「到 YouTube 看 MV」；還沒有影片代號時，網站不放開場，預覽版用 `viz/mv-placeholder.mp4` 暫代。
+MV 的 YouTube 影片代號設定在 `build/web.config.json` 的 `nextgenMv`（例：`{"yt": "影片代號", "len": "3 分半", "en": {"yt": "英文版代號", "len": "3.5 min"}}`）。`en` 是英文介面播的版本；還沒有 `en.yt` 時，英文介面先播中文版，標題畫面註明「Chinese version」。標題畫面只有按「播放 MV」或「全螢幕播放」才開始播，播放前可以先換語言。網站上用 youtube-nocookie.com 的播放器；控制播放器的 YouTube API 會設定 cookie，所以等觀眾按下播放才載入。YouTube 回報無法播放時，先轉到地圖，上方的 MV 按鈕改成開 YouTube 新分頁。claude.ai 預覽版不能內嵌 YouTube，一律改成「到 YouTube 看 MV」；還沒有影片代號時，網站不放開場，預覽版用 `viz/mv-placeholder.mp4` 暫代。
 
 ## 發現錯誤？
 

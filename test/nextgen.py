@@ -18,6 +18,7 @@ html = open(os.path.join(ROOT, 'map', 'index.html'), encoding='utf8').read()
 open(os.path.join(ROOT, 'map', '_yt.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID"}};', html, count=1, flags=re.S))
 open(os.path.join(ROOT, 'map', '_file.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"src":"../viz/mv-placeholder.mp4"}};', html, count=1, flags=re.S))
 open(os.path.join(ROOT, 'map', '_nomv.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":null};', html, count=1, flags=re.S))
+open(os.path.join(ROOT, 'map', '_yten.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID","len":"3 分半","en":{"yt":"TESTEN","len":"3.5 min"}}};', html, count=1, flags=re.S))
 open(os.path.join(ROOT, 'map', '_ext.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID","len":"3 分半","ext":true}};', html, count=1, flags=re.S))
 CFG = json.load(open(os.path.join(ROOT, 'build', 'web.config.json'), encoding='utf8')).get('nextgenMv') or {}
 
@@ -38,6 +39,7 @@ window.YT = { Player: function (el, o) {
   this.playVideo = function () { window.__yt.calls.push('play'); if (window.__ytErr) { setTimeout(function () { o.events.onError({ data: 150 }); }, 100); return; } if (!window.__ytBlock) self.start(); };
   this.pauseVideo = function () { window.__yt.calls.push('pause'); clearInterval(iv); o.events.onStateChange({ data: 2 }); };
   this.seekTo = function (s, ahead) { t = s; (window.__yt.seeks = window.__yt.seeks || []).push([Math.round(s * 10) / 10, !!ahead]); }; this.getCurrentTime = function () { return t; }; this.getDuration = function () { return dur; };
+  this.cueVideoById = function (id) { window.__yt.calls.push('cue:' + id); }; this.loadVideoById = function (id) { window.__yt.calls.push('load:' + id); self.start(); };
   this.mute = function () { muted = true; }; this.unMute = function () { muted = false; }; this.isMuted = function () { return muted; };
   var vol = 100; window.__yt.vols = []; this.getVolume = function () { return vol; }; this.setVolume = function (v) { vol = v; window.__yt.vols.push(v); };
   window.__ytp = this; setTimeout(function () { o.events.onReady({ target: self }); }, 50);
@@ -56,6 +58,9 @@ API = []
 
 with sync_playwright() as p:
     b = p.chromium.launch(args=['--use-gl=swiftshader', '--enable-unsafe-swiftshader'])
+    _nc = b.new_context
+    def newctx(**kw): kw.setdefault('locale', 'zh-TW'); return _nc(**kw)   # 預設是中文瀏覽器（介面語言跟著瀏覽器）
+    b.new_context = newctx
     for mode in ('desktop', 'mobile'):
         vw = (1440, 900) if mode == 'desktop' else (390, 844)
         ctx = b.new_context(viewport={'width': vw[0], 'height': vw[1]}, has_touch=mode == 'mobile', is_mobile=mode == 'mobile')
@@ -77,10 +82,14 @@ with sync_playwright() as p:
         pg.goto(BASE + '_file.html'); pg.wait_for_timeout(2000)
         check(mode + ': 開場標題畫面', pg.evaluate(I + '.hidden') is False and pg.evaluate("document.documentElement.classList.contains('ng-lock')"))
         check(mode + ': 預設深色', pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'dark')
+        # 不會自己播：點空白處、按其他鍵、選語言都不會開始
         if mode == 'mobile': pg.tap('.ng-title', position={'x': 195, 'y': 300})
-        else: pg.keyboard.press('k')
+        else: pg.mouse.click(300, 300); pg.keyboard.press('k'); pg.keyboard.press('Enter') if pg.evaluate("document.activeElement === document.body") else None
+        pg.wait_for_timeout(700)
+        check(mode + ': 點空白處、按其他鍵不會開始播', pg.evaluate("window.__ng.intro.state()") == 'title' and 'playing' not in pg.evaluate(I + '.className') and pg.evaluate("document.querySelector('.ng-file').paused"))
+        pg.click('.ng-play') if mode == 'desktop' else pg.tap('.ng-play')
         pg.wait_for_timeout(1300)
-        check(mode + ': 按鍵／點一下開始播放', 'on' in pg.evaluate(I + '.className') and pg.evaluate("document.querySelector('.ng-file').currentTime") > 0.2, pg.evaluate(I + '.className'))
+        check(mode + ': 按「播放 MV」開始播放', 'on' in pg.evaluate(I + '.className') and pg.evaluate("document.querySelector('.ng-file').currentTime") > 0.2, pg.evaluate(I + '.className'))
         check(mode + ': 地圖在背後先載入', pg.evaluate("window.__ng.viz.ready()"))
         if mode == 'mobile': pg.tap('.ng-catch', position={'x': 100, 'y': 300})
         else: pg.mouse.move(300, 300); pg.mouse.move(320, 320)
@@ -165,7 +174,7 @@ with sync_playwright() as p:
         tag = 'YouTube' + ('（擋自動播放）' if block else '')
         check(tag + ': 隱私強化模式', pg.evaluate("document.getElementById('ng-yt-frame').src").startswith('https://www.youtube-nocookie.com/embed/TESTID?'))
         check(tag + ': 按下播放前不載入 API', not pg.evaluate("!!window.__yt"))
-        pg.click('.ng-title', position={'x': 600, 'y': 300}); pg.wait_for_timeout(800)
+        pg.click('.ng-play'); pg.wait_for_timeout(800)
         check(tag + ': 按下播放後才載入 API', pg.evaluate("!!window.__yt && window.__yt.calls.indexOf('play') >= 0"))
         if block:
             pg.wait_for_timeout(3300)
@@ -392,8 +401,114 @@ with sync_playwright() as p:
         check(tag + ': 按鈕開 YouTube、轉到地圖', pg.evaluate('window.__opened') == ['https://youtu.be/TESTID'] and pg.evaluate(I + '.hidden'))
         check(tag + ': 沒有錯誤', not errs, errs)
         ctx.close()
+    # ---- 語言：開場畫面就能換；英文介面播英文版 MV；地圖的文字跟著換 ----
+    for mode in ('desktop', 'mobile'):
+        vw = (1280, 800) if mode == 'desktop' else (390, 844)
+        ctx = b.new_context(viewport={'width': vw[0], 'height': vw[1]}, has_touch=mode == 'mobile', is_mobile=mode == 'mobile')
+        pg = ctx.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.add_init_script('window.__ytDur = 60;')
+        pg.route('**/*', route); del API[:]
+        tap = (lambda sel: pg.click(sel)) if mode == 'desktop' else (lambda sel: pg.tap(sel))
+        pg.goto(BASE + '_yten.html'); pg.wait_for_timeout(1500)
+        tag = '語言 ' + mode
+        check(tag + ': 中文瀏覽器預設中文', pg.evaluate("document.documentElement.lang") == 'zh-Hant-TW' and pg.evaluate("document.querySelector('.ng-play-t').textContent") == '播放 MV' and pg.evaluate("document.querySelector('[data-lang-pick=zh]').getAttribute('aria-pressed')") == 'true')
+        tap('[data-lang-pick=en]'); pg.wait_for_timeout(300)
+        ti = pg.evaluate("({ lang: document.documentElement.lang, play: document.querySelector('.ng-play-t').textContent, sub: document.querySelector('.ng-play-s').textContent, skip: document.querySelector('.ng-skipall').textContent, land: document.querySelector('.ng-landbtn').innerText.trim(), state: window.__ng.intro.state(), saved: localStorage.getItem('ng:lang'), title: document.title, pressed: document.querySelector('[data-lang-pick=en]').getAttribute('aria-pressed'), src: document.getElementById('ng-yt-frame').src })")
+        check(tag + ': 開場按 EN：文字換成英文、還沒開始播、記住選擇', ti['lang'] == 'en' and ti['play'] == 'Play MV' and 'about 3.5 min' in ti['sub'] and ti['skip'].startswith('Skip the MV') and ti['land'].startswith('Play fullscreen') and ti['state'] == 'title' and ti['saved'] == 'en' and ti['title'].startswith('NEXT GEN · ') and ti['pressed'] == 'true', ti)
+        check(tag + ': 英文介面換成英文版 MV（還沒按播放，不載入 YouTube API）', '/embed/TESTEN?' in ti['src'] and not API, (ti['src'], API))
+        tap('[data-lang-pick=zh]'); pg.wait_for_timeout(300)
+        check(tag + ': 換回中文：文字與 MV 都換回來', pg.evaluate("document.querySelector('.ng-play-t').textContent") == '播放 MV' and '/embed/TESTID?' in pg.evaluate("document.getElementById('ng-yt-frame').src") and pg.evaluate("document.querySelector('.ng-skipall').textContent").startswith('略過'))
+        tap('[data-lang-pick=en]'); pg.wait_for_timeout(200)
+        pg.evaluate('window.__ng.viz._bare(true)')
+        tap('.ng-play'); pg.wait_for_timeout(800)
+        check(tag + ': 英文介面按播放：播英文版', 'on' in pg.evaluate(I + '.className') and len(API) == 1)
+        if mode == 'mobile': pg.tap('.ng-catch', position={'x': 100, 'y': 300})
+        else: pg.mouse.move(300, 300); pg.mouse.move(320, 320)
+        pg.wait_for_timeout(250)
+        hud = pg.evaluate("({ mute: document.querySelector('.ng-mute span').textContent, fs: document.querySelector('.ng-fs span').textContent, skip: document.querySelector('.ng-skip').textContent.trim(), pause: document.querySelector('.ng-pause').getAttribute('aria-label') })")
+        check(tag + ': 播放中的控制列是英文', hud['mute'] == 'Mute' and hud['skip'] == 'Skip MV' and hud['pause'] == 'Pause' and hud['fs'] in ('Fullscreen', 'Landscape'), hud)
+        pg.keyboard.press('Escape') if mode == 'desktop' else pg.evaluate("document.querySelector('.ng-skip').click()")
+        pg.wait_for_function("document.getElementById('ng-intro').hidden", timeout=6000)
+        pg.wait_for_timeout(600)
+        mp = pg.evaluate("({ chips: [...document.querySelectorAll('.vz-chip')].map(c => c.textContent), legend: document.querySelector('.vz-lg-t').textContent, tilt: document.querySelector('.vz-ctl .vz-txt').textContent, set: document.querySelector('.vz-ctl .vz-btn:not(.vz-txt)').getAttribute('aria-label'), mvbtn: document.getElementById('ng-mvbtn').title, head: document.querySelector('.ng-sub').textContent, lede: document.querySelector('.ng-lede').textContent.slice(0, 9) })")
+        check(tag + ': 地圖與頁面是英文', mp['chips'][:3] == ['Map', 'Age', 'Housing'] and mp['legend'] == 'Threshold %ile' and mp['tilt'] == 'Tilt-shift' and mp['set'] == 'Display settings' and mp['mvbtn'] == 'Replay the MV' and mp['head'] == 'Parenthood threshold' and mp['lede'] == 'Each dot ', mp)
+        pg.evaluate("window.__ng.viz.setFilter('age')"); pg.wait_for_timeout(500)
+        lb = pg.evaluate("[...document.querySelectorAll('.vz-lbl b')].map(b => b.textContent)")
+        check(tag + ': 切片名稱是英文', 'Ages 30–34' in lb, lb)
+        pg.evaluate("window.__ng.viz.show(0)"); pg.wait_for_timeout(200)
+        ct = pg.evaluate("document.querySelector('.vz-card').textContent")
+        check(tag + ': 資訊卡是英文（縣市用英文名）', 'Threshold' in ct and not re.search('[\u4e00-\u9fff]', ct), ct)
+        # 頁首的語言按鈕：換回中文，地圖上的字跟著換（資訊卡、切片名稱、圖例）
+        tap('#ng-lang'); pg.wait_for_timeout(400)
+        zh = pg.evaluate("({ lang: document.documentElement.lang, lbl: [...document.querySelectorAll('.vz-lbl:not(.out) b')].map(b => b.textContent), card: document.querySelector('.vz-card').textContent, legend: document.querySelector('.vz-lg-t').textContent, chip: document.querySelector('.vz-chip.on').textContent, btn: document.getElementById('ng-lang').textContent, calls: window.__yt.calls })")
+        check(tag + ': 頁首按鈕換回中文：地圖文字立刻換', zh['lang'] == 'zh-Hant-TW' and '30–34 歲' in zh['lbl'] and '門檻 PR' in zh['card'] and zh['legend'] == '門檻 PR' and zh['chip'] == '年齡層' and zh['btn'] == 'EN', zh)
+        check(tag + ': 已經接上播放器後換語言：改放那個語言的 MV（停在開頭）', zh['calls'][-1] == 'cue:TESTID', zh['calls'][-3:])
+        pg.goto(BASE + '_yten.html?lang=en'); pg.wait_for_timeout(1200)
+        check(tag + ': 網址 ?lang=en 直接是英文', pg.evaluate("document.documentElement.lang") == 'en' and pg.evaluate("document.querySelector('.vz-chip').textContent") == 'Map')
+        check(tag + ': 沒有錯誤', not errs, errs)
+        ctx.close()
+    # 英文瀏覽器：預設英文；英文版 MV 還沒有時播中文版，標題畫面註明
+    ctx = b.new_context(viewport={'width': 1280, 'height': 800}, locale='en-US')
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1300)
+    check('英文瀏覽器：預設英文、沒有英文版 MV 時播中文版並註明', pg.evaluate("document.documentElement.lang") == 'en' and 'Chinese version' in pg.evaluate("document.querySelector('.ng-play-s').textContent") and '/embed/TESTID?' in pg.evaluate("document.getElementById('ng-yt-frame').src"))
+    check('英文瀏覽器：沒有錯誤', not errs, errs)
+    ctx.close()
+    # ---- 操作說明：第一次進到地圖時浮出來；碰一下地圖就收起；右上角可以再叫出來 ----
+    for mode in ('desktop', 'mobile'):
+        vw = (1440, 900) if mode == 'desktop' else (390, 844)
+        ctx = b.new_context(viewport={'width': vw[0], 'height': vw[1]}, has_touch=mode == 'mobile', is_mobile=mode == 'mobile')
+        pg = ctx.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.route('**/*', route)
+        pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1200)
+        tag = '操作說明 ' + mode
+        check(tag + ': 開場時還沒出現', not pg.evaluate("!!document.querySelector('.vz-guide.on')"))
+        pg.click('.ng-skipall') if mode == 'desktop' else pg.tap('.ng-skipall')
+        pg.wait_for_timeout(1500)
+        check(tag + ': 地圖轉進來的途中還沒出現', not pg.evaluate("!!document.querySelector('.vz-guide.on')"))
+        pg.wait_for_function("!!document.querySelector('.vz-guide.on')", timeout=8000)
+        pg.wait_for_timeout(1300)
+        g = pg.evaluate("""(() => { const g = document.querySelector('.vz-guide'), st = document.querySelector('.vz-stage').getBoundingClientRect(), r = e => e.getBoundingClientRect(), inS = e => { const b = r(e); return b.left >= st.left - 1 && b.right <= st.right + 1 && b.top >= st.top - 1 && b.bottom <= st.bottom + 1; };
+          const set = r(document.querySelector('.vz-ctl .vz-btn:not(.vz-txt)')), dn = r(document.querySelector('.vz-g-dn')), up = r(document.querySelector('.vz-g-up')), bar = r(document.querySelector('.vz-filters'));
+          return { pe: getComputedStyle(g).pointerEvents, op: +getComputedStyle(g).opacity, items: [...g.querySelectorAll('.vz-g-it b')].map(b => b.textContent), anim: getComputedStyle(g.querySelector('.vz-g-it')).animationName,
+            inside: [...g.querySelectorAll('.vz-g-mid, .vz-g-up, .vz-g-dn')].every(inS), dnAbove: dn.bottom <= set.top, upBelow: up.top >= bar.bottom, help: getComputedStyle(document.querySelector('.vz-help')).opacity, seen: localStorage.getItem('ng:guide') }; })()""")
+        want = ['單指拖曳', '雙指開合', '雙指拖曳', '點一下光點'] if mode == 'mobile' else ['拖曳', '滾輪', '右鍵拖曳', '點一下光點']
+        check(tag + ': 淡淡浮出手勢示範（' + ('觸控' if mode == 'mobile' else '滑鼠') + '）', g['items'] == want and g['anim'] == 'vzgIt' and g['op'] > 0.9 and g['pe'] == 'none' and g['seen'] == '1', g)
+        check(tag + ': 標註在地圖裡，分別指向分法列和設定按鈕', g['inside'] and g['dnAbove'] and g['upBelow'], g)
+        cv = pg.evaluate("(() => { const r = document.querySelector('.vz-canvas').getBoundingClientRect(); return [r.left + r.width * 0.3, r.top + r.height * 0.3]; })()")
+        if mode == 'mobile': pg.touchscreen.tap(cv[0], cv[1])
+        else: pg.mouse.move(cv[0], cv[1]); pg.mouse.down(); pg.mouse.move(cv[0] + 60, cv[1], steps=5); pg.mouse.up()
+        pg.wait_for_timeout(1000)
+        check(tag + ': 碰一下地圖就收起，右上角有「操作說明」', not pg.evaluate("!!document.querySelector('.vz-guide.on')") and pg.evaluate("document.querySelector('.vz-guide').hidden") and float(pg.evaluate("getComputedStyle(document.querySelector('.vz-help')).opacity")) > 0.9)
+        pg.click('.vz-help') if mode == 'desktop' else pg.tap('.vz-help')
+        pg.wait_for_timeout(1300)
+        check(tag + ': 按「操作說明」再出現', pg.evaluate("!!document.querySelector('.vz-guide.on')"))
+        pg.click('.vz-help') if mode == 'desktop' else pg.tap('.vz-help')
+        pg.wait_for_timeout(1200)
+        check(tag + ': 再按一次收起（手機上不會被同一下點到又打開）', not pg.evaluate("!!document.querySelector('.vz-guide.on')") and pg.evaluate("document.querySelector('.vz-help').getAttribute('aria-pressed')") == 'false')
+        pg.goto(BASE + '_yt.html?again=1#map'); pg.wait_for_timeout(4000)
+        check(tag + ': 看過之後不再自己出現', not pg.evaluate("!!document.querySelector('.vz-guide.on')"))
+        check(tag + ': 沒有錯誤', not errs, errs)
+        ctx.close()
+    # 地圖轉進來途中就開始操作：這次不跳出操作說明
+    ctx = b.new_context(viewport={'width': 1280, 'height': 800})
+    pg = ctx.new_page(); errs = []
+    pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.route('**/*', route)
+    pg.goto(BASE + '_yt.html'); pg.wait_for_timeout(1200)
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(1600)
+    check('標題畫面按 Esc：略過 MV 看地圖', pg.evaluate(I + '.hidden'))
+    pg.mouse.move(640, 400); pg.mouse.down(); pg.mouse.move(700, 420, steps=4); pg.mouse.up()
+    pg.wait_for_timeout(3500)
+    check('轉進來途中就開始拖：不跳出操作說明', not pg.evaluate("!!document.querySelector('.vz-guide.on')") and pg.evaluate("localStorage.getItem('ng:guide')") is None)
+    check('（略過途中操作）沒有錯誤', not errs, errs)
+    ctx.close()
     b.close()
 srv.shutdown()
-for f in ('_yt.html', '_file.html', '_nomv.html', '_ext.html'): os.remove(os.path.join(ROOT, 'map', f))
+for f in ('_yt.html', '_yten.html', '_file.html', '_nomv.html', '_ext.html'): os.remove(os.path.join(ROOT, 'map', f))
 print('全部通過' if ok else '有失敗')
 sys.exit(0 if ok else 1)

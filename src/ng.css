@@ -31,6 +31,12 @@ body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/
 .ng-btn svg { width: 14px; height: 14px; fill: currentColor; }
 .ng-btn.ic { width: 32px; padding: 0; justify-content: center; }
 .ng-btn.ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.ng-langbtn { min-width: 32px; justify-content: center; padding: 0 9px; }
+:root[data-lang="en"] .ng-langbtn { font-family: var(--f-sans); letter-spacing: .04em; }
+:root[data-lang="en"] .ng-sub { letter-spacing: .14em; text-transform: uppercase; font-size: 11px; }
+/* 英文版：頁首的小程式先藏起畫面，等文字換成英文再出現（萬一程式出錯，1.5 秒後也會出現） */
+html.ng-hold body { visibility: hidden; animation: ngHold 0s linear 1.5s forwards; }
+@keyframes ngHold { to { visibility: visible; } }
 
 /* ---------- 地圖：塞滿第一個畫面，底下留一條看得到下一段 ---------- */
 .ng .vz { padding: 0; border-top: 0; }
@@ -54,6 +60,7 @@ body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/
 .ng-x-k { display: flex; gap: 14px; font-family: var(--ng-mono); font-size: 11px; letter-spacing: .14em; color: var(--ng-ink-2); margin-bottom: 8px; }
 .ng-x-seal { width: 92px; height: 92px; display: block; transform: rotate(-6deg); }
 .ng-x-seal svg { width: 100%; height: 100%; display: block; }
+.ng-x h3 small { display: block; margin-top: 2px; font-family: var(--f-sans); font-size: 13px; font-weight: 500; letter-spacing: .02em; color: var(--ng-ink-2); }
 .ng-x h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.3; font-weight: 700; font-family: "Noto Serif TC", "Noto Serif CJK TC", "Songti TC", serif; letter-spacing: .02em; }
 .ng-x p { margin: 0 0 14px; max-width: 36em; font-size: 14px; line-height: 1.7; color: var(--ng-ink-2); }
 .ng-x-go { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
@@ -84,7 +91,7 @@ body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/
 html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-intro { position: fixed; inset: 0; z-index: 300; background: #000; color: #ececE6; transition: opacity .9s ease; color-scheme: dark; }
 .ng-intro.out { opacity: 0; pointer-events: none; }
-.ng-title { position: absolute; inset: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 20px calc(5vh + env(safe-area-inset-bottom, 0px)); transition: opacity .6s ease; -webkit-tap-highlight-color: transparent; }
+.ng-title { position: absolute; inset: 0; cursor: default; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 20px calc(5vh + env(safe-area-inset-bottom, 0px)); transition: opacity .6s ease; -webkit-tap-highlight-color: transparent; }
 .ng-intro.playing .ng-title { opacity: 0; pointer-events: none; }
 .ng-kv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; opacity: 0; animation: ngKv 2.4s ease .1s forwards; user-select: none; -webkit-user-drag: none; }
 @keyframes ngKv { from { opacity: 0; transform: scale(1.04); } to { opacity: .92; transform: scale(1); } }
@@ -109,6 +116,13 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-landbtn:hover, .ng-landbtn:focus-visible { border-color: #ececE6; background: rgba(236, 236, 230, .12); outline: none; }
 .ng-landbtn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .ng-intro.nomv .ng-landbtn, .ng-intro.ext .ng-landbtn { display: none; }
+/* 語言：開場畫面右上角，播放前就能換 */
+.ng-lang { position: absolute; z-index: 2; top: calc(16px + env(safe-area-inset-top, 0px)); right: calc(16px + env(safe-area-inset-right, 0px)); display: flex; padding: 3px; gap: 2px; border: 1px solid rgba(236, 236, 230, .35); border-radius: 999px; background: rgba(0, 0, 0, .35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; animation: ngIn 1s ease .9s forwards; }
+.ng-lang-b { appearance: none; border: 0; background: none; color: rgba(236, 236, 230, .7); font: 500 12px/1 var(--f-sans); letter-spacing: .08em; padding: 7px 12px; border-radius: 999px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.ng-lang-b:hover { color: #ececE6; }
+.ng-lang-b.on { background: rgba(236, 236, 230, .92); color: #0a0a0b; }
+.ng-lang-b:focus-visible { outline: 2px solid #ececE6; outline-offset: 2px; }
+.ng-intro.playing .ng-lang { opacity: 0; pointer-events: none; }
 /* 播放畫面（影片、暫停鍵、控制列、進度條）放在 ng-vp 裡：橫向播放時整塊轉 90 度 */
 .ng-vp { position: absolute; inset: 0; pointer-events: none; }   /* 本身不接點擊（標題畫面在它底下）；裡面要點的元素各自打開 */
 .ng-mv { position: absolute; inset: 0; opacity: 0; transition: opacity .7s ease; pointer-events: none; }
@@ -190,7 +204,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
 .ng-intro.hud .ng-prog { opacity: 0; }
 .ng-intro.playing .ng-prog { display: block; }
 .ng-prog i { position: absolute; inset: 0; background: rgba(236, 236, 230, .75); transform-origin: 0 50%; transform: scaleX(0); }
-@media (prefers-reduced-motion: reduce) { .ng-kv, .ng-play, .ng-skipall { animation-duration: .01s; animation-delay: 0s; } .ng-play-t, .ng-more i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ng-kv, .ng-play, .ng-skipall, .ng-lang { animation-duration: .01s; animation-delay: 0s; } .ng-play-t, .ng-more i { animation: none; } }
 
 .k-tap { display: none; }
 @media (pointer: coarse) { .k-key, .ng-esc { display: none; } .k-tap { display: inline; } }
@@ -218,6 +232,7 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
   .ng-foot .ng-r { margin-left: 0; }
 }
 @media (max-width: 380px) { .ng-sub { display: none; } }
+@media (max-width: 430px) { :root[data-lang="en"] .ng-sub { display: none; } }
 /* 直式手機：主視覺是橫的，整張放進畫面上半部 */
 @media (max-aspect-ratio: 4/5) {
   .ng-kv { object-fit: contain; object-position: 50% 38%; }
