@@ -20,7 +20,8 @@ open(os.path.join(ROOT, 'map', '_file.html'), 'w', encoding='utf8').write(re.sub
 open(os.path.join(ROOT, 'map', '_nomv.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":null};', html, count=1, flags=re.S))
 open(os.path.join(ROOT, 'map', '_yten.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID","len":"3 分半","en":{"yt":"TESTEN","len":"3.5 min"}}};', html, count=1, flags=re.S))
 open(os.path.join(ROOT, 'map', '_ext.html'), 'w', encoding='utf8').write(re.sub(r'window\.NEXTGEN = \{.*?\};', 'window.NEXTGEN = {"mv":{"yt":"TESTID","len":"3 分半","ext":true}};', html, count=1, flags=re.S))
-CFG = json.load(open(os.path.join(ROOT, 'build', 'web.config.json'), encoding='utf8')).get('nextgenMv') or {}
+WCFG = json.load(open(os.path.join(ROOT, 'build', 'web.config.json'), encoding='utf8'))
+CFG = WCFG.get('nextgenMv') or {}
 
 class Quiet(http.server.SimpleHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -142,7 +143,7 @@ with sync_playwright() as p:
         pg.click('.vz-ctl .vz-txt') if mode == 'desktop' else pg.tap('.vz-ctl .vz-txt')
         pg.wait_for_timeout(200)
         check(mode + ': 再點一次關掉', not pg.evaluate("document.querySelector('.vz-stage').classList.contains('vz-mini')") and pg.evaluate("document.querySelector('.vz-tilt').hidden") and pg.evaluate(tb + ".getAttribute('aria-pressed')") == 'false')
-        check(mode + ': 下方小欄有 QR Code 與測驗連結', pg.evaluate("!!document.querySelector('.ng-x .ng-qr-box svg') && /next-gen\\/$/.test(document.querySelector('.ng-x-btn').href)"))
+        check(mode + ': 下方小欄有 QR Code 與測驗連結', pg.evaluate("!!document.querySelector('.ng-x:not(.ng-pf) .ng-qr-box svg') && /next-gen\\/$/.test(document.querySelector('.ng-x:not(.ng-pf) .ng-x-btn').href)"))
         pg.reload(); pg.wait_for_timeout(1200)
         check(mode + ': 同一分頁重新整理不再播開場', pg.evaluate(I + '.hidden'))
         pg.click('#ng-mvbtn') if mode == 'desktop' else pg.tap('#ng-mvbtn')
@@ -269,7 +270,9 @@ with sync_playwright() as p:
     check('手機：標題畫面有「橫向全螢幕播放」', pg.evaluate("document.querySelector('.ng-landbtn').offsetParent !== null") and pg.evaluate("document.querySelector('.ng-landbtn').innerText.trim()") in ('橫向全螢幕播放', '橫向播放'))
     pg.tap('.ng-landbtn'); pg.wait_for_timeout(900)
     check('手機：按下就橫向播放', 'on' in pg.evaluate(I + '.className') and pg.evaluate('window.__ng.intro.land()') and pg.evaluate("document.getElementById('ng-intro').classList.contains('rot')"))
-    pg.evaluate("document.querySelector('.ng-skip').click()"); pg.wait_for_timeout(2000)
+    pg.evaluate("document.querySelector('.ng-skip').click()"); pg.wait_for_timeout(1200)
+    try: pg.wait_for_function("!document.fullscreenElement && document.getElementById('ng-intro').hidden", timeout=5000)   # 先等畫面淡出才離開全螢幕（約 1～2 秒）
+    except Exception: pass
     lv3 = pg.evaluate("({ hidden: document.getElementById('ng-intro').hidden, land: window.__ng.intro.land(), fs: document.fullscreenElement && (document.fullscreenElement.id || document.fullscreenElement.className), st: document.querySelector('.ng-vp').style.cssText })")
     check('手機：略過後回到直向、離開全螢幕', lv3 == {'hidden': True, 'land': False, 'fs': None, 'st': ''}, lv3)
     check('手機（橫向）：沒有錯誤', not errs, errs)
@@ -492,6 +495,28 @@ with sync_playwright() as p:
         check(tag + ': 再按一次收起（手機上不會被同一下點到又打開）', not pg.evaluate("!!document.querySelector('.vz-guide.on')") and pg.evaluate("document.querySelector('.vz-help').getAttribute('aria-pressed')") == 'false')
         pg.goto(BASE + '_yt.html?again=1#map'); pg.wait_for_timeout(4000)
         check(tag + ': 看過之後不再自己出現', not pg.evaluate("!!document.querySelector('.vz-guide.on')"))
+        check(tag + ': 沒有錯誤', not errs, errs)
+        ctx.close()
+    # ---- 作品集與贊助：頁首 MV 旁的 Portfolio 按鈕、測驗小欄上方的作品集小欄、頁尾上方的贊助 ----
+    for mode in ('desktop', 'mobile'):
+        vw = (1280, 800) if mode == 'desktop' else (375, 812)
+        ctx = b.new_context(viewport={'width': vw[0], 'height': vw[1]}, has_touch=mode == 'mobile', is_mobile=mode == 'mobile')
+        pg = ctx.new_page(); errs = []
+        pg.on('pageerror', lambda e: errs.append(str(e)))
+        pg.route('**/*', route)
+        pg.goto(BASE + '_yt.html#map'); pg.wait_for_timeout(900)
+        tag = '作品集 ' + mode
+        r = pg.evaluate("""(() => { const pf = document.getElementById('ng-pf'), mv = document.getElementById('ng-mvbtn'), img = pf.querySelector('img');
+          const xs = [...document.querySelectorAll('.ng-x')]; const sup = document.querySelector('.ng-sup a');
+          return { next: pf.nextElementSibling === mv, text: pf.textContent.trim(), href: pf.getAttribute('href'), img: img.complete && img.naturalWidth > 0, vis: pf.getBoundingClientRect().width > 0,
+            order: xs.map(x => x.getAttribute('aria-labelledby')), stripHref: document.querySelector('.ng-pf-btn').getAttribute('href'), av: document.querySelector('.ng-pf-av img').getAttribute('src'),
+            qr: !!document.querySelector('.ng-pf .ng-qr-box svg'), sup: sup.getAttribute('href'), supT: sup.target, supRel: sup.rel, last: document.querySelector('main').lastElementChild.className }; })()""")
+        check(tag + ': 頁首 MV 按鈕旁有頭像＋Portfolio 按鈕，連到作品集', r['next'] and r['text'] == 'Portfolio' and r['href'] == WCFG['portfolioUrl'] and r['img'] and r['vis'], r)
+        check(tag + ': 作品集小欄在測驗小欄上面（頭像、按鈕、QR Code）', r['order'] == ['ng-pf-t', 'ng-x-t'] and r['stripHref'] == WCFG['portfolioUrl'] and r['qr'] and r['av'].endswith('pf-192.webp'), r)
+        check(tag + ': 頁尾上方有贊助入口（新分頁開啟）', r['sup'] == WCFG['sponsorUrl'] and r['supT'] == '_blank' and 'noopener' in r['supRel'] and r['last'] == 'ng-sup', r)
+        pg.evaluate("document.querySelector('[data-lang-pick=en]').click()"); pg.wait_for_timeout(200)
+        en = pg.evaluate("({ btn: document.querySelector('.ng-pf-btn').textContent.trim(), sup: document.querySelector('.ng-sup-btn').textContent.trim(), k: document.querySelector('.ng-pf .ng-x-k').textContent, pf: document.getElementById('ng-pf').textContent.trim() })")
+        check(tag + ': 英文版文字', en['btn'] == 'See the portfolio' and en['sup'] == 'Support my work' and en['k'] == 'Portfolio' and en['pf'] == 'Portfolio', en)
         check(tag + ': 沒有錯誤', not errs, errs)
         ctx.close()
     # 地圖轉進來途中就開始操作：這次不跳出操作說明

@@ -16,7 +16,8 @@ const N = PTS.n, DATE = PTS.date;
 const SEAL = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect x="3" y="3" width="34" height="34" rx="5" fill="#fbfcfa" stroke="#c0302b" stroke-width="3"/><text x="20" y="27.5" text-anchor="middle" font-family="Noto Serif TC,Noto Serif CJK TC,serif" font-weight="900" font-size="20" fill="#c0302b">審</text></svg>';
 const NG_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="7" fill="#050506"/><g fill="#ececE6"><rect x="9" y="10" width="4" height="20"/><rect x="27" y="10" width="4" height="20"/><path d="M9 10h4l18 20h-4z"/></g><circle cx="31.5" cy="8.5" r="2.6" fill="#f0507a"/><circle cx="8.5" cy="32" r="2" fill="#4fd6e8"/></svg>';
 const I_ARROW = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg>';
-const QR_MAP = R('ng/qr-map.svg'), QR_GAME = R('ng/qr-game.svg');
+const QR_MAP = R('ng/qr-map.svg'), QR_GAME = R('ng/qr-game.svg'), QR_PF = R('ng/qr-portfolio.svg');
+const I_HEART = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.6S2.2 10.2 2.2 6.1A2.9 2.9 0 0 1 8 4.6a2.9 2.9 0 0 1 5.8 1.5c0 4.1-5.8 7.5-5.8 7.5z"/></svg>';
 const dataUrl = (p, type) => 'data:' + type + ';base64,' + RB(p).toString('base64');
 
 // ---------- 遊戲頁：頁尾上方的 NEXT GEN 小欄 ----------
@@ -51,12 +52,14 @@ function page(o) {
   const mvLen = o.mv && o.mv.len ? '約 ' + o.mv.len : '';
   const gameShown = o.siteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '');
   const gtgt = o.web ? '' : ' target="_blank" rel="noopener noreferrer"';
+  const pfShown = o.pf ? o.pf.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
   const notes = [
     [`資料更新到 ${DATE}・只計入同意匿名分享的玩家；之後取消分享的人，下次更新時移除。`, `Data as of ${DATE}. Only players who agreed to share anonymously are included; anyone who withdraws is removed at the next update.`],
     ['分享少於 5 筆的縣市不顯示收入 PR 與審查結果。', 'Counties with fewer than 5 entries don’t show income percentiles or verdicts.'],
     ['地形高度放大 5 倍，才看得出起伏；可以在右下角的設定調整。', 'Terrain height is exaggerated 5× so the relief shows; you can change it in the settings at the bottom right.'],
     ['地圖：道路 © OpenStreetMap contributors（經 Overture Maps）・地形 AWS Terrain Tiles（SRTM 等）・人口密度 WorldPop・行政區界 內政部', 'Map: roads © OpenStreetMap contributors (via Overture Maps) · terrain AWS Terrain Tiles (SRTM and others) · population density WorldPop · administrative boundaries Ministry of the Interior, Taiwan'],
-    o.mv && o.mv.yt ? (o.mv.ext ? ['MV 放在 YouTube，按下後在新分頁播放。', 'The MV is on YouTube and opens in a new tab.'] : ['MV 由 YouTube 播放（隱私強化模式：按下播放前不會設定 YouTube 的 cookie）。', 'The MV plays from YouTube in privacy-enhanced mode: no YouTube cookies are set until you press play.']) : null
+    // 有瀏覽統計時，隱私說明（統計＋YouTube）統一寫在頁尾，和作品集網站一樣
+    o.mv && o.mv.yt && !o.gc ? (o.mv.ext ? ['MV 放在 YouTube，按下後在新分頁播放。', 'The MV is on YouTube and opens in a new tab.'] : ['MV 由 YouTube 播放（隱私強化模式：按下播放前不會設定 YouTube 的 cookie）。', 'The MV plays from YouTube in privacy-enhanced mode: no YouTube cookies are set until you press play.']) : null
   ].filter(Boolean);
   // claude.ai 版：平台會補上 <html><head><body> 外框，所以不寫這幾個標籤
   const open = o.web ? `<!doctype html>
@@ -81,7 +84,8 @@ ${o.web ? `<link rel="canonical" href="${o.ngUrl}">
 <meta property="og:image:alt" content="NEXT GEN 生育門檻可視化網頁：3D 台灣上的 ${sep(N)} 個光點">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
-` : ''}<meta name="theme-color" content="#050506">
+${o.gc ? `<script data-goatcounter="${o.gc}" async src="https://gc.zgo.at/count.js"></script>
+` : ''}` : ''}<meta name="theme-color" content="#050506">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap">
@@ -126,6 +130,7 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
   <a class="ng-brand" href="./" aria-label="NEXT GEN 生育門檻可視化網頁"${I({ 'aria-label': 'NEXT GEN — the parenthood threshold, visualized' })}><span class="ng-word">NEXT GEN</span><span class="ng-sub"${I({ t: 'Parenthood threshold' })}>生育門檻可視化</span></a>
   <div class="ng-head"${I({ h: `What <b>${sep(N)}</b> people think it takes to raise a child` })}><b>${sep(N)}</b> 個人心中，養孩子的標準</div>
   <div class="ng-acts">
+    ${o.pf ? `<a class="ng-btn ng-pfbtn" id="ng-pf" href="${o.pf}"${gtgt} aria-label="作品集：海島上的波波"${I({ 'aria-label': 'Portfolio: 海島上的波波' })}><img src="${o.pfImg[0]}" width="20" height="20" alt="">Portfolio</a>` : ''}
     <button class="ng-btn" id="ng-mvbtn" type="button" aria-label="重播 MV" title="重播 MV"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg>MV</button>
     <button class="ng-btn ng-langbtn" id="ng-lang" type="button" lang="en" aria-label="Switch to English" title="Switch to English"${I({ t: '中文', lang: 'zh-Hant-TW', 'aria-label': '切換成中文', title: '切換成中文' })}>EN</button>
     <button class="ng-btn ic" id="ng-theme" type="button" aria-label="深色模式"${I({ 'aria-label': 'Dark mode' })} aria-pressed="true" title="換成淺色"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2A5.6 5.6 0 0 0 8 2.4z" fill="currentColor" stroke="none"/></svg></button>
@@ -141,7 +146,18 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
       <ul class="ng-notes">${notes.map(t => `<li${I({ t: t[1] })}>${esc(t[0])}</li>`).join('')}</ul>
     </div>
   </section>
-  <aside class="ng-x" aria-labelledby="ng-x-t">
+${o.pf ? `  <aside class="ng-x ng-pf" aria-labelledby="ng-pf-t">
+    <div class="ng-in">
+      <span class="ng-x-seal ng-pf-av" aria-hidden="true"><img src="${o.pfImg[1]}" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
+      <div class="ng-x-txt">
+        <div class="ng-x-head"><div class="ng-x-k"><span${I({ t: 'Portfolio' })}>作品集・PORTFOLIO</span></div><h3 id="ng-pf-t">海島上的波波<small${I({ t: 'AI creator · games, interactive sites & videos' })}>AI 創作者・遊戲・互動網站・影片</small></h3></div>
+        <p${I({ t: 'This map, the threshold test and the MV were all made by an ordinary person with no professional background, working with AI. There are more games, interactive sites and videos in the portfolio, all free to enjoy. The site is in Traditional Chinese.' })}>這張地圖、生育門檻測驗和這支 MV，都是一個沒有專業背景的普通人和 AI 一起做的。作品集裡還有更多遊戲、互動網站和影片，全部免費。</p>
+        <div class="ng-x-go"><a class="ng-x-btn ng-pf-btn" href="${o.pf}"${gtgt}${I({ h: 'See the portfolio ' + I_ARROW })}>看作品集 ${I_ARROW}</a><span class="ng-x-url">${esc(pfShown)}</span></div>
+      </div>
+      <figure class="ng-qr"><span class="ng-qr-box" role="img" aria-label="作品集網址的 QR Code"${I({ 'aria-label': 'QR code for the portfolio' })}>${QR_PF}</span><figcaption${I({ t: 'Scan with your phone' })}>手機掃描</figcaption></figure>
+    </div>
+  </aside>
+` : ''}  <aside class="ng-x" aria-labelledby="ng-x-t">
     <div class="ng-in">
       <span class="ng-x-seal" aria-hidden="true">${SEAL}</span>
       <div class="ng-x-txt">
@@ -152,12 +168,19 @@ ${o.inline || ''}${o.web ? '</head>\n<body class="ng">' : '<script>document.body
       <figure class="ng-qr"><span class="ng-qr-box" role="img" aria-label="生育門檻測驗網址的 QR Code"${I({ 'aria-label': 'QR code for the threshold test' })}>${QR_GAME}</span><figcaption${I({ t: 'Scan with your phone' })}>手機掃描</figcaption></figure>
     </div>
   </aside>
-</main>
+${o.sponsor ? `  <section class="ng-sup" aria-label="贊助"${I({ 'aria-label': 'Support' })}>
+    <div class="ng-in">
+      <p${I({ t: 'Enjoyed this? Your support helps me keep making new work.' })}>喜歡這個作品嗎？歡迎贊助支持，讓我繼續做下去。</p>
+      <a class="ng-sup-btn" href="${o.sponsor}" target="_blank" rel="noopener noreferrer"${I({ h: I_HEART + 'Support my work ' + I_ARROW })}>${I_HEART}贊助支持 ${I_ARROW}</a>
+    </div>
+  </section>
+` : ''}</main>
 <footer class="ng-foot"><div class="ng-in">
   <span class="ng-credit"${I({ h: '<b>CREDIT</b>Made by <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a> × Claude' })}><b>CREDIT</b>製作 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a> × Claude</span>
   <a href="${o.repo}" target="_blank" rel="noopener noreferrer"${I({ t: 'Source code & data sources' })}>原始碼與資料來源</a>
   <span${I({ t: 'Code: MIT · Map & data: CC BY 4.0 · The MV and key visual are not covered by CC BY' })}>程式碼 MIT・地圖與資料 CC BY 4.0・MV 與主視覺不在 CC BY 範圍內</span>
-  <span class="ng-r"${I({ h: 'Follow <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">@popolab_tw</a> on Threads' })}>在 Threads 上追蹤 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">@popolab_tw</a></span>
+${o.gc ? `  <span class="ng-priv"${I({ t: 'This site counts page views with GoatCounter: no cookies, no personal data. The MV connects to YouTube only after you press play.' })}>本站用 GoatCounter 統計瀏覽次數，不使用 cookie、不記錄個人資料；MV 在你按下播放後才會連到 YouTube。</span>
+` : ''}  <span class="ng-r"${I({ h: 'Follow <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">@popolab_tw</a> on Threads' })}>在 Threads 上追蹤 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">@popolab_tw</a></span>
 </div></footer>
 <script>
 ${['util.js', 'data.js', 'i18n.js', 'viz.js', 'nextgen.js'].map(f => '/* ---- ' + f + ' ---- */\n' + strip(R(f))).join('\n')}
@@ -184,9 +207,10 @@ function build(o) {
   const mvEn = mvCfg.en ? { yt: mvCfg.en.yt || undefined, len: mvCfg.en.len || undefined } : undefined;
   if (mvCfg.yt) mvWeb = { yt: mvCfg.yt, len: mvCfg.len, en: mvEn };
   // 還沒有 MV 的 YouTube 代號：網站版不放開場，直接看地圖（暫代影片只用在 claude.ai 預覽版）
-  ['kv-1920.webp', 'og.jpg'].forEach(f => { fs.copyFileSync(path.join(ROOT, 'src', 'ng', f), path.join(out, f)); keep.add(f); });
+  ['kv-1920.webp', 'og.jpg', 'pf-48.webp', 'pf-192.webp'].forEach(f => { fs.copyFileSync(path.join(ROOT, 'src', 'ng', f), path.join(out, f)); keep.add(f); });
   fs.writeFileSync(path.join(out, 'favicon.svg'), NG_ICON); keep.add('favicon.svg');
-  const web = page({ web: true, siteUrl: site, ngUrl, repo: o.repo, desc, descEn, kv: 'kv-1920.webp', mv: mvWeb,
+  const pfo = { pf: o.portfolio || '', sponsor: o.sponsor || '' };   // 瀏覽統計（o.gc）只放網站版
+  const web = page({ web: true, siteUrl: site, ngUrl, repo: o.repo, desc, descEn, kv: 'kv-1920.webp', mv: mvWeb, ...pfo, gc: o.gc || '', pfImg: ['pf-48.webp', 'pf-192.webp'],
     twkids: { target: 'nextgen', vizN: N, vizDate: DATE, vizMap: mapF, vizPts: ptsF, vizWheel: true } });
   fs.writeFileSync(path.join(out, 'index.html'), web); keep.add('index.html');
   // 舊的雜湊檔：只留最近一個版本（剛更新時，快取裡的舊網頁還找得到它要的檔案）
@@ -199,7 +223,7 @@ window.__VIZ_PTS = ${ptsB.toString('utf8').trim()};</script>
 `;
   // claude.ai 預覽版不能內嵌 YouTube：有 MV 代號時改成「到 YouTube 看」（ext）；還沒有代號時用暫代影片
   const mvDist = mvCfg.yt ? { yt: mvCfg.yt, len: mvCfg.len, ext: true, en: mvEn } : { src: dataUrl('viz/mv-placeholder.mp4', 'video/mp4'), len: mvCfg.len, en: mvEn };
-  const dist = page({ web: false, siteUrl: site, ngUrl, repo: o.repo, desc, descEn, kv: dataUrl('src/ng/kv-1920.webp', 'image/webp'), mv: mvDist, inline,
+  const dist = page({ web: false, siteUrl: site, ngUrl, repo: o.repo, desc, descEn, kv: dataUrl('src/ng/kv-1920.webp', 'image/webp'), mv: mvDist, ...pfo, pfImg: [dataUrl('src/ng/pf-48.webp', 'image/webp'), dataUrl('src/ng/pf-192.webp', 'image/webp')], inline,
     twkids: { target: 'nextgen-artifact', local: true, vizN: N, vizDate: DATE, vizWheel: true } });
   fs.mkdirSync(path.join(ROOT, 'dist'), { recursive: true });
   fs.writeFileSync(path.join(ROOT, 'dist', 'map.html'), dist);

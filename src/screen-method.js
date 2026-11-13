@@ -136,6 +136,8 @@ APP.screens.method = function (main) {
     ? '分享的資料存放在 Supabase 資料庫（亞太地區的機房）。每台裝置會隨機產生一個匿名代號，和一段只有這台裝置知道的密語；要取消分享，請用同一台裝置的同一個瀏覽器。為了防止有人灌資料，送出時會暫存連線位址的雜湊值（無法還原成位址），24 小時後自動刪除。你在「意見與回報」寫的內容只有作者看得到，不會公開。你的存檔只留在自己的瀏覽器裡。所有試算都在你的裝置上完成，只有你同意分享的那幾個欄位會上傳。'
     : '分享與雲端存檔需要 claude.ai 的寫入權限：作者本人（以及同一個組織的成員）可以加入統計；從公開連結進來的訪客可以看到大家分享的統計，但無法加入自己的資料，存檔也只會留在自己的瀏覽器裡。所有試算都在你的裝置上完成，不會上傳。'));
 
+  if (window.TWKIDS && window.TWKIDS.gc) inn.appendChild(p('網站用 GoatCounter 統計瀏覽次數：只算有多少人來看，不使用 cookie、不記錄個人資料，也不會知道你填了什麼。'));
+
   inn.appendChild(h('h2', {}, '九、資料來源'));
   var src = h('div');
   Object.keys(D.SOURCES).forEach(function (k) { var s = D.SOURCES[k]; src.appendChild(h('div', { class: 'src' }, h('a', { href: s.u, target: '_blank', rel: 'noopener' }, s.t), h('span', {}, s.d))); });

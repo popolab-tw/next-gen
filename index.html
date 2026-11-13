@@ -21,6 +21,7 @@
 <meta name="theme-color" content="#0d1210" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script data-goatcounter="https://popolab.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=LXGW+WenKai+TC:wght@400;700&family=DotGothic16&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -747,6 +748,7 @@ p { margin: 0; }
 .foot-credit .foot-th:hover { border-bottom-color: var(--pen); }
 @media (max-width: 640px) { .foot-credit .foot-th { margin-left: 0; flex-basis: 100%; } }
 .foot-meta { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); }
+.foot-priv { flex-basis: 100%; }   /* 瀏覽統計的說明：自己一行 */
 .demo-note { margin-top: 8px; padding-left: 10px; border-left: 2px solid var(--warn); line-height: 1.6; }
 .foot-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; font-size: 13px; color: var(--ink-3); }
 .foot-links a { color: var(--pen); text-decoration: none; border-bottom: 1px solid transparent; }
@@ -899,7 +901,7 @@ button.wd-li:hover { background: var(--sheet-2); }
 }
 
 </style>
-<script>window.TWKIDS = {"target":"web","siteUrl":"https://popolab-tw.github.io/next-gen/","repoUrl":"https://github.com/popolab-tw/next-gen","sb":{"url":"https://yzmqgrtxbibufjmllimv.supabase.co","key":"sb_publishable_BOnfiTrQN53RzycO4nffGg_b8o-i0Nk"},"worldSrc":"world.a90062cc20.js"};</script>
+<script>window.TWKIDS = {"target":"web","siteUrl":"https://popolab-tw.github.io/next-gen/","repoUrl":"https://github.com/popolab-tw/next-gen","sb":{"url":"https://yzmqgrtxbibufjmllimv.supabase.co","key":"sb_publishable_BOnfiTrQN53RzycO4nffGg_b8o-i0Nk"},"worldSrc":"world.a90062cc20.js","gc":true};</script>
 <script>
 /* 搬家（2026 年 11 月）：網站從 jasontzeng123.github.io/next-gen 搬到 popolab-tw.github.io/next-gen。
    瀏覽器的紀錄是依網址分開存的，換網址後會看不到舊的紀錄；舊網址的跳轉頁會把那台裝置的紀錄
@@ -957,10 +959,11 @@ button.wd-li:hover { background: var(--sheet-2); }
     <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popolab_tw</a></div>
     <div class="foot-links"><a href="https://github.com/popolab-tw/next-gen" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="https://github.com/popolab-tw/next-gen/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
     <div class="foot-meta"><span>依 2026 年 10 月公開資料試算，不是理財建議。</span><span>主計總處・內政部・勞動部・衛福部・財政部・樂居・591</span></div>
+    <div class="foot-meta foot-priv"><span>本站用 GoatCounter 統計瀏覽次數，不使用 cookie、不記錄個人資料。</span></div>
   </footer>
 </div>
 <script>
-window.__diag = { t0: Date.now(), build: '2026-11-11T14:27', timer: false, mc: false, raf: false, errors: [] };
+window.__diag = { t0: Date.now(), build: '2026-11-13T12:19', timer: false, mc: false, raf: false, errors: [] };
 setTimeout(function () { window.__diag.timer = true; }, 30);
 try { var __mc = new MessageChannel(); __mc.port1.onmessage = function () { window.__diag.mc = true; }; __mc.port2.postMessage(0); } catch (e) {}
 try { requestAnimationFrame(function () { window.__diag.raf = true; }); } catch (e) {}
@@ -7033,6 +7036,8 @@ APP.screens.method = function (main) {
     : COMM.st.backend === 'web'
     ? '分享的資料存放在 Supabase 資料庫（亞太地區的機房）。每台裝置會隨機產生一個匿名代號，和一段只有這台裝置知道的密語；要取消分享，請用同一台裝置的同一個瀏覽器。為了防止有人灌資料，送出時會暫存連線位址的雜湊值（無法還原成位址），24 小時後自動刪除。你在「意見與回報」寫的內容只有作者看得到，不會公開。你的存檔只留在自己的瀏覽器裡。所有試算都在你的裝置上完成，只有你同意分享的那幾個欄位會上傳。'
     : '分享與雲端存檔需要 claude.ai 的寫入權限：作者本人（以及同一個組織的成員）可以加入統計；從公開連結進來的訪客可以看到大家分享的統計，但無法加入自己的資料，存檔也只會留在自己的瀏覽器裡。所有試算都在你的裝置上完成，不會上傳。'));
+
+  if (window.TWKIDS && window.TWKIDS.gc) inn.appendChild(p('網站用 GoatCounter 統計瀏覽次數：只算有多少人來看，不使用 cookie、不記錄個人資料，也不會知道你填了什麼。'));
 
   inn.appendChild(h('h2', {}, '九、資料來源'));
   var src = h('div');

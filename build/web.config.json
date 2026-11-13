@@ -1,6 +1,9 @@
 {
   "siteUrl": "https://popolab-tw.github.io/next-gen/",
   "repoUrl": "https://github.com/popolab-tw/next-gen",
+  "portfolioUrl": "https://popolab-tw.github.io/",
+  "sponsorUrl": "https://portaly.cc/popolab_tw/support",
+  "goatcounter": "https://popolab.goatcounter.com/count",
   "sb": {
     "url": "https://yzmqgrtxbibufjmllimv.supabase.co",
     "key": "sb_publishable_BOnfiTrQN53RzycO4nffGg_b8o-i0Nk"

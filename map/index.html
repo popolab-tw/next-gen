@@ -19,6 +19,7 @@
 <meta property="og:image:alt" content="NEXT GEN 生育門檻可視化網頁：3D 台灣上的 4,698 個光點">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<script data-goatcounter="https://popolab.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 <meta name="theme-color" content="#050506">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -296,6 +297,9 @@ body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/
 .ng-btn.ic { width: 32px; padding: 0; justify-content: center; }
 .ng-btn.ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .ng-langbtn { min-width: 32px; justify-content: center; padding: 0 9px; }
+/* 作品集按鈕：柴犬頭像＋Portfolio，放在 MV 按鈕旁邊 */
+.ng-pfbtn { gap: 7px; padding-left: 6px; }
+.ng-pfbtn img { width: 20px; height: 20px; border-radius: 50%; display: block; flex: none; }
 :root[data-lang="en"] .ng-langbtn { font-family: var(--f-sans); letter-spacing: .04em; }
 :root[data-lang="en"] .ng-sub { letter-spacing: .14em; text-transform: uppercase; font-size: 11px; }
 /* 英文版：頁首的小程式先藏起畫面，等文字換成英文再出現（萬一程式出錯，1.5 秒後也會出現） */
@@ -335,6 +339,20 @@ html.ng-hold body { visibility: hidden; animation: ngHold 0s linear 1.5s forward
 .ng-qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .ng-qr-box { width: 108px; height: 108px; padding: 8px; background: #fff; color: #111; border-radius: 4px; box-sizing: border-box; display: block; }
 .ng-qr-box svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+/* 作品集小欄：和測驗小欄同一個樣式，放在它上面；頭像取代印章 */
+.ng-pf + .ng-x { margin-top: 0; }
+.ng-x-seal.ng-pf-av { transform: none; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px var(--ng-rule); }
+.ng-pf-av img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.ng-x-btn.ng-pf-btn { background: #f08a24; color: #160d04 !important; }
+/* 贊助：頁尾上方一條 */
+.ng-sup { margin-top: 0; border-top: 1px solid var(--ng-ink); }
+.ng-sup .ng-in { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding-top: 26px; padding-bottom: 30px; }
+.ng-sup p { margin: 0; font-size: 14px; color: var(--ng-ink-2); }
+.ng-sup-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: 1px solid var(--ng-ink); border-radius: 2px; color: var(--ng-ink) !important; text-decoration: none; font-weight: 700; font-size: 14px; letter-spacing: .04em; }
+.ng-sup-btn:hover { background: var(--ng-chip); }
+.ng-sup-btn:focus-visible { outline: 2px solid var(--ng-ink); outline-offset: 2px; }
+.ng-sup-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+.ng-sup-btn svg:first-child { fill: #e2475b; stroke: #e2475b; stroke-width: 1.2; }
 .ng-qr figcaption { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: var(--ng-ink-3); }
 
 /* ---------- 頁尾 ---------- */
@@ -345,6 +363,7 @@ html.ng-hold body { visibility: hidden; animation: ngHold 0s linear 1.5s forward
 .ng-credit { color: var(--ng-ink-2); font-size: 13.5px; }
 .ng-credit b { font-family: var(--ng-mono); font-weight: 500; font-size: 11px; letter-spacing: .14em; color: var(--ng-ink-3); margin-right: 8px; }
 .ng-foot .ng-r { margin-left: auto; }
+.ng-foot .ng-priv { order: 10; flex-basis: 100%; font-size: 12px; }   /* 隱私說明：最後自己一行 */
 
 /* ---------- 提示訊息 ---------- */
 .ng .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ng-ink); color: var(--ng-bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; z-index: 400; opacity: 0; pointer-events: none; max-width: calc(100% - 32px); }
@@ -494,7 +513,20 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
   .ng-qr { grid-column: 1 / -1; flex-direction: row; justify-content: flex-start; gap: 12px; }
   .ng-qr-box { width: 84px; height: 84px; padding: 6px; }
   .ng-foot .ng-r { margin-left: 0; }
+  .ng-sub { display: none; }   /* 手機頁首放不下：留 NEXT GEN 和右邊的按鈕 */
+  .ng-acts { gap: 5px; }
+  .ng-pfbtn { padding-right: 9px; letter-spacing: .04em; }
+  .ng-sup .ng-in { padding-top: 22px; padding-bottom: 26px; }
 }
+@media (max-width: 400px) {   /* 小手機：按鈕排緊一點，NEXT GEN 才不會被擠到 */
+  .ng-top .ng-in { gap: 12px; }
+  .ng-acts { gap: 4px; }
+  .ng-btn { padding: 0 8px; letter-spacing: .04em; }
+  .ng-pfbtn { gap: 6px; padding: 0 8px 0 5px; font-size: 11.5px; letter-spacing: .02em; }
+  .ng-langbtn { padding: 0 7px; }
+}
+@media (max-width: 372px) { .ng-acts { gap: 3px; } .ng-btn { padding: 0 6px; } .ng-pfbtn { padding: 0 6px 0 4px; } .ng-langbtn { padding: 0 6px; } }
+@media (max-width: 352px) { .ng-pfbtn { font-size: 0; gap: 0; padding: 0 5px; } }   /* 很窄的手機：作品集按鈕只留頭像 */
 @media (max-width: 380px) { .ng-sub { display: none; } }
 @media (max-width: 430px) { :root[data-lang="en"] .ng-sub { display: none; } }
 /* 直式手機：主視覺是橫的，整張放進畫面上半部 */
@@ -540,6 +572,7 @@ window.NEXTGEN = {"mv":{"yt":"wm0saBo-C28","len":"3 分半","en":{"yt":"1hOQl-NB
   <a class="ng-brand" href="./" aria-label="NEXT GEN 生育門檻可視化網頁" data-i18n data-en-aria-label="NEXT GEN — the parenthood threshold, visualized"><span class="ng-word">NEXT GEN</span><span class="ng-sub" data-i18n data-en="Parenthood threshold">生育門檻可視化</span></a>
   <div class="ng-head" data-i18n data-en-html="What &lt;b>4,698&lt;/b> people think it takes to raise a child"><b>4,698</b> 個人心中，養孩子的標準</div>
   <div class="ng-acts">
+    <a class="ng-btn ng-pfbtn" id="ng-pf" href="https://popolab-tw.github.io/" aria-label="作品集：海島上的波波" data-i18n data-en-aria-label="Portfolio: 海島上的波波"><img src="pf-48.webp" width="20" height="20" alt="">Portfolio</a>
     <button class="ng-btn" id="ng-mvbtn" type="button" aria-label="重播 MV" title="重播 MV"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3.2v13.6L16.4 10z"/></svg>MV</button>
     <button class="ng-btn ng-langbtn" id="ng-lang" type="button" lang="en" aria-label="Switch to English" title="Switch to English" data-i18n data-en="中文" data-en-lang="zh-Hant-TW" data-en-aria-label="切換成中文" data-en-title="切換成中文">EN</button>
     <button class="ng-btn ic" id="ng-theme" type="button" aria-label="深色模式" data-i18n data-en-aria-label="Dark mode" aria-pressed="true" title="換成淺色"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6"/><path d="M8 2.4v11.2A5.6 5.6 0 0 0 8 2.4z" fill="currentColor" stroke="none"/></svg></button>
@@ -552,9 +585,20 @@ window.NEXTGEN = {"mv":{"yt":"wm0saBo-C28","len":"3 分半","en":{"yt":"1hOQl-NB
       <a class="ng-more" id="ng-more" href="#ng-about"><span>ARCHIVE</span><span data-i18n data-en="Share map · N=4,698">全台分享地圖・N=4,698</span><span data-i18n data-en-html="More &lt;i>↓&lt;/i>">往下看 <i>↓</i></span></a>
       <h2 id="ng-about-t" data-i18n data-en-html="What 4,698 people think&lt;br>it takes to raise a child">4,698 個人心中，<br>養孩子的標準</h2>
       <p class="ng-lede" data-i18n data-en="Each dot is a player who finished the calculator in “Do You Qualify to Have Kids?” and chose to share anonymously. Its color shows how high an income their standard requires — the threshold, as a percentile of people their age. Dots are scattered at random by county and population density; they are not real addresses. Pick a grouping and everyone rises into slices above Taiwan; tap a dot to see that person’s choices.">每一點是一位在「你有資格生下一代嗎？」做完試算、選擇匿名分享的玩家；顏色是他的標準需要多高的收入（門檻 PR）。點的位置依縣市與人口密度隨機分布，不是真實住址。選一種分法，大家就會升到台灣上方的切片；點一下，可以看那個人的選擇。</p>
-      <ul class="ng-notes"><li data-i18n data-en="Data as of 2026-10-24. Only players who agreed to share anonymously are included; anyone who withdraws is removed at the next update.">資料更新到 2026-10-24・只計入同意匿名分享的玩家；之後取消分享的人，下次更新時移除。</li><li data-i18n data-en="Counties with fewer than 5 entries don’t show income percentiles or verdicts.">分享少於 5 筆的縣市不顯示收入 PR 與審查結果。</li><li data-i18n data-en="Terrain height is exaggerated 5× so the relief shows; you can change it in the settings at the bottom right.">地形高度放大 5 倍，才看得出起伏；可以在右下角的設定調整。</li><li data-i18n data-en="Map: roads © OpenStreetMap contributors (via Overture Maps) · terrain AWS Terrain Tiles (SRTM and others) · population density WorldPop · administrative boundaries Ministry of the Interior, Taiwan">地圖：道路 © OpenStreetMap contributors（經 Overture Maps）・地形 AWS Terrain Tiles（SRTM 等）・人口密度 WorldPop・行政區界 內政部</li><li data-i18n data-en="The MV plays from YouTube in privacy-enhanced mode: no YouTube cookies are set until you press play.">MV 由 YouTube 播放（隱私強化模式：按下播放前不會設定 YouTube 的 cookie）。</li></ul>
+      <ul class="ng-notes"><li data-i18n data-en="Data as of 2026-10-24. Only players who agreed to share anonymously are included; anyone who withdraws is removed at the next update.">資料更新到 2026-10-24・只計入同意匿名分享的玩家；之後取消分享的人，下次更新時移除。</li><li data-i18n data-en="Counties with fewer than 5 entries don’t show income percentiles or verdicts.">分享少於 5 筆的縣市不顯示收入 PR 與審查結果。</li><li data-i18n data-en="Terrain height is exaggerated 5× so the relief shows; you can change it in the settings at the bottom right.">地形高度放大 5 倍，才看得出起伏；可以在右下角的設定調整。</li><li data-i18n data-en="Map: roads © OpenStreetMap contributors (via Overture Maps) · terrain AWS Terrain Tiles (SRTM and others) · population density WorldPop · administrative boundaries Ministry of the Interior, Taiwan">地圖：道路 © OpenStreetMap contributors（經 Overture Maps）・地形 AWS Terrain Tiles（SRTM 等）・人口密度 WorldPop・行政區界 內政部</li></ul>
     </div>
   </section>
+  <aside class="ng-x ng-pf" aria-labelledby="ng-pf-t">
+    <div class="ng-in">
+      <span class="ng-x-seal ng-pf-av" aria-hidden="true"><img src="pf-192.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
+      <div class="ng-x-txt">
+        <div class="ng-x-head"><div class="ng-x-k"><span data-i18n data-en="Portfolio">作品集・PORTFOLIO</span></div><h3 id="ng-pf-t">海島上的波波<small data-i18n data-en="AI creator · games, interactive sites &amp; videos">AI 創作者・遊戲・互動網站・影片</small></h3></div>
+        <p data-i18n data-en="This map, the threshold test and the MV were all made by an ordinary person with no professional background, working with AI. There are more games, interactive sites and videos in the portfolio, all free to enjoy. The site is in Traditional Chinese.">這張地圖、生育門檻測驗和這支 MV，都是一個沒有專業背景的普通人和 AI 一起做的。作品集裡還有更多遊戲、互動網站和影片，全部免費。</p>
+        <div class="ng-x-go"><a class="ng-x-btn ng-pf-btn" href="https://popolab-tw.github.io/" data-i18n data-en-html="See the portfolio &lt;svg viewBox=&quot;0 0 16 16&quot; aria-hidden=&quot;true&quot;>&lt;path d=&quot;M4 12L12 4M6 4h6v6&quot;/>&lt;/svg>">看作品集 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg></a><span class="ng-x-url">popolab-tw.github.io</span></div>
+      </div>
+      <figure class="ng-qr"><span class="ng-qr-box" role="img" aria-label="作品集網址的 QR Code" data-i18n data-en-aria-label="QR code for the portfolio"><svg viewBox="0 0 29 29" class="segno"><path class="qrline" stroke="currentColor" d="M0 0.5h7m4 0h2m1 0h1m3 0h3m1 0h7m-29 1h1m5 0h1m1 0h1m1 0h3m2 0h3m4 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m5 0h1m4 0h1m2 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h2m1 0h1m3 0h2m1 0h2m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m4 0h5m3 0h1m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m5 0h3m1 0h5m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-20 1h1m1 0h4m2 0h3m-19 1h3m1 0h2m3 0h3m1 0h4m8 0h2m-27 1h2m1 0h1m2 0h4m1 0h2m1 0h11m2 0h1m-23 1h1m1 0h1m1 0h6m2 0h1m1 0h1m1 0h2m1 0h1m1 0h1m-26 1h1m1 0h2m3 0h5m1 0h1m2 0h1m1 0h1m2 0h1m1 0h1m2 0h1m-29 1h3m1 0h1m1 0h1m1 0h1m2 0h1m5 0h1m1 0h1m1 0h1m1 0h1m2 0h3m-27 1h1m1 0h1m3 0h2m1 0h1m1 0h4m2 0h1m2 0h2m1 0h4m-29 1h2m1 0h1m1 0h3m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3m3 0h3m1 0h2m-25 1h1m2 0h3m1 0h1m1 0h4m4 0h1m2 0h2m1 0h1m-23 1h6m2 0h5m2 0h2m2 0h2m1 0h1m-27 1h3m3 0h1m1 0h1m1 0h4m1 0h2m3 0h1m1 0h1m2 0h1m-27 1h1m3 0h1m1 0h2m2 0h1m1 0h1m2 0h2m5 0h3m1 0h1m-25 1h1m1 0h2m2 0h1m3 0h1m1 0h1m2 0h1m1 0h9m-27 1h1m1 0h4m1 0h5m1 0h1m1 0h12m-20 1h1m1 0h2m2 0h1m3 0h3m3 0h2m2 0h1m-29 1h7m2 0h2m1 0h3m2 0h1m1 0h2m1 0h1m1 0h1m1 0h2m-28 1h1m5 0h1m1 0h1m1 0h3m1 0h3m3 0h1m3 0h1m2 0h2m-29 1h1m1 0h3m1 0h1m5 0h1m2 0h1m2 0h1m1 0h7m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m3 0h1m2 0h2m1 0h1m4 0h4m-28 1h1m1 0h3m1 0h1m1 0h1m1 0h3m2 0h2m3 0h1m2 0h1m2 0h1m1 0h1m-29 1h1m5 0h1m1 0h1m3 0h3m1 0h1m3 0h1m3 0h2m1 0h1m-28 1h7m3 0h2m1 0h3m2 0h4m1 0h1m3 0h1"/></svg></span><figcaption data-i18n data-en="Scan with your phone">手機掃描</figcaption></figure>
+    </div>
+  </aside>
   <aside class="ng-x" aria-labelledby="ng-x-t">
     <div class="ng-in">
       <span class="ng-x-seal" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect x="3" y="3" width="34" height="34" rx="5" fill="#fbfcfa" stroke="#c0302b" stroke-width="3"/><text x="20" y="27.5" text-anchor="middle" font-family="Noto Serif TC,Noto Serif CJK TC,serif" font-weight="900" font-size="20" fill="#c0302b">審</text></svg></span>
@@ -566,11 +610,18 @@ window.NEXTGEN = {"mv":{"yt":"wm0saBo-C28","len":"3 分半","en":{"yt":"1hOQl-NB
       <figure class="ng-qr"><span class="ng-qr-box" role="img" aria-label="生育門檻測驗網址的 QR Code" data-i18n data-en-aria-label="QR code for the threshold test"><svg viewBox="0 0 29 29" class="segno"><path class="qrline" stroke="currentColor" d="M0 0.5h7m5 0h4m1 0h3m2 0h7m-29 1h1m5 0h1m1 0h2m4 0h4m1 0h1m2 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h4m1 0h1m3 0h1m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m5 0h1m2 0h3m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m1 0h6m3 0h1m2 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m3 0h1m3 0h7m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-18 1h1m1 0h2m1 0h4m-20 1h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m1 0h2m3 0h1m2 0h1m-26 1h1m2 0h1m1 0h4m2 0h1m2 0h2m2 0h3m2 0h1m2 0h1m-29 1h3m3 0h1m1 0h4m2 0h1m2 0h2m2 0h1m1 0h1m2 0h3m-28 1h4m2 0h1m5 0h1m1 0h3m2 0h2m2 0h1m2 0h1m-24 1h4m1 0h1m4 0h5m1 0h3m2 0h1m1 0h2m-29 1h2m1 0h1m3 0h2m2 0h2m7 0h3m2 0h1m2 0h1m-26 1h4m1 0h1m1 0h4m2 0h2m2 0h1m1 0h1m1 0h2m1 0h2m-28 1h1m2 0h1m2 0h4m1 0h1m2 0h3m2 0h1m2 0h1m1 0h1m1 0h1m-23 1h4m2 0h2m4 0h1m1 0h5m1 0h1m1 0h2m-28 1h2m1 0h1m2 0h2m2 0h1m1 0h1m2 0h1m4 0h2m2 0h2m1 0h1m-29 1h1m2 0h1m2 0h2m3 0h1m2 0h1m1 0h1m1 0h1m3 0h2m3 0h2m-28 1h1m1 0h1m1 0h1m2 0h2m3 0h3m1 0h2m1 0h3m1 0h2m1 0h1m-28 1h1m1 0h5m3 0h2m2 0h2m1 0h1m2 0h5m-17 1h3m3 0h1m1 0h1m3 0h1m3 0h1m1 0h3m-29 1h7m2 0h5m3 0h1m1 0h2m1 0h1m1 0h2m1 0h2m-29 1h1m5 0h1m8 0h4m1 0h1m3 0h2m1 0h2m-29 1h1m1 0h3m1 0h1m1 0h2m6 0h3m1 0h5m2 0h2m-29 1h1m1 0h3m1 0h1m2 0h1m1 0h2m3 0h1m2 0h1m1 0h1m1 0h2m1 0h3m-29 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h2m2 0h3m2 0h1m-29 1h1m5 0h1m3 0h3m3 0h3m1 0h1m1 0h2m3 0h1m-28 1h7m1 0h1m1 0h1m1 0h6m1 0h4m1 0h2m1 0h2"/></svg></span><figcaption data-i18n data-en="Scan with your phone">手機掃描</figcaption></figure>
     </div>
   </aside>
+  <section class="ng-sup" aria-label="贊助" data-i18n data-en-aria-label="Support">
+    <div class="ng-in">
+      <p data-i18n data-en="Enjoyed this? Your support helps me keep making new work.">喜歡這個作品嗎？歡迎贊助支持，讓我繼續做下去。</p>
+      <a class="ng-sup-btn" href="https://portaly.cc/popolab_tw/support" target="_blank" rel="noopener noreferrer" data-i18n data-en-html="&lt;svg viewBox=&quot;0 0 16 16&quot; aria-hidden=&quot;true&quot;>&lt;path d=&quot;M8 13.6S2.2 10.2 2.2 6.1A2.9 2.9 0 0 1 8 4.6a2.9 2.9 0 0 1 5.8 1.5c0 4.1-5.8 7.5-5.8 7.5z&quot;/>&lt;/svg>Support my work &lt;svg viewBox=&quot;0 0 16 16&quot; aria-hidden=&quot;true&quot;>&lt;path d=&quot;M4 12L12 4M6 4h6v6&quot;/>&lt;/svg>"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.6S2.2 10.2 2.2 6.1A2.9 2.9 0 0 1 8 4.6a2.9 2.9 0 0 1 5.8 1.5c0 4.1-5.8 7.5-5.8 7.5z"/></svg>贊助支持 <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg></a>
+    </div>
+  </section>
 </main>
 <footer class="ng-foot"><div class="ng-in">
   <span class="ng-credit" data-i18n data-en-html="&lt;b>CREDIT&lt;/b>Made by &lt;a href=&quot;https://www.threads.com/@popolab_tw&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;>海島上的波波&lt;/a> × Claude"><b>CREDIT</b>製作 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a> × Claude</span>
   <a href="https://github.com/popolab-tw/next-gen" target="_blank" rel="noopener noreferrer" data-i18n data-en="Source code &amp; data sources">原始碼與資料來源</a>
   <span data-i18n data-en="Code: MIT · Map &amp; data: CC BY 4.0 · The MV and key visual are not covered by CC BY">程式碼 MIT・地圖與資料 CC BY 4.0・MV 與主視覺不在 CC BY 範圍內</span>
+  <span class="ng-priv" data-i18n data-en="This site counts page views with GoatCounter: no cookies, no personal data. The MV connects to YouTube only after you press play.">本站用 GoatCounter 統計瀏覽次數，不使用 cookie、不記錄個人資料；MV 在你按下播放後才會連到 YouTube。</span>
   <span class="ng-r" data-i18n data-en-html="Follow &lt;a href=&quot;https://www.threads.com/@popolab_tw&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;>@popolab_tw&lt;/a> on Threads">在 Threads 上追蹤 <a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">@popolab_tw</a></span>
 </div></footer>
 <script>

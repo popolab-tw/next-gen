@@ -38,6 +38,8 @@
 | `viz/map.bin.gz` | 底圖：海岸線、行政區界、道路、等高線與地形高度網格 |
 | `viz/points.json` | 分享資料的固定版本：位置依縣市與人口密度隨機撒（不是真實住址），不含匿名代號與分享時間，順序打亂；分享少於 5 筆的縣市不放收入 PR 與審查結果 |
 
+作品集與贊助：`build/web.config.json` 的 `portfolioUrl`（頁首 MV 旁的 Portfolio 按鈕、測驗小欄上方的作品集小欄）和 `sponsorUrl`（頁尾上方的贊助入口）。作品集頭像與 QR Code 由 `python3 build/ng_assets.py --icon 頭像.png` 產生（`src/ng/pf-*.webp`、`qr-portfolio.svg`）。
+
 MV 的 YouTube 影片代號設定在 `build/web.config.json` 的 `nextgenMv`（例：`{"yt": "影片代號", "len": "3 分半", "en": {"yt": "英文版代號", "len": "3.5 min"}}`）。`en` 是英文介面播的版本；還沒有 `en.yt` 時，英文介面先播中文版，標題畫面註明「Chinese version」。標題畫面只有按「播放 MV」或「全螢幕播放」才開始播，播放前可以先換語言。網站上用 youtube-nocookie.com 的播放器；控制播放器的 YouTube API 會設定 cookie，所以等觀眾按下播放才載入。YouTube 回報無法播放時，先轉到地圖，上方的 MV 按鈕改成開 YouTube 新分頁。claude.ai 預覽版不能內嵌 YouTube，一律改成「到 YouTube 看 MV」；還沒有影片代號時，網站不放開場，預覽版用 `viz/mv-placeholder.mp4` 暫代。
 
 ## 發現錯誤？

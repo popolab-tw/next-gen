@@ -32,6 +32,9 @@ body.ng { margin: 0; background: var(--ng-bg); color: var(--ng-ink); font: 15px/
 .ng-btn.ic { width: 32px; padding: 0; justify-content: center; }
 .ng-btn.ic svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; }
 .ng-langbtn { min-width: 32px; justify-content: center; padding: 0 9px; }
+/* 作品集按鈕：柴犬頭像＋Portfolio，放在 MV 按鈕旁邊 */
+.ng-pfbtn { gap: 7px; padding-left: 6px; }
+.ng-pfbtn img { width: 20px; height: 20px; border-radius: 50%; display: block; flex: none; }
 :root[data-lang="en"] .ng-langbtn { font-family: var(--f-sans); letter-spacing: .04em; }
 :root[data-lang="en"] .ng-sub { letter-spacing: .14em; text-transform: uppercase; font-size: 11px; }
 /* 英文版：頁首的小程式先藏起畫面，等文字換成英文再出現（萬一程式出錯，1.5 秒後也會出現） */
@@ -71,6 +74,20 @@ html.ng-hold body { visibility: hidden; animation: ngHold 0s linear 1.5s forward
 .ng-qr { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 7px; }
 .ng-qr-box { width: 108px; height: 108px; padding: 8px; background: #fff; color: #111; border-radius: 4px; box-sizing: border-box; display: block; }
 .ng-qr-box svg { width: 100%; height: 100%; display: block; shape-rendering: crispEdges; }
+/* 作品集小欄：和測驗小欄同一個樣式，放在它上面；頭像取代印章 */
+.ng-pf + .ng-x { margin-top: 0; }
+.ng-x-seal.ng-pf-av { transform: none; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px var(--ng-rule); }
+.ng-pf-av img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.ng-x-btn.ng-pf-btn { background: #f08a24; color: #160d04 !important; }
+/* 贊助：頁尾上方一條 */
+.ng-sup { margin-top: 0; border-top: 1px solid var(--ng-ink); }
+.ng-sup .ng-in { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding-top: 26px; padding-bottom: 30px; }
+.ng-sup p { margin: 0; font-size: 14px; color: var(--ng-ink-2); }
+.ng-sup-btn { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px; border: 1px solid var(--ng-ink); border-radius: 2px; color: var(--ng-ink) !important; text-decoration: none; font-weight: 700; font-size: 14px; letter-spacing: .04em; }
+.ng-sup-btn:hover { background: var(--ng-chip); }
+.ng-sup-btn:focus-visible { outline: 2px solid var(--ng-ink); outline-offset: 2px; }
+.ng-sup-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; }
+.ng-sup-btn svg:first-child { fill: #e2475b; stroke: #e2475b; stroke-width: 1.2; }
 .ng-qr figcaption { font-family: var(--ng-mono); font-size: 10.5px; letter-spacing: .1em; color: var(--ng-ink-3); }
 
 /* ---------- 頁尾 ---------- */
@@ -81,6 +98,7 @@ html.ng-hold body { visibility: hidden; animation: ngHold 0s linear 1.5s forward
 .ng-credit { color: var(--ng-ink-2); font-size: 13.5px; }
 .ng-credit b { font-family: var(--ng-mono); font-weight: 500; font-size: 11px; letter-spacing: .14em; color: var(--ng-ink-3); margin-right: 8px; }
 .ng-foot .ng-r { margin-left: auto; }
+.ng-foot .ng-priv { order: 10; flex-basis: 100%; font-size: 12px; }   /* 隱私說明：最後自己一行 */
 
 /* ---------- 提示訊息 ---------- */
 .ng .toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ng-ink); color: var(--ng-bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; z-index: 400; opacity: 0; pointer-events: none; max-width: calc(100% - 32px); }
@@ -230,7 +248,20 @@ html.ng-lock, html.ng-lock body { overflow: hidden; }
   .ng-qr { grid-column: 1 / -1; flex-direction: row; justify-content: flex-start; gap: 12px; }
   .ng-qr-box { width: 84px; height: 84px; padding: 6px; }
   .ng-foot .ng-r { margin-left: 0; }
+  .ng-sub { display: none; }   /* 手機頁首放不下：留 NEXT GEN 和右邊的按鈕 */
+  .ng-acts { gap: 5px; }
+  .ng-pfbtn { padding-right: 9px; letter-spacing: .04em; }
+  .ng-sup .ng-in { padding-top: 22px; padding-bottom: 26px; }
 }
+@media (max-width: 400px) {   /* 小手機：按鈕排緊一點，NEXT GEN 才不會被擠到 */
+  .ng-top .ng-in { gap: 12px; }
+  .ng-acts { gap: 4px; }
+  .ng-btn { padding: 0 8px; letter-spacing: .04em; }
+  .ng-pfbtn { gap: 6px; padding: 0 8px 0 5px; font-size: 11.5px; letter-spacing: .02em; }
+  .ng-langbtn { padding: 0 7px; }
+}
+@media (max-width: 372px) { .ng-acts { gap: 3px; } .ng-btn { padding: 0 6px; } .ng-pfbtn { padding: 0 6px 0 4px; } .ng-langbtn { padding: 0 6px; } }
+@media (max-width: 352px) { .ng-pfbtn { font-size: 0; gap: 0; padding: 0 5px; } }   /* 很窄的手機：作品集按鈕只留頭像 */
 @media (max-width: 380px) { .ng-sub { display: none; } }
 @media (max-width: 430px) { :root[data-lang="en"] .ng-sub { display: none; } }
 /* 直式手機：主視覺是橫的，整張放進畫面上半部 */

@@ -29,7 +29,10 @@ const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=LXGW+WenKai+TC:wght@400;700&family=DotGothic16&display=swap">`;
 const NG = require('./ng.js');
-const APPBODY = xp => `<div id="app">
+// 瀏覽統計：GoatCounter（和作品集網站同一個帳號），只記瀏覽次數、不用 cookie；只放在網站版，claude.ai 版不放
+const GC = CFG.goatcounter || '';
+const GC_TAG = GC ? `<script data-goatcounter="${GC}" async src="https://gc.zgo.at/count.js"></script>` : '';
+const APPBODY = (xp, gc) => `<div id="app">
   <header id="topbar" class="topbar"></header>
   <main id="main" class="main" tabindex="-1"></main>
   ${xp}
@@ -37,6 +40,7 @@ const APPBODY = xp => `<div id="app">
     <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popolab_tw</a></div>
     <div class="foot-links"><a href="${REPO}" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="${REPO}/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
     <div class="foot-meta"><span>依 2026 年 10 月公開資料試算，不是理財建議。</span><span>主計總處・內政部・勞動部・衛福部・財政部・樂居・591</span></div>
+    ${gc ? '<div class="foot-meta foot-priv"><span>本站用 GoatCounter 統計瀏覽次數，不使用 cookie、不記錄個人資料。</span></div>' : ''}
   </footer>
 </div>`;
 // 自架網站：字型改成不擋畫面的載入方式（Google 字型慢或連不上時，先用系統字型顯示）
@@ -103,17 +107,18 @@ if (CFG.siteUrl) {
 <meta name="theme-color" content="#0d1210" media="(prefers-color-scheme: dark)">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+${GC_TAG}
 ${FONTS_WEB}
 <style>body{margin:0}[hidden]{display:none!important}</style>
 <style>
 ${R('styles.css')}
 </style>
-<script>window.TWKIDS = ${JSON.stringify({ target: 'web', siteUrl: site, repoUrl: REPO, sb: sb, worldSrc: WORLD_FILE })};</script>
+<script>window.TWKIDS = ${JSON.stringify({ target: 'web', siteUrl: site, repoUrl: REPO, sb: sb, worldSrc: WORLD_FILE, gc: !!GC })};</script>
 <script>
 ${R('migrate.js')}</script>
 </head>
 <body>
-${APPBODY(NG.xpHtml({ web: true, ngUrl: NGURL }))}
+${APPBODY(NG.xpHtml({ web: true, ngUrl: NGURL }), !!GC)}
 ${SCRIPT_WEB}
 </body>
 </html>
@@ -161,7 +166,7 @@ jobs:
 }
 
 // NEXT GEN 網站（map/）與預覽版（dist/map.html）
-NG.build({ siteUrl: SITE, ngUrl: NGURL, repo: REPO, mv: CFG.nextgenMv });
+NG.build({ siteUrl: SITE, ngUrl: NGURL, repo: REPO, mv: CFG.nextgenMv, portfolio: CFG.portfolioUrl, sponsor: CFG.sponsorUrl, gc: GC });
 
 // 資料來源清單（docs/資料來源.md）
 require('./sources.js');
