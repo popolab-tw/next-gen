@@ -749,6 +749,12 @@ p { margin: 0; }
 @media (max-width: 640px) { .foot-credit .foot-th { margin-left: 0; flex-basis: 100%; } }
 .foot-meta { display: flex; flex-wrap: wrap; gap: 4px 18px; justify-content: space-between; font-size: 12.5px; color: var(--ink-3); }
 .foot-priv { flex-basis: 100%; }   /* 瀏覽統計的說明：自己一行 */
+/* 作品集與贊助：頁尾的兩顆小按鈕 */
+.foot-more { display: flex; flex-wrap: wrap; gap: 8px 10px; }
+.foot-more a { display: inline-flex; align-items: center; gap: 7px; padding: 5px 13px 5px 6px; border: 1px solid var(--rule); border-radius: 999px; color: var(--ink); text-decoration: none; font-size: 13px; line-height: 1.3; }
+.foot-more a:hover { border-color: var(--ink-3); }
+.foot-more img { width: 18px; height: 18px; border-radius: 50%; display: block; flex: none; }
+.foot-more svg { width: 15px; height: 15px; margin-left: 4px; fill: var(--seal); stroke: var(--seal); stroke-width: 1.2; flex: none; }
 .demo-note { margin-top: 8px; padding-left: 10px; border-left: 2px solid var(--warn); line-height: 1.6; }
 .foot-links { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; font-size: 13px; color: var(--ink-3); }
 .foot-links a { color: var(--pen); text-decoration: none; border-bottom: 1px solid transparent; }
@@ -957,13 +963,14 @@ button.wd-li:hover { background: var(--sheet-2); }
 </aside>
   <footer class="foot">
     <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popolab_tw</a></div>
+    <div class="foot-more"><a class="foot-pf" href="https://popolab-tw.github.io/" target="_blank" rel="noopener noreferrer"><img src="data:image/webp;base64,UklGRiAEAABXRUJQVlA4IBQEAADwEwCdASowADAAPlUgjkUjoaEVWq6oOAVEtgBWGWN9W8U/Gv2BKi/U/wdu7RO+wGcBtyPMd+sHkge5v0AP6h/Xesv9ADy2fY4/cr9pPa7uZfg74m0nf5Th9aOrXdjx9CTQN9LewP/LP64dR098ulxf7ZxxX2mK8iJd1TpaHh9Hvnceog4vPF1pKRlp+dZhxIbXj66Cx1o82ZH1pTI8QnhZtU06nWlGGAAA/v+H+czxP/xwbnynftf6P9BWxtlD+7qHzvleCwbK8AfORJgbKD/dL+57Z1S36IaYcB2if+nN7uNcq1Z9v9/SNhVhd0hI9QJqoQEgUfx5n1eTqhH/9uG48u3JRnT/9+/KnzEB/Y3gyb0VYuWZsxRLrsmqi0KJvKL2IR/sfybng2dxyujNU1W//UYwn//o9P8YVSc+9YCd7f82ZeJyeBxqiPAXq4lkUSRhjxnR2cOdiIbaxGG4koj+f1XQjvEmX1Q7+Ao2Bzc/LXymgiJEnMs+tsj5lHhxkDnz2kqia0IXFX8HcYqOpAWzFS/r5ySCne2p/wdCDVP2VZxBvH/gs/5izUsuLHl1rC0Ehmxq5CSYGcgfVmJbRjiNm34lQV+yvrfxp5F65pch7UWqccL1jpv1dUYghLHBNCLJ2DkhWHHpdqSGfN/+KP9L21QGMaiN9RK3/qO+54Ba15tjqOlcgdFloVaXWzWnUQfz+LCoJkpPi5/iHZTKFQQaOK/4RmUmubTaouvcxB+wSFo+OyzU9/599XvcWzYg5ixQYLYnw+/MtQ7NiElK5890PYaS/2k2MfeJ7/4rQPngJQO1ci22LwUYsVSWBUc0JKQG3h7vpoj5wpM0lCSX5bd3ldWWz+aXeaxyz9cdJMGmICGDK4k2yWp59j2t87D/bGkzBrdiUHBqfjWpbdC+zDOa3E15/ebf10crjJWcBmrA7Bd/KAS359pAYOSOW5ieb5e2nbSTXExR6EkiiRao8rLcc7XPbXemjXcX4NBudS+sydnP0eNZXUvV+rW6wTNr0LBjS/0iXbqtgs+aSbpD47fhMyV/1HIem049JZIP8PMIwGJGjp4NbKY2dlZnPCDmNRCueowTB62gLVflfbSj/sjTkE3KnPItjhQZc1fm//bDS1LRH4rr+024JEDk6sh9tev/1kGne2bRKfSzvVfscYGvz/yjVn/6NNn0fHftP5w3dYgG3TiPzDa8UK7Z6sN0ch6176kIh2JuXWXH/xmag/Fy/wCrIASlTNewG6znlx/Dp9SzB3kjobJwdI1SdJcrFyW2nW3U8YZpTI88ell8mo9JtBzt2ZRzjk53WFPbSl5wRCYNGtX/3BBBG+JYRZ/qjHkIptVs+R+KRX/Gcaz/u7g9OMsFddvP1K5lFv26jYNimBMMAAA=" width="18" height="18" alt="">看更多作品：海島上的波波作品集</a><a class="foot-sup" href="https://portaly.cc/popolab_tw/support" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.6S2.2 10.2 2.2 6.1A2.9 2.9 0 0 1 8 4.6a2.9 2.9 0 0 1 5.8 1.5c0 4.1-5.8 7.5-5.8 7.5z"/></svg>贊助支持</a></div>
     <div class="foot-links"><a href="https://github.com/popolab-tw/next-gen" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="https://github.com/popolab-tw/next-gen/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
     <div class="foot-meta"><span>依 2026 年 10 月公開資料試算，不是理財建議。</span><span>主計總處・內政部・勞動部・衛福部・財政部・樂居・591</span></div>
     <div class="foot-meta foot-priv"><span>本站用 GoatCounter 統計瀏覽次數，不使用 cookie、不記錄個人資料。</span></div>
   </footer>
 </div>
 <script>
-window.__diag = { t0: Date.now(), build: '2026-11-13T12:19', timer: false, mc: false, raf: false, errors: [] };
+window.__diag = { t0: Date.now(), build: '2026-11-13T12:39', timer: false, mc: false, raf: false, errors: [] };
 setTimeout(function () { window.__diag.timer = true; }, 30);
 try { var __mc = new MessageChannel(); __mc.port1.onmessage = function () { window.__diag.mc = true; }; __mc.port2.postMessage(0); } catch (e) {}
 try { requestAnimationFrame(function () { window.__diag.raf = true; }); } catch (e) {}

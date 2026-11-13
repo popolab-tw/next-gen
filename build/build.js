@@ -32,12 +32,18 @@ const NG = require('./ng.js');
 // 瀏覽統計：GoatCounter（和作品集網站同一個帳號），只記瀏覽次數、不用 cookie；只放在網站版，claude.ai 版不放
 const GC = CFG.goatcounter || '';
 const GC_TAG = GC ? `<script data-goatcounter="${GC}" async src="https://gc.zgo.at/count.js"></script>` : '';
+// 頁尾：作品集與贊助（新分頁開啟，玩到一半點了也不會離開測驗）；頭像直接內嵌，網站版和 claude.ai 版都能用
+const PF = CFG.portfolioUrl || '', SUP = CFG.sponsorUrl || '';
+const PF_IMG = PF ? 'data:image/webp;base64,' + fs.readFileSync(path.join(__dirname, '..', 'src', 'ng', 'pf-48.webp')).toString('base64') : '';
+const I_HEART = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.6S2.2 10.2 2.2 6.1A2.9 2.9 0 0 1 8 4.6a2.9 2.9 0 0 1 5.8 1.5c0 4.1-5.8 7.5-5.8 7.5z"/></svg>';
+const FOOT_MORE = PF || SUP ? `<div class="foot-more">${PF ? `<a class="foot-pf" href="${PF}" target="_blank" rel="noopener noreferrer"><img src="${PF_IMG}" width="18" height="18" alt="">看更多作品：海島上的波波作品集</a>` : ''}${SUP ? `<a class="foot-sup" href="${SUP}" target="_blank" rel="noopener noreferrer">${I_HEART}贊助支持</a>` : ''}</div>` : '';
 const APPBODY = (xp, gc) => `<div id="app">
   <header id="topbar" class="topbar"></header>
   <main id="main" class="main" tabindex="-1"></main>
   ${xp}
   <footer class="foot">
     <div class="foot-credit"><span class="foot-k">製作</span><a href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">海島上的波波</a><span class="foot-x">×</span><span>Claude</span><a class="foot-th" href="https://www.threads.com/@popolab_tw" target="_blank" rel="noopener noreferrer">在 Threads 上追蹤 @popolab_tw</a></div>
+    ${FOOT_MORE}
     <div class="foot-links"><a href="${REPO}" target="_blank" rel="noopener noreferrer">原始碼與資料來源</a><a href="${REPO}/issues/new" target="_blank" rel="noopener noreferrer">回報錯誤</a><span>程式碼 MIT・內容 CC BY 4.0</span></div>
     <div class="foot-meta"><span>依 2026 年 10 月公開資料試算，不是理財建議。</span><span>主計總處・內政部・勞動部・衛福部・財政部・樂居・591</span></div>
     ${gc ? '<div class="foot-meta foot-priv"><span>本站用 GoatCounter 統計瀏覽次數，不使用 cookie、不記錄個人資料。</span></div>' : ''}
